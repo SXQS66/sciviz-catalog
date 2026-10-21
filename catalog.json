@@ -1,0 +1,1484 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "updatedAt": "2026-10-21",
+  "pkg": {
+    "version": "",
+    "url": "",
+    "notes": ""
+  },
+  "tools": [
+    {
+      "id": "line",
+      "addedAt": "2026-10-21",
+      "group": "dist",
+      "glyph": "line",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/line.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "折线 / 趋势图",
+        "scope": "时间序列、剂量响应、重复测量趋势；多系列对比",
+        "tags": [
+          "折线",
+          "趋势",
+          "时间序列",
+          "line",
+          "多系列"
+        ]
+      },
+      "en": {
+        "name": "Line & Trend",
+        "scope": "Time series, dose-response, repeated measures; multi-series",
+        "tags": [
+          "line",
+          "trend",
+          "time series",
+          "multi-series"
+        ]
+      }
+    },
+    {
+      "id": "heatmap",
+      "addedAt": "2026-10-21",
+      "group": "matrix",
+      "glyph": "heatmap",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/heatmap.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "表达热图",
+        "scope": "转录组 / 蛋白组表达矩阵；聚类、标准化、色标可调",
+        "tags": [
+          "热图",
+          "表达矩阵",
+          "转录组",
+          "聚类",
+          "heatmap"
+        ]
+      },
+      "en": {
+        "name": "Expression Heatmap",
+        "scope": "Transcriptome / proteome matrices; clustering, scaling, colorbar",
+        "tags": [
+          "heatmap",
+          "expression",
+          "transcriptome",
+          "clustering"
+        ]
+      }
+    },
+    {
+      "id": "volcano",
+      "addedAt": "2026-10-21",
+      "group": "deg",
+      "glyph": "volcano",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/volcano.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "差异表达火山图",
+        "scope": "转录组 / 蛋白组差异筛选；log2FC × 显著性，可标注基因名",
+        "tags": [
+          "转录组",
+          "差异表达",
+          "火山图",
+          "DEG",
+          "蛋白组"
+        ]
+      },
+      "en": {
+        "name": "Volcano Plot",
+        "scope": "DEG screening by log2FC vs significance, with gene labels",
+        "tags": [
+          "transcriptome",
+          "DEG",
+          "volcano",
+          "proteomics"
+        ]
+      }
+    },
+    {
+      "id": "meta-volcano",
+      "addedAt": "2026-10-21",
+      "group": "deg",
+      "glyph": "volcano",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/meta-volcano.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "代谢组火山图",
+        "scope": "代谢组差异代谢物筛选；支持 VIP 与 P 值双阈值",
+        "tags": [
+          "代谢组",
+          "差异代谢物",
+          "火山图",
+          "VIP"
+        ]
+      },
+      "en": {
+        "name": "Metabolomics Volcano",
+        "scope": "Differential metabolites with VIP and p-value thresholds",
+        "tags": [
+          "metabolomics",
+          "volcano",
+          "VIP"
+        ]
+      }
+    },
+    {
+      "id": "degs-volcano",
+      "addedAt": "2026-10-21",
+      "group": "deg",
+      "glyph": "volcano",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/degs-volcano.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "多组差异火山图",
+        "scope": "多个比较组的差异基因分面展示；分组着色",
+        "tags": [
+          "转录组",
+          "多组比较",
+          "差异表达",
+          "火山图"
+        ]
+      },
+      "en": {
+        "name": "Grouped DEG Volcano",
+        "scope": "Faceted volcano plots across multiple comparisons",
+        "tags": [
+          "transcriptome",
+          "multi-group",
+          "DEG",
+          "volcano"
+        ]
+      }
+    },
+    {
+      "id": "enrich-bar",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "hbar",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-bar.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "富集气泡条形图",
+        "scope": "GO / KEGG 富集结果；条目名过长自动换行",
+        "tags": [
+          "富集分析",
+          "GO",
+          "KEGG",
+          "气泡图",
+          "条形图"
+        ]
+      },
+      "en": {
+        "name": "Enrichment Bubble-Bar",
+        "scope": "GO / KEGG terms as bubble bars, long labels wrapped",
+        "tags": [
+          "enrichment",
+          "GO",
+          "KEGG",
+          "bubble"
+        ]
+      }
+    },
+    {
+      "id": "enrich-lollipop",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "lollipop",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-lollipop.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "富集棒棒糖图",
+        "scope": "条目较少的富集结果；突出数值高低而非面积",
+        "tags": [
+          "富集分析",
+          "棒棒糖图",
+          "GO",
+          "KEGG"
+        ]
+      },
+      "en": {
+        "name": "Enrichment Lollipop",
+        "scope": "Few-term enrichment results where exact values matter",
+        "tags": [
+          "enrichment",
+          "lollipop",
+          "GO",
+          "KEGG"
+        ]
+      }
+    },
+    {
+      "id": "gsea-bubble",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "bubble",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-bubble.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "GSEA 气泡图",
+        "scope": "GSEA 通路结果；NES × 显著性 × 基因数三重编码",
+        "tags": [
+          "GSEA",
+          "富集分析",
+          "通路",
+          "气泡图",
+          "NES"
+        ]
+      },
+      "en": {
+        "name": "GSEA Bubble",
+        "scope": "GSEA pathways encoded by NES, significance and set size",
+        "tags": [
+          "GSEA",
+          "enrichment",
+          "pathway",
+          "bubble"
+        ]
+      }
+    },
+    {
+      "id": "gsea-lollipop",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "lollipop",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-lollipop.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "GSEA 棒棒糖图",
+        "scope": "GSEA 结果按 NES 排序；强调方向与大小",
+        "tags": [
+          "GSEA",
+          "富集分析",
+          "棒棒糖图",
+          "NES"
+        ]
+      },
+      "en": {
+        "name": "GSEA Lollipop",
+        "scope": "GSEA terms ranked by NES with direction emphasized",
+        "tags": [
+          "GSEA",
+          "enrichment",
+          "lollipop"
+        ]
+      }
+    },
+    {
+      "id": "go-center-bar",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "hbar",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/go-center-bar.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "GO 分组居中条形图",
+        "scope": "GO 三大类（BP / CC / MF）分组对比；共轴居中",
+        "tags": [
+          "GO",
+          "富集分析",
+          "BP",
+          "CC",
+          "MF",
+          "条形图"
+        ]
+      },
+      "en": {
+        "name": "GO Grouped Center Bar",
+        "scope": "BP / CC / MF side-by-side on a centered axis",
+        "tags": [
+          "GO",
+          "enrichment",
+          "BP",
+          "CC",
+          "MF"
+        ]
+      }
+    },
+    {
+      "id": "gsea-ridge",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "ridge",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-ridge.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "GSEA 气泡山脊图",
+        "scope": "GSEA 结果叠加山脊图；展示富集分布形状",
+        "tags": [
+          "GSEA",
+          "山脊图",
+          "富集分析",
+          "分布"
+        ]
+      },
+      "en": {
+        "name": "GSEA Bubble & Ridge",
+        "scope": "GSEA bubbles combined with ridge distributions",
+        "tags": [
+          "GSEA",
+          "ridge",
+          "enrichment",
+          "distribution"
+        ]
+      }
+    },
+    {
+      "id": "enrich-sankey",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "sankey",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-sankey.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "富集桑基气泡图",
+        "scope": "基因 → 富集条目 → 通路的流向；同时看比例与强度",
+        "tags": [
+          "富集分析",
+          "桑基图",
+          "通路",
+          "流向"
+        ]
+      },
+      "en": {
+        "name": "Enrichment Sankey-Bubble",
+        "scope": "Gene to term to pathway flow with strength encoding",
+        "tags": [
+          "enrichment",
+          "sankey",
+          "pathway",
+          "flow"
+        ]
+      }
+    },
+    {
+      "id": "enrich-chord",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "chord",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-chord.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "富集弦图",
+        "scope": "富集条目与基因的对应关系；看共享基因",
+        "tags": [
+          "富集分析",
+          "弦图",
+          "基因",
+          "共享"
+        ]
+      },
+      "en": {
+        "name": "Enrichment Chord",
+        "scope": "Term-gene correspondence and shared membership",
+        "tags": [
+          "enrichment",
+          "chord",
+          "gene"
+        ]
+      }
+    },
+    {
+      "id": "dot-pie",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "dotpie",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/dot-pie.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "点饼组合图",
+        "scope": "富集条目里「占比 + 数值」双编码；饼太小放不下时更清晰",
+        "tags": [
+          "富集分析",
+          "点图",
+          "饼图",
+          "占比"
+        ]
+      },
+      "en": {
+        "name": "Dot & Pie Combo",
+        "scope": "Share plus value in one glyph for enrichment terms",
+        "tags": [
+          "enrichment",
+          "dot",
+          "pie",
+          "share"
+        ]
+      }
+    },
+    {
+      "id": "bubble",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "bubble",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/bubble.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "通用气泡图",
+        "scope": "三变量编码（x / y / 大小）；富集、组学汇总通用",
+        "tags": [
+          "气泡图",
+          "三变量",
+          "汇总",
+          "bubble"
+        ]
+      },
+      "en": {
+        "name": "Bubble Chart",
+        "scope": "Three-variable encoding (x / y / size), general purpose",
+        "tags": [
+          "bubble",
+          "three-variable",
+          "summary"
+        ]
+      }
+    },
+    {
+      "id": "grouped-dot",
+      "addedAt": "2026-10-21",
+      "group": "enrich",
+      "glyph": "dot",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/grouped-dot.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "分组点图",
+        "scope": "单细胞标记基因；多分组 × 多基因的表达与占比",
+        "tags": [
+          "单细胞",
+          "scRNA",
+          "标记基因",
+          "点图",
+          "dotplot"
+        ]
+      },
+      "en": {
+        "name": "Grouped Dot Plot",
+        "scope": "scRNA-seq marker genes across groups: expression and fraction",
+        "tags": [
+          "scRNA",
+          "single-cell",
+          "marker",
+          "dotplot"
+        ]
+      }
+    },
+    {
+      "id": "cor-heatmap",
+      "addedAt": "2026-10-21",
+      "group": "matrix",
+      "glyph": "heatmap",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cor-heatmap.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "相关性热图",
+        "scope": "变量两两相关矩阵；显著性星标与聚类排序",
+        "tags": [
+          "相关性",
+          "热图",
+          "相关矩阵",
+          "显著性"
+        ]
+      },
+      "en": {
+        "name": "Correlation Heatmap",
+        "scope": "Pairwise correlation matrices with significance marks",
+        "tags": [
+          "correlation",
+          "heatmap",
+          "matrix",
+          "significance"
+        ]
+      }
+    },
+    {
+      "id": "circular-heatmap",
+      "addedAt": "2026-10-21",
+      "group": "matrix",
+      "glyph": "ring",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circular-heatmap.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "环状热图",
+        "scope": "基因组区间 / 染色体分布；环形排布省横向空间",
+        "tags": [
+          "环状热图",
+          "基因组",
+          "染色体",
+          "circos"
+        ]
+      },
+      "en": {
+        "name": "Circular Heatmap",
+        "scope": "Genomic intervals and chromosomes in a radial layout",
+        "tags": [
+          "circular",
+          "heatmap",
+          "genome",
+          "circos"
+        ]
+      }
+    },
+    {
+      "id": "cluster-enrich",
+      "addedAt": "2026-10-21",
+      "group": "matrix",
+      "glyph": "cluster",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cluster-enrich.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "聚类表达 + 富集",
+        "scope": "时序 / 分群表达热图与富集结果并排（ClusterGVis 风格）",
+        "tags": [
+          "聚类",
+          "时序",
+          "表达热图",
+          "富集分析",
+          "ClusterGVis"
+        ]
+      },
+      "en": {
+        "name": "Cluster Expression & Enrichment",
+        "scope": "Clustered expression heatmap beside enrichment, ClusterGVis style",
+        "tags": [
+          "clustering",
+          "time-course",
+          "expression",
+          "enrichment"
+        ]
+      }
+    },
+    {
+      "id": "mantel",
+      "addedAt": "2026-10-21",
+      "group": "matrix",
+      "glyph": "corr",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/mantel.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "Mantel 检验相关图",
+        "scope": "环境因子与距离矩阵的相关；微生物 / 生态多组学",
+        "tags": [
+          "Mantel",
+          "环境因子",
+          "距离矩阵",
+          "微生物",
+          "生态"
+        ]
+      },
+      "en": {
+        "name": "Mantel Test Correlation",
+        "scope": "Environment factors vs distance matrices in ecology / microbiome",
+        "tags": [
+          "mantel",
+          "environment",
+          "microbiome",
+          "ecology"
+        ]
+      }
+    },
+    {
+      "id": "matrix-cor",
+      "addedAt": "2026-10-21",
+      "group": "matrix",
+      "glyph": "corr",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/matrix-cor.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "两组矩阵相关",
+        "scope": "模块 × 性状关联；两组矩阵间的相关系数矩阵",
+        "tags": [
+          "相关",
+          "模块",
+          "性状",
+          "WGCNA",
+          "矩阵"
+        ]
+      },
+      "en": {
+        "name": "Two-Matrix Correlation",
+        "scope": "Module-trait style correlation between two matrices",
+        "tags": [
+          "correlation",
+          "module",
+          "trait",
+          "WGCNA"
+        ]
+      }
+    },
+    {
+      "id": "venn",
+      "addedAt": "2026-10-21",
+      "group": "set",
+      "glyph": "venn",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/venn.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "韦恩图",
+        "scope": "2–5 组基因 / OTU 交集；组数少时最直观",
+        "tags": [
+          "韦恩图",
+          "交集",
+          "基因",
+          "OTU",
+          "venn"
+        ]
+      },
+      "en": {
+        "name": "Venn Diagram",
+        "scope": "Overlap of 2-5 gene or OTU sets",
+        "tags": [
+          "venn",
+          "overlap",
+          "gene",
+          "OTU"
+        ]
+      }
+    },
+    {
+      "id": "upset",
+      "addedAt": "2026-10-21",
+      "group": "set",
+      "glyph": "upset",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/upset.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "UpSet 图",
+        "scope": "5 组以上集合交集；韦恩图放不下时的标准替代",
+        "tags": [
+          "UpSet",
+          "交集",
+          "多集合",
+          "集合"
+        ]
+      },
+      "en": {
+        "name": "UpSet Plot",
+        "scope": "Set intersections beyond five sets, the Venn alternative",
+        "tags": [
+          "upset",
+          "intersection",
+          "sets"
+        ]
+      }
+    },
+    {
+      "id": "stacked-bar",
+      "addedAt": "2026-10-21",
+      "group": "comp",
+      "glyph": "stacked",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/stacked-bar.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "堆叠柱状图",
+        "scope": "物种 / 功能组成、流程占比；多组堆叠与百分比归一",
+        "tags": [
+          "堆叠柱状图",
+          "组成",
+          "物种",
+          "占比",
+          "stacked"
+        ]
+      },
+      "en": {
+        "name": "Stacked Bar",
+        "scope": "Taxonomic or functional composition, absolute or normalized",
+        "tags": [
+          "stacked",
+          "composition",
+          "taxonomy",
+          "proportion"
+        ]
+      }
+    },
+    {
+      "id": "pie",
+      "addedAt": "2026-10-21",
+      "group": "comp",
+      "glyph": "pie",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/pie.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "饼图 / 环形图",
+        "scope": "少量类别的占比；类别少时优于堆叠柱",
+        "tags": [
+          "饼图",
+          "环形图",
+          "占比",
+          "pie"
+        ]
+      },
+      "en": {
+        "name": "Pie / Donut",
+        "scope": "Share of a few categories",
+        "tags": [
+          "pie",
+          "donut",
+          "proportion"
+        ]
+      }
+    },
+    {
+      "id": "sunburst",
+      "addedAt": "2026-10-21",
+      "group": "comp",
+      "glyph": "sunburst",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sunburst.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "旭日图",
+        "scope": "层级占比（门 / 纲 / 目 / 科）；一眼看层级构成",
+        "tags": [
+          "旭日图",
+          "层级",
+          "分类学",
+          "占比"
+        ]
+      },
+      "en": {
+        "name": "Sunburst",
+        "scope": "Hierarchical composition down a taxonomy",
+        "tags": [
+          "sunburst",
+          "hierarchy",
+          "taxonomy"
+        ]
+      }
+    },
+    {
+      "id": "flower",
+      "addedAt": "2026-10-21",
+      "group": "comp",
+      "glyph": "flower",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/flower.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "花瓣图",
+        "scope": "多组 OTU / 基因交集与核心集；比韦恩图更省空间",
+        "tags": [
+          "花瓣图",
+          "OTU",
+          "核心集",
+          "交集",
+          "微生物"
+        ]
+      },
+      "en": {
+        "name": "Flower Plot",
+        "scope": "Core and shared OTU / gene sets across many groups",
+        "tags": [
+          "flower",
+          "OTU",
+          "core",
+          "microbiome"
+        ]
+      }
+    },
+    {
+      "id": "network",
+      "addedAt": "2026-10-21",
+      "group": "relation",
+      "glyph": "net",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/network.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "互作网络图",
+        "scope": "基因 / 蛋白 / 物种互作；按度数或分组布局",
+        "tags": [
+          "网络图",
+          "互作",
+          "基因",
+          "蛋白",
+          "network"
+        ]
+      },
+      "en": {
+        "name": "Interaction Network",
+        "scope": "Gene / protein / taxa interaction graphs",
+        "tags": [
+          "network",
+          "interaction",
+          "gene",
+          "protein"
+        ]
+      }
+    },
+    {
+      "id": "chord",
+      "addedAt": "2026-10-21",
+      "group": "relation",
+      "glyph": "chord",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/chord.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "弦图",
+        "scope": "组间流向与共现；比桑基图更适合环形对比",
+        "tags": [
+          "弦图",
+          "流向",
+          "共现",
+          "chord"
+        ]
+      },
+      "en": {
+        "name": "Chord Diagram",
+        "scope": "Group-to-group flow and co-occurrence",
+        "tags": [
+          "chord",
+          "flow",
+          "co-occurrence"
+        ]
+      }
+    },
+    {
+      "id": "sankey",
+      "addedAt": "2026-10-21",
+      "group": "relation",
+      "glyph": "sankey",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sankey.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "桑基图",
+        "scope": "多阶段流向（处理 → 物种 → 功能）；宽度即数量",
+        "tags": [
+          "桑基图",
+          "流向",
+          "多阶段",
+          "sankey"
+        ]
+      },
+      "en": {
+        "name": "Sankey Diagram",
+        "scope": "Multi-stage flows where width encodes quantity",
+        "tags": [
+          "sankey",
+          "flow",
+          "multi-stage"
+        ]
+      }
+    },
+    {
+      "id": "path-net",
+      "addedAt": "2026-10-21",
+      "group": "relation",
+      "glyph": "net",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/path-net.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "通路相似性网络",
+        "scope": "富集结果聚类成通路模块（aPEAR）；从条目列表到主题",
+        "tags": [
+          "富集分析",
+          "通路",
+          "网络图",
+          "模块",
+          "aPEAR"
+        ]
+      },
+      "en": {
+        "name": "Pathway Similarity Network",
+        "scope": "Enrichment results clustered into pathway themes (aPEAR)",
+        "tags": [
+          "enrichment",
+          "pathway",
+          "network",
+          "aPEAR"
+        ]
+      }
+    },
+    {
+      "id": "zi-pi",
+      "addedAt": "2026-10-21",
+      "group": "relation",
+      "glyph": "net",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/zi-pi.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "Zi-Pi 共现网络",
+        "scope": "微生物 OTU 共现模块与关键类群识别",
+        "tags": [
+          "微生物",
+          "OTU",
+          "共现网络",
+          "Zi-Pi",
+          "模块"
+        ]
+      },
+      "en": {
+        "name": "Zi-Pi Co-occurrence Network",
+        "scope": "Microbial co-occurrence modules and keystone taxa",
+        "tags": [
+          "microbiome",
+          "OTU",
+          "network",
+          "Zi-Pi"
+        ]
+      }
+    },
+    {
+      "id": "circle-packing",
+      "addedAt": "2026-10-21",
+      "group": "relation",
+      "glyph": "packing",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circle-packing.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "圆堆积图",
+        "scope": "层级占比的面积表达；比旭日图更强调体量",
+        "tags": [
+          "圆堆积",
+          "层级",
+          "占比",
+          "hierarchy"
+        ]
+      },
+      "en": {
+        "name": "Circle Packing",
+        "scope": "Hierarchical composition by area",
+        "tags": [
+          "packing",
+          "hierarchy",
+          "composition"
+        ]
+      }
+    },
+    {
+      "id": "scatter",
+      "addedAt": "2026-10-21",
+      "group": "dist",
+      "glyph": "scatter",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/scatter.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "散点图",
+        "scope": "两变量关系、相关趋势；可加拟合线与置信带",
+        "tags": [
+          "散点图",
+          "相关",
+          "回归",
+          "scatter"
+        ]
+      },
+      "en": {
+        "name": "Scatter Plot",
+        "scope": "Two-variable relationships with fit lines",
+        "tags": [
+          "scatter",
+          "correlation",
+          "regression"
+        ]
+      }
+    },
+    {
+      "id": "four-quadrant",
+      "addedAt": "2026-10-21",
+      "group": "dist",
+      "glyph": "quadrant",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/four-quadrant.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "四象限散点图",
+        "scope": "按两条阈值线分区（上调 / 下调 / 不显著）",
+        "tags": [
+          "四象限",
+          "散点图",
+          "阈值",
+          "上调",
+          "下调"
+        ]
+      },
+      "en": {
+        "name": "Four-Quadrant Scatter",
+        "scope": "Points partitioned by two thresholds",
+        "tags": [
+          "quadrant",
+          "scatter",
+          "threshold"
+        ]
+      }
+    },
+    {
+      "id": "nine-quadrant",
+      "addedAt": "2026-10-21",
+      "group": "dist",
+      "glyph": "nine",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/nine-quadrant.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "九象限图",
+        "scope": "三条阈值线分层筛选；多指标同时设限",
+        "tags": [
+          "九象限",
+          "阈值",
+          "分层",
+          "筛选"
+        ]
+      },
+      "en": {
+        "name": "Nine-Quadrant Diagram",
+        "scope": "Three thresholds for layered multi-metric screening",
+        "tags": [
+          "nine-quadrant",
+          "threshold",
+          "screening"
+        ]
+      }
+    },
+    {
+      "id": "ternary",
+      "addedAt": "2026-10-21",
+      "group": "dist",
+      "glyph": "ternary",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/ternary.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "三元图",
+        "scope": "三组分比例（土壤质地、微生物门、营养配比）",
+        "tags": [
+          "三元图",
+          "三组分",
+          "比例",
+          "土壤",
+          "ternary"
+        ]
+      },
+      "en": {
+        "name": "Ternary Plot",
+        "scope": "Three-part compositions such as soil texture or phylum mixes",
+        "tags": [
+          "ternary",
+          "composition",
+          "soil"
+        ]
+      }
+    },
+    {
+      "id": "box-violin",
+      "addedAt": "2026-10-21",
+      "group": "dist",
+      "glyph": "box",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/box-violin.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "箱线 / 小提琴图",
+        "scope": "分组分布比较；中位数、离散度与离群点",
+        "tags": [
+          "箱线图",
+          "小提琴图",
+          "分布",
+          "分组比较"
+        ]
+      },
+      "en": {
+        "name": "Box & Violin",
+        "scope": "Grouped distributions: median, spread and outliers",
+        "tags": [
+          "boxplot",
+          "violin",
+          "distribution"
+        ]
+      }
+    },
+    {
+      "id": "survival",
+      "addedAt": "2026-10-21",
+      "group": "dist",
+      "glyph": "survival",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/survival.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "生存曲线",
+        "scope": "随访数据 KM 曲线；风险表与 log-rank",
+        "tags": [
+          "生存分析",
+          "KM",
+          "随访",
+          "医学",
+          "survival"
+        ]
+      },
+      "en": {
+        "name": "Survival Curve",
+        "scope": "Kaplan-Meier curves with risk table and log-rank",
+        "tags": [
+          "survival",
+          "KM",
+          "clinical",
+          "log-rank"
+        ]
+      }
+    },
+    {
+      "id": "forest",
+      "addedAt": "2026-10-21",
+      "group": "dist",
+      "glyph": "forest",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/forest.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "森林图",
+        "scope": "效应量 + 置信区间；meta 分析与回归结果汇总",
+        "tags": [
+          "森林图",
+          "效应量",
+          "置信区间",
+          "meta分析"
+        ]
+      },
+      "en": {
+        "name": "Forest Plot",
+        "scope": "Effect sizes with confidence intervals, meta-analysis",
+        "tags": [
+          "forest",
+          "effect size",
+          "confidence interval",
+          "meta-analysis"
+        ]
+      }
+    },
+    {
+      "id": "bump",
+      "addedAt": "2026-10-21",
+      "group": "dist",
+      "glyph": "bump",
+      "thumb": "",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "排名变化图",
+        "scope": "多时间点排序迁移；看谁上升谁掉队",
+        "tags": [
+          "排名",
+          "变化",
+          "时间序列",
+          "bump"
+        ]
+      },
+      "en": {
+        "name": "Bump Plot",
+        "scope": "Rank changes across time points",
+        "tags": [
+          "bump",
+          "rank",
+          "time-course"
+        ]
+      }
+    },
+    {
+      "id": "radar",
+      "addedAt": "2026-10-21",
+      "group": "shape",
+      "glyph": "radar",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radar.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "雷达图",
+        "scope": "多指标样本对比；指标数 5–8 时最清楚",
+        "tags": [
+          "雷达图",
+          "多指标",
+          "样本对比",
+          "radar"
+        ]
+      },
+      "en": {
+        "name": "Radar Plot",
+        "scope": "Multi-metric sample comparison, best with 5-8 axes",
+        "tags": [
+          "radar",
+          "multi-metric",
+          "comparison"
+        ]
+      }
+    },
+    {
+      "id": "polar-bar",
+      "addedAt": "2026-10-21",
+      "group": "shape",
+      "glyph": "polar",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/polar-bar.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "极坐标柱状图",
+        "scope": "周期性 / 方向性数据；月份、方位、角度分布",
+        "tags": [
+          "极坐标",
+          "柱状图",
+          "方向",
+          "周期"
+        ]
+      },
+      "en": {
+        "name": "Polar Bar",
+        "scope": "Circular or directional data: months, bearings, angles",
+        "tags": [
+          "polar",
+          "bar",
+          "directional",
+          "circular"
+        ]
+      }
+    },
+    {
+      "id": "radial-bar",
+      "addedAt": "2026-10-21",
+      "group": "shape",
+      "glyph": "radial",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radial-bar.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "径向条形图",
+        "scope": "长列表排名紧凑展示；节省横向空间",
+        "tags": [
+          "径向",
+          "条形图",
+          "排名",
+          "紧凑"
+        ]
+      },
+      "en": {
+        "name": "Radial Bar",
+        "scope": "Compact ranking for long lists",
+        "tags": [
+          "radial",
+          "bar",
+          "ranking"
+        ]
+      }
+    },
+    {
+      "id": "rose",
+      "addedAt": "2026-10-21",
+      "group": "shape",
+      "glyph": "rose",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/rose.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "玫瑰图",
+        "scope": "方向性强度分布；比极坐标柱更强调轮廓",
+        "tags": [
+          "玫瑰图",
+          "方向",
+          "风向",
+          "rose"
+        ]
+      },
+      "en": {
+        "name": "Rose Plot",
+        "scope": "Directional intensity such as wind roses",
+        "tags": [
+          "rose",
+          "directional",
+          "wind"
+        ]
+      }
+    },
+    {
+      "id": "panel-forge",
+      "addedAt": "2026-10-21",
+      "group": "shape",
+      "glyph": "panel",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/panel-forge.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "SCI 拼图",
+        "scope": "多子图排版、A/B/C 标注与尺寸对齐；投稿前拼版",
+        "tags": [
+          "拼图",
+          "排版",
+          "子图",
+          "投稿",
+          "panel"
+        ]
+      },
+      "en": {
+        "name": "Panel Composer",
+        "scope": "Multi-panel layout with A/B/C labels before submission",
+        "tags": [
+          "panel",
+          "layout",
+          "figure",
+          "submission"
+        ]
+      }
+    },
+    {
+      "id": "as-te",
+      "addedAt": "2026-10-21",
+      "group": "omics",
+      "glyph": "genome",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/as-te.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "可变剪接 · 转座子互作图",
+        "scope": "AS 事件与转座子的位置关系；基因组区间可视化",
+        "tags": [
+          "可变剪接",
+          "转座子",
+          "基因组",
+          "AS",
+          "TE"
+        ]
+      },
+      "en": {
+        "name": "AS & Transposon Map",
+        "scope": "Splicing events versus transposon positions on a genome",
+        "tags": [
+          "splicing",
+          "transposon",
+          "genome"
+        ]
+      }
+    },
+    {
+      "id": "synteny",
+      "addedAt": "2026-10-21",
+      "group": "omics",
+      "glyph": "synteny",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/synteny.png?v=1.0.0",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "共线性图",
+        "scope": "多基因组区间比对；物种间同源块与重排",
+        "tags": [
+          "共线性",
+          "基因组",
+          "比较基因组",
+          "synteny"
+        ]
+      },
+      "en": {
+        "name": "Synteny Viewer",
+        "scope": "Multi-genome collinearity and rearrangements",
+        "tags": [
+          "synteny",
+          "genome",
+          "comparative genomics"
+        ]
+      }
+    },
+    {
+      "id": "map",
+      "addedAt": "2026-10-21",
+      "group": "omics",
+      "glyph": "map",
+      "thumb": "",
+      "price": "",
+      "buyUrl": "",
+      "version": "1.0.0",
+      "cn": {
+        "name": "地图可视化",
+        "scope": "经纬度采样点与区域着色；地理分布与梯度",
+        "tags": [
+          "地图",
+          "经纬度",
+          "采样点",
+          "地理分布"
+        ]
+      },
+      "en": {
+        "name": "Map Visualizer",
+        "scope": "Sampling points and regions by latitude / longitude",
+        "tags": [
+          "map",
+          "geo",
+          "latitude",
+          "sampling"
+        ]
+      }
+    }
+  ]
+}
