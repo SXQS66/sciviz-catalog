@@ -14,7 +14,7 @@
       "group": "dist",
       "glyph": "line",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/line.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "https://www.xiaohongshu.com/goods-detail/6895940302d7b00001661a80",
       "version": "1.0.0",
       "cn": {
@@ -45,7 +45,7 @@
       "group": "matrix",
       "glyph": "heatmap",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/heatmap.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "7.1.0",
       "cn": {
@@ -76,7 +76,7 @@
       "group": "deg",
       "glyph": "volcano",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/volcano.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "6.1.0",
       "cn": {
@@ -107,7 +107,7 @@
       "group": "deg",
       "glyph": "volcano",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/meta-volcano.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "4.0.0",
       "cn": {
@@ -136,7 +136,7 @@
       "group": "deg",
       "glyph": "volcano",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/degs-volcano.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "7.0.0",
       "cn": {
@@ -166,7 +166,7 @@
       "group": "enrich",
       "glyph": "hbar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-bar.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "6.0.0",
       "cn": {
@@ -197,7 +197,7 @@
       "group": "enrich",
       "glyph": "lollipop",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-lollipop.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "8.5.0",
       "cn": {
@@ -227,7 +227,7 @@
       "group": "enrich",
       "glyph": "bubble",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-bubble.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "5.0.0",
       "cn": {
@@ -258,7 +258,7 @@
       "group": "enrich",
       "glyph": "lollipop",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-lollipop.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "6.0.0",
       "cn": {
@@ -287,7 +287,7 @@
       "group": "enrich",
       "glyph": "hbar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/go-center-bar.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "2.0.0",
       "cn": {
@@ -320,7 +320,7 @@
       "group": "enrich",
       "glyph": "ridge",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-ridge.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "https://xhslink.com/m/ENYDAZcaTW",
       "version": "5.0.0",
       "cn": {
@@ -350,7 +350,7 @@
       "group": "enrich",
       "glyph": "sankey",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-sankey.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "6.0.0",
       "cn": {
@@ -380,7 +380,7 @@
       "group": "enrich",
       "glyph": "chord",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-chord.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "2.0.0",
       "cn": {
@@ -409,7 +409,7 @@
       "group": "enrich",
       "glyph": "dotpie",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/dot-pie.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -439,7 +439,7 @@
       "group": "enrich",
       "glyph": "bubble",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/bubble.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "6.0.0",
       "cn": {
@@ -468,7 +468,7 @@
       "group": "enrich",
       "glyph": "dot",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/grouped-dot.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "4.0.0",
       "cn": {
@@ -499,7 +499,7 @@
       "group": "matrix",
       "glyph": "heatmap",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cor-heatmap.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "https://www.xiaohongshu.com/goods-detail/69da661a8ca4f400013aa554",
       "version": "2.0.0",
       "cn": {
@@ -529,7 +529,7 @@
       "group": "matrix",
       "glyph": "ring",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circular-heatmap.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "2.0.0",
       "cn": {
@@ -559,7 +559,7 @@
       "group": "matrix",
       "glyph": "cluster",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cluster-enrich.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -590,7 +590,7 @@
       "group": "matrix",
       "glyph": "corr",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/mantel.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.1.0",
       "cn": {
@@ -621,7 +621,7 @@
       "group": "matrix",
       "glyph": "corr",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/matrix-cor.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -652,7 +652,7 @@
       "group": "set",
       "glyph": "venn",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/venn.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -683,7 +683,7 @@
       "group": "set",
       "glyph": "upset",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/upset.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "5.0.0",
       "cn": {
@@ -712,7 +712,7 @@
       "group": "comp",
       "glyph": "stacked",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/stacked-bar.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "5.1.0",
       "cn": {
@@ -743,7 +743,7 @@
       "group": "comp",
       "glyph": "pie",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/pie.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -772,7 +772,7 @@
       "group": "comp",
       "glyph": "sunburst",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sunburst.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -801,7 +801,7 @@
       "group": "comp",
       "glyph": "flower",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/flower.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -832,7 +832,7 @@
       "group": "relation",
       "glyph": "net",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/network.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "5.0.0",
       "cn": {
@@ -863,7 +863,7 @@
       "group": "relation",
       "glyph": "chord",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/chord.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -892,7 +892,7 @@
       "group": "relation",
       "glyph": "sankey",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sankey.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "3.0.0",
       "cn": {
@@ -921,7 +921,7 @@
       "group": "relation",
       "glyph": "net",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/path-net.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "2.0.0",
       "cn": {
@@ -952,7 +952,7 @@
       "group": "relation",
       "glyph": "net",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/zi-pi.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -983,7 +983,7 @@
       "group": "relation",
       "glyph": "packing",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circle-packing.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "2.0.0",
       "cn": {
@@ -1012,7 +1012,7 @@
       "group": "dist",
       "glyph": "scatter",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/scatter.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "4.0.0",
       "cn": {
@@ -1041,7 +1041,7 @@
       "group": "dist",
       "glyph": "quadrant",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/four-quadrant.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -1071,7 +1071,7 @@
       "group": "dist",
       "glyph": "nine",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/nine-quadrant.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -1100,7 +1100,7 @@
       "group": "dist",
       "glyph": "ternary",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/ternary.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -1130,7 +1130,7 @@
       "group": "dist",
       "glyph": "box",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/box-violin.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "2.0.0",
       "cn": {
@@ -1159,7 +1159,7 @@
       "group": "dist",
       "glyph": "survival",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/survival.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "2.0.0",
       "cn": {
@@ -1190,7 +1190,7 @@
       "group": "dist",
       "glyph": "forest",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/forest.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -1220,7 +1220,7 @@
       "group": "dist",
       "glyph": "bump",
       "thumb": "",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -1249,7 +1249,7 @@
       "group": "shape",
       "glyph": "radar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radar.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "3.0.0",
       "cn": {
@@ -1278,7 +1278,7 @@
       "group": "shape",
       "glyph": "polar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/polar-bar.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -1308,7 +1308,7 @@
       "group": "shape",
       "glyph": "radial",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radial-bar.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -1337,7 +1337,7 @@
       "group": "shape",
       "glyph": "rose",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/rose.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -1366,7 +1366,7 @@
       "group": "shape",
       "glyph": "panel",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/panel-forge.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "2.0.0",
       "cn": {
@@ -1397,7 +1397,7 @@
       "group": "omics",
       "glyph": "genome",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/as-te.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -1427,7 +1427,7 @@
       "group": "omics",
       "glyph": "synteny",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/synteny.png?v=1.0.0",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "1.0.0",
       "cn": {
@@ -1456,7 +1456,7 @@
       "group": "omics",
       "glyph": "map",
       "thumb": "",
-      "price": "25元",
+      "price": "",
       "buyUrl": "",
       "version": "2.0.0",
       "cn": {
