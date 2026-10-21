@@ -47,7 +47,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/heatmap.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "7.1.0",
       "cn": {
         "name": "表达热图",
         "scope": "转录组 / 蛋白组表达矩阵；聚类、标准化、色标可调",
@@ -78,7 +78,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/volcano.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "6.1.0",
       "cn": {
         "name": "差异表达火山图",
         "scope": "转录组 / 蛋白组差异筛选；log2FC × 显著性，可标注基因名",
@@ -109,7 +109,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/meta-volcano.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "4.0.0",
       "cn": {
         "name": "代谢组火山图",
         "scope": "代谢组差异代谢物筛选；支持 VIP 与 P 值双阈值",
@@ -138,7 +138,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/degs-volcano.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "7.0.0",
       "cn": {
         "name": "多组差异火山图",
         "scope": "多个比较组的差异基因分面展示；分组着色",
@@ -168,7 +168,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-bar.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "6.0.0",
       "cn": {
         "name": "富集气泡条形图",
         "scope": "GO / KEGG 富集结果；条目名过长自动换行",
@@ -199,7 +199,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-lollipop.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "8.5.0",
       "cn": {
         "name": "富集棒棒糖图",
         "scope": "条目较少的富集结果；突出数值高低而非面积",
@@ -229,7 +229,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-bubble.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "5.0.0",
       "cn": {
         "name": "GSEA 气泡图",
         "scope": "GSEA 通路结果；NES × 显著性 × 基因数三重编码",
@@ -260,7 +260,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-lollipop.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "6.0.0",
       "cn": {
         "name": "GSEA 棒棒糖图",
         "scope": "GSEA 结果按 NES 排序；强调方向与大小",
@@ -289,7 +289,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/go-center-bar.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "cn": {
         "name": "GO 分组居中条形图",
         "scope": "GO 三大类（BP / CC / MF）分组对比；共轴居中",
@@ -322,7 +322,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-ridge.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "5.0.0",
       "cn": {
         "name": "GSEA 气泡山脊图",
         "scope": "GSEA 结果叠加山脊图；展示富集分布形状",
@@ -352,7 +352,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-sankey.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "6.0.0",
       "cn": {
         "name": "富集桑基气泡图",
         "scope": "基因 → 富集条目 → 通路的流向；同时看比例与强度",
@@ -382,7 +382,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-chord.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "cn": {
         "name": "富集弦图",
         "scope": "富集条目与基因的对应关系；看共享基因",
@@ -441,7 +441,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/bubble.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "6.0.0",
       "cn": {
         "name": "通用气泡图",
         "scope": "三变量编码（x / y / 大小）；富集、组学汇总通用",
@@ -470,7 +470,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/grouped-dot.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "4.0.0",
       "cn": {
         "name": "分组点图",
         "scope": "单细胞标记基因；多分组 × 多基因的表达与占比",
@@ -501,7 +501,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cor-heatmap.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "cn": {
         "name": "相关性热图",
         "scope": "变量两两相关矩阵；显著性星标与聚类排序",
@@ -531,7 +531,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circular-heatmap.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "cn": {
         "name": "环状热图",
         "scope": "基因组区间 / 染色体分布；环形排布省横向空间",
@@ -592,7 +592,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/mantel.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "cn": {
         "name": "Mantel 检验相关图",
         "scope": "环境因子与距离矩阵的相关；微生物 / 生态多组学",
@@ -685,7 +685,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/upset.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "5.0.0",
       "cn": {
         "name": "UpSet 图",
         "scope": "5 组以上集合交集；韦恩图放不下时的标准替代",
@@ -714,7 +714,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/stacked-bar.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "5.1.0",
       "cn": {
         "name": "堆叠柱状图",
         "scope": "物种 / 功能组成、流程占比；多组堆叠与百分比归一",
@@ -834,7 +834,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/network.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "5.0.0",
       "cn": {
         "name": "互作网络图",
         "scope": "基因 / 蛋白 / 物种互作；按度数或分组布局",
@@ -894,7 +894,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sankey.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "3.0.0",
       "cn": {
         "name": "桑基图",
         "scope": "多阶段流向（处理 → 物种 → 功能）；宽度即数量",
@@ -923,7 +923,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/path-net.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "cn": {
         "name": "通路相似性网络",
         "scope": "富集结果聚类成通路模块（aPEAR）；从条目列表到主题",
@@ -985,7 +985,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circle-packing.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "cn": {
         "name": "圆堆积图",
         "scope": "层级占比的面积表达；比旭日图更强调体量",
@@ -1014,7 +1014,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/scatter.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "4.0.0",
       "cn": {
         "name": "散点图",
         "scope": "两变量关系、相关趋势；可加拟合线与置信带",
@@ -1132,7 +1132,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/box-violin.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "cn": {
         "name": "箱线 / 小提琴图",
         "scope": "分组分布比较；中位数、离散度与离群点",
@@ -1161,7 +1161,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/survival.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "cn": {
         "name": "生存曲线",
         "scope": "随访数据 KM 曲线；风险表与 log-rank",
@@ -1251,7 +1251,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radar.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "3.0.0",
       "cn": {
         "name": "雷达图",
         "scope": "多指标样本对比；指标数 5–8 时最清楚",
@@ -1368,7 +1368,7 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/panel-forge.png?v=1.0.0",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "cn": {
         "name": "SCI 拼图",
         "scope": "多子图排版、A/B/C 标注与尺寸对齐；投稿前拼版",
@@ -1458,7 +1458,7 @@
       "thumb": "",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "cn": {
         "name": "地图可视化",
         "scope": "经纬度采样点与区域着色；地理分布与梯度",
