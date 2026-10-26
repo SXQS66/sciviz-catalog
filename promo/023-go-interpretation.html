@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="sciviz-promo" content="no=23;date=2026-07-26;id=023-go-interpretation">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>No.023 · GO 富集结果怎么解读</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #070312;
+            --glow-purple: #7c3aed;
+            --purple-light: #a78bfa;
+            --hot-pink: #ec4899;
+            --cyan-accent: #22d3ee;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --rose: #fb7185;
+            --slate-dark: #1e293b;
+            --glass: rgba(12, 18, 45, 0.55);
+            --glass-border: rgba(168, 139, 255, 0.20);
+        }
+
+        body {
+            background: radial-gradient(ellipse at 15% 10%, rgba(124, 58, 237, 0.35), transparent 60%),
+                radial-gradient(circle at 80% 90%, rgba(34, 211, 238, 0.18), transparent 50%),
+                #070312;
+            font-family: 'Inter', system-ui, -apple-system, 'PingFang SC', 'Segoe UI', BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            color: #f0f2fe;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: 2rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.96) translateY(18px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.7s ease;
+            pointer-events: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .slide::-webkit-scrollbar {
+            width: 4px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .slide::-webkit-scrollbar-thumb {
+            background: #7c3aed;
+            border-radius: 10px;
+        }
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .title-lg {
+            font-size: 3.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #c4b5fd, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.2rem;
+            line-height: 1.15;
+        }
+        .title-md {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(120deg, #e0d6ff, #fbcfe8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.3rem;
+            line-height: 1.2;
+        }
+        .title-sm {
+            font-size: 1.7rem;
+            font-weight: 600;
+            text-align: center;
+            background: linear-gradient(120deg, #d4c8ff, #f0d0e8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.2rem;
+            line-height: 1.2;
+        }
+        .sub {
+            font-size: 1.25rem;
+            color: #bac8e0;
+            text-align: center;
+            max-width: 85%;
+            margin-top: 0.1rem;
+            margin-bottom: 0.6rem;
+            line-height: 1.4;
+        }
+        .sub-sm {
+            font-size: 1.0rem;
+            color: #9aabca;
+            text-align: center;
+            max-width: 90%;
+            margin-top: 0.2rem;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 1.2rem 1.8rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(124, 58, 237, 0.15);
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 1rem;
+        }
+        .glow-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.20), rgba(236, 72, 153, 0.10));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(168, 85, 247, 0.55);
+            box-shadow: 0 0 36px rgba(124, 58, 237, 0.30);
+        }
+        .glass-card-inner {
+            background: rgba(0, 0, 0, 0.30);
+            backdrop-filter: blur(8px);
+            border-radius: 18px;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+            width: 100%;
+            margin: 0.4rem auto 0;
+        }
+
+        .two-col {
+            display: flex;
+            gap: 1.2rem;
+            width: 100%;
+            margin-top: 0.3rem;
+        }
+        .three-col {
+            display: flex;
+            gap: 1.0rem;
+            width: 100%;
+            margin: 0.3rem 0;
+            flex-wrap: wrap;
+        }
+
+        .col-card {
+            background: rgba(10, 14, 40, 0.55);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            flex: 1;
+            min-width: 160px;
+        }
+        .col-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            margin-left: 0.4rem;
+            letter-spacing: -0.01em;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-left: 0.8rem;
+            font-size: 0.92rem;
+            line-height: 1.35;
+        }
+        .feature-list li {
+            margin: 0.25rem 0;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .feature-list li::before {
+            content: "▹";
+            color: #22d3ee;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .feature-list-sm li {
+            font-size: 0.85rem;
+            margin: 0.15rem 0;
+        }
+        .feature-list-gold li::before {
+            color: #fbbf24;
+        }
+        .feature-list-pink li::before {
+            color: #f472b6;
+        }
+        .feature-list-purple li::before {
+            color: #c084fc;
+        }
+
+        .highlight-pink {
+            color: #f472b6;
+            font-weight: 600;
+        }
+        .highlight-cyan {
+            color: #22d3ee;
+            font-weight: 600;
+        }
+        .highlight-purple {
+            color: #c084fc;
+            font-weight: 600;
+        }
+        .highlight-gold {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+        .highlight-emerald {
+            color: #34d399;
+            font-weight: 600;
+        }
+        .highlight-rose {
+            color: #fb7185;
+            font-weight: 600;
+        }
+        .highlight-white {
+            color: #f0f2fe;
+            font-weight: 600;
+        }
+
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: #a78bfa;
+            padding: 0 0.1rem;
+        }
+
+        .badge-compare {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 40px;
+            padding: 0.3rem 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.85rem;
+        }
+        .badge-compare .label {
+            font-weight: 500;
+            color: #9aabca;
+        }
+        .badge-compare .val {
+            font-weight: 700;
+            color: #f0f2fe;
+        }
+
+        .formula-frame {
+            background: rgba(0, 0, 0, 0.50);
+            border-radius: 36px;
+            padding: 0.5rem 1.4rem;
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-align: center;
+            border-left: 6px solid var(--cyan-accent);
+            color: #cffafe;
+            margin: 0.3rem 0;
+        }
+        .small-formula {
+            font-size: 0.92rem;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.10);
+            border-left: 4px solid #f59e0b;
+            border-radius: 12px;
+            padding: 0.3rem 0.8rem;
+            margin: 0.2rem 0;
+            font-size: 0.85rem;
+        }
+        .warning-box .label {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+        .tip-box {
+            background: rgba(34, 211, 238, 0.07);
+            border-left: 4px solid #22d3ee;
+            border-radius: 12px;
+            padding: 0.3rem 0.8rem;
+            margin: 0.2rem 0;
+            font-size: 0.85rem;
+        }
+        .tip-box .label {
+            color: #22d3ee;
+            font-weight: 600;
+        }
+        .danger-box {
+            background: rgba(236, 72, 153, 0.08);
+            border-left: 4px solid #ec4899;
+            border-radius: 12px;
+            padding: 0.3rem 0.8rem;
+            margin: 0.2rem 0;
+            font-size: 0.85rem;
+        }
+        .danger-box .label {
+            color: #f472b6;
+            font-weight: 600;
+        }
+        .success-box {
+            background: rgba(16, 185, 129, 0.07);
+            border-left: 4px solid #10b981;
+            border-radius: 12px;
+            padding: 0.3rem 0.8rem;
+            margin: 0.2rem 0;
+            font-size: 0.85rem;
+        }
+        .success-box .label {
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        .id-example-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 0.2rem 0;
+        }
+        .id-example-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            padding: 0.2rem 0.8rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.5s ease;
+        }
+        .reveal-item.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .progress-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: transparent;
+        }
+        .timeline-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #22d3ee, #ec4899);
+            width: 0%;
+            transition: width 0.05s linear;
+        }
+        .slide-counter {
+            position: fixed;
+            bottom: 16px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.60);
+            backdrop-filter: blur(12px);
+            padding: 4px 14px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #c4b5fd;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            z-index: 55;
+            font-family: monospace;
+        }
+        .control-hint {
+            position: fixed;
+            bottom: 16px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(8px);
+            padding: 4px 12px;
+            border-radius: 32px;
+            font-size: 0.7rem;
+            color: #b9c7e0;
+            z-index: 55;
+            display: none;
+        }
+
+        @keyframes softFloat {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        .float-icon {
+            animation: softFloat 2.5s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        .dimension-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+            margin: 0.3rem 0;
+        }
+        .dimension-item {
+            background: rgba(20, 30, 55, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 0.3rem 0.9rem;
+            text-align: center;
+            border-top: 3px solid;
+            min-width: 90px;
+        }
+        .dimension-item .icon {
+            font-size: 1.2rem;
+            display: block;
+        }
+        .dimension-item .name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: block;
+            margin-top: 0.1rem;
+        }
+        .dimension-item .desc {
+            font-size: 0.7rem;
+            color: #b9c7e0;
+            display: block;
+        }
+        .dim-p {
+            border-top-color: #22d3ee;
+        }
+        .dim-lfc {
+            border-top-color: #f59e0b;
+        }
+        .dim-fdr {
+            border-top-color: #ec4899;
+        }
+        .dim-expr {
+            border-top-color: #34d399;
+        }
+        .dim-valid {
+            border-top-color: #c084fc;
+        }
+
+        .key-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fbbf24;
+            display: inline-block;
+            margin: 0 0.2rem;
+        }
+
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            font-size: 1.1rem;
+            color: #9aabca;
+            padding: 0.1rem 0;
+        }
+        .vs-divider .line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(168, 139, 255, 0.3), transparent);
+        }
+
+        .merge-example {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 16px;
+            padding: 0.4rem 1rem;
+            margin: 0.2rem 0;
+            font-size: 0.85rem;
+        }
+        .merge-example .arrow {
+            color: #a78bfa;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .merge-tag {
+            background: rgba(34, 211, 238, 0.10);
+            border: 1px solid rgba(34, 211, 238, 0.20);
+            border-radius: 20px;
+            padding: 0.15rem 0.8rem;
+            font-size: 0.75rem;
+            color: #22d3ee;
+        }
+
+        .gene-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem 0.6rem;
+            justify-content: center;
+            margin: 0.2rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #c084fc;
+        }
+        .gene-list .gene {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(192, 132, 252, 0.15);
+        }
+
+        @media (max-width: 850px) {
+            .title-lg {
+                font-size: 2.2rem;
+            }
+            .title-md {
+                font-size: 1.8rem;
+            }
+            .title-sm {
+                font-size: 1.3rem;
+            }
+            .sub {
+                font-size: 1.05rem;
+            }
+            .glass-card {
+                padding: 0.9rem 1.0rem;
+                margin-bottom: 1rem;
+            }
+            .two-col {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .three-col {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .formula-frame {
+                font-size: 0.85rem;
+                padding: 0.3rem 0.8rem;
+            }
+            .feature-list {
+                font-size: 0.82rem;
+            }
+            .col-card {
+                padding: 0.5rem 0.8rem;
+            }
+            .flow-arrow {
+                font-size: 1.0rem;
+                padding: 0.1rem 0;
+            }
+            .dimension-item {
+                min-width: 70px;
+                padding: 0.2rem 0.6rem;
+            }
+            .dimension-item .icon {
+                font-size: 1.0rem;
+            }
+            .dimension-item .name {
+                font-size: 0.75rem;
+            }
+            .key-number {
+                font-size: 1.6rem;
+            }
+            .badge-compare {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.8rem;
+            }
+            .merge-example {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.6rem;
+            }
+            .gene-list {
+                font-size: 0.7rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .title-lg {
+                font-size: 1.6rem;
+            }
+            .title-md {
+                font-size: 1.2rem;
+            }
+            .title-sm {
+                font-size: 1.0rem;
+            }
+            .sub {
+                font-size: 0.9rem;
+            }
+            .slide {
+                padding: 0.8rem 0.5rem;
+            }
+            .glass-card {
+                padding: 0.5rem 0.6rem;
+                border-radius: 18px;
+            }
+            .feature-list {
+                font-size: 0.75rem;
+            }
+            .formula-frame {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.5rem;
+            }
+            .dimension-item {
+                min-width: 60px;
+                padding: 0.15rem 0.4rem;
+            }
+            .dimension-item .icon {
+                font-size: 0.8rem;
+            }
+            .dimension-item .name {
+                font-size: 0.65rem;
+            }
+            .dimension-item .desc {
+                font-size: 0.6rem;
+            }
+            .key-number {
+                font-size: 1.2rem;
+            }
+            .badge-compare {
+                font-size: 0.65rem;
+                padding: 0.15rem 0.6rem;
+                gap: 0.3rem;
+            }
+            .merge-example {
+                font-size: 0.65rem;
+                padding: 0.2rem 0.4rem;
+                gap: 0.3rem;
+            }
+            .gene-list {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SLIDE 0: 封面 ===== -->
+    <div class="slide active">
+        <div class="title-lg reveal-item" data-duration="800">GO 结果太泛？</div>
+        <div class="title-md reveal-item" data-duration="1000" style="font-size:2.2rem; margin-top:-0.2rem;">这样写才不像废话</div>
+        <div class="sub reveal-item" data-duration="1200" style="margin-bottom:0.8rem;">
+            富集结果一堆显著条目，写进论文却句句空话？
+        </div>
+        <div class="glass-card glow-card reveal-item" data-duration="1400" style="max-width:1100px;">
+            <div style="display:flex; justify-content:center; gap:1.2rem; flex-wrap:wrap; margin:0.2rem 0 0.6rem;">
+                <div style="text-align:center; padding:0.2rem 1.0rem; background:rgba(245,158,11,0.08); border-radius:20px; border:1px solid rgba(245,158,11,0.15);">
+                    <div style="font-size:0.9rem; color:#fbbf24; font-weight:600;">❌ 常见误区</div>
+                    <div style="font-size:0.75rem; color:#9aabca;">逐条照搬 · 机械翻译</div>
+                </div>
+                <div style="display:flex; align-items:center; font-size:1.4rem; color:#7c3aed;">→</div>
+                <div style="text-align:center; padding:0.2rem 1.0rem; background:rgba(34,211,238,0.08); border-radius:20px; border:1px solid rgba(34,211,238,0.15);">
+                    <div style="font-size:0.9rem; color:#22d3ee; font-weight:600;">✅ 正确做法</div>
+                    <div style="font-size:0.75rem; color:#9aabca;">删泛词 · 合并模块 · 贴合课题</div>
+                </div>
+            </div>
+            <div class="vs-divider"><span class="line"></span><span style="color:#a78bfa; font-weight:600;">不是数据不行，是解读方式不对</span><span class="line"></span></div>
+            <div class="three-col" style="margin-top:0.5rem;">
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #f59e0b;">
+                    <h3 style="color:#f59e0b;">📌 核心痛点</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-gold">biological process</span> · 写了等于没写</li>
+                        <li><span class="highlight-gold">cellular response</span> · 毫无信息量</li>
+                        <li>一堆显著条目，却 <span class="highlight-pink">串不起一个故事</span></li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">🎯 根本原因</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>停留在 <span class="highlight-cyan">"翻译条目"</span> 阶段</li>
+                        <li>没有把条目整理成 <span class="highlight-cyan">生物学方向</span></li>
+                        <li>脱离 <span class="highlight-cyan">研究问题</span> 孤立解读</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3500" style="border-top:4px solid #c084fc;">
+                    <h3 style="color:#c084fc;">💡 解决思路</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-purple">删</span> 顶层泛词</li>
+                        <li><span class="highlight-purple">合</span> 相似条目 → 功能模块</li>
+                        <li><span class="highlight-purple">回</span> 研究问题 · 讲机制方向</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="3000" style="margin-top:0.9rem;">
+                🔑 GO 解读的核心：从 <span style="color:#fbbf24;">条目列表</span> 到 <span style="color:#22d3ee;">生物学故事</span>
+            </div>
+        </div>
+        <div class="sub-sm reveal-item" data-duration="2500" style="margin-top:0.5rem;">
+            告别空话 · 写出有深度的机制解读
+        </div>
+    </div>
+
+    <!-- ===== SLIDE 1: 误区 + 删泛词 ===== -->
+    <div class="slide">
+        <div class="title-sm reveal-item" data-duration="1200">策略一 · 删泛词 + 合并模块</div>
+        <div class="sub reveal-item" data-duration="1200">先筛掉顶层宽泛条目，再把零散方向合并成功能模块</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width:1100px;">
+            <div class="two-col">
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #f472b6;">
+                    <h3 style="color:#f472b6;">🚫 删泛词</h3>
+                    <div style="font-size:0.85rem; color:#cffafe; margin:0.1rem 0 0.2rem 0.4rem;">
+                        剔除 GO 顶层宽泛条目
+                    </div>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-pink">biological process</span> · 太顶层</li>
+                        <li><span class="highlight-pink">cellular process</span> · 无信息量</li>
+                        <li><span class="highlight-pink">response to stimulus</span> · 过于通用</li>
+                        <li><span class="highlight-pink">regulation of signaling</span> · 方向模糊</li>
+                    </ul>
+                    <div style="margin-top:0.3rem; background:rgba(236,72,153,0.06); border-radius:10px; padding:0.2rem 0.6rem; font-size:0.8rem; color:#9aabca;">
+                        📌 这些条目可作为 <span style="color:#fbbf24;">背景</span>，不适合当 <span style="color:#f472b6;">重点结果</span>
+                    </div>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #34d399;">
+                    <h3 style="color:#34d399;">🔗 合并模块</h3>
+                    <div style="font-size:0.85rem; color:#cffafe; margin:0.1rem 0 0.2rem 0.4rem;">
+                        相似条目 → 一个功能方向
+                    </div>
+                    <ul class="feature-list feature-list-sm">
+                        <li>从 <span class="highlight-emerald">零散条目</span> 中看出 <span class="highlight-emerald">共同方向</span></li>
+                        <li>合并后直接 <span class="highlight-emerald">对接疾病表型</span></li>
+                        <li>避免 <span class="highlight-emerald">逐条机械翻译</span></li>
+                    </ul>
+                    <div class="success-box" style="margin-top:0.3rem;">
+                        <span class="label">💡 关键</span> 合并后写出来的是一句话，不是一个列表
+                    </div>
+                </div>
+            </div>
+            <div class="merge-example reveal-item" data-duration="3500" style="margin-top:0.4rem;">
+                <span style="color:#9aabca;">示例</span>
+                <span class="merge-tag">白细胞迁移</span>
+                <span class="merge-tag">中性粒细胞活化</span>
+                <span class="merge-tag">细胞因子信号</span>
+                <span class="merge-tag">炎症应答</span>
+                <span class="arrow">→</span>
+                <span style="color:#fbbf24; font-weight:600;">炎症反应和免疫细胞募集增强</span>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top:0.3rem;">
+                🔑 先 <span style="color:#f472b6;">删</span> 再 <span style="color:#34d399;">合</span> —— 从条目列表到功能模块，一句话讲清方向
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SLIDE 2: 结合研究问题 + 核心基因 ===== -->
+    <div class="slide">
+        <div class="title-sm reveal-item" data-duration="1200">策略二 · 结合研究问题 + 关注核心基因</div>
+        <div class="sub reveal-item" data-duration="1200">GO 条目要贴合课题主线，价值取决于背后的驱动基因</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width:1100px;">
+            <div class="two-col">
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">🎯 结合研究问题</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>同一条目，不同课题 <span class="highlight-cyan">写法不同</span></li>
+                        <li><span class="highlight-cyan">肿瘤转移</span> → 往侵袭、微环境重塑上收</li>
+                        <li><span class="highlight-cyan">免疫疾病</span> → 往免疫激活、炎症放大上收</li>
+                    </ul>
+                    <div style="margin-top:0.4rem; background:rgba(34,211,238,0.06); border-radius:10px; padding:0.2rem 0.6rem; font-size:0.8rem; color:#9aabca;">
+                        📌 不要只问 <span style="color:#fbbf24;">"这个条目什么意思"</span>，要问 <span style="color:#22d3ee;">"它能不能解释我的疾病现象"</span>
+                    </div>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #c084fc;">
+                    <h3 style="color:#c084fc;">🧬 关注核心基因</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>条目显著 ≠ 它就是核心机制</li>
+                        <li>价值取决于 <span class="highlight-purple">富集背后的驱动基因</span></li>
+                        <li>如果贡献基因很散，或后续不打算讲，<span class="highlight-purple">不适合当主线</span></li>
+                    </ul>
+                    <div class="tip-box" style="margin-top:0.4rem;">
+                        <span class="label">💡 判断依据</span> 看条目里有没有 <span style="color:#fbbf24;">IL1B、TNF、CCL2、CXCL8</span> 这类关键基因
+                    </div>
+                </div>
+            </div>
+            <div class="gene-list reveal-item" data-duration="3500" style="margin:0.3rem 0;">
+                <span style="color:#9aabca; font-family:sans-serif; font-size:0.8rem;">炎症条目 + 驱动基因 → 有说服力：</span>
+                <span class="gene">IL1B</span>
+                <span class="gene">TNF</span>
+                <span class="gene">CCL2</span>
+                <span class="gene">CXCL8</span>
+                <span class="gene">IL6</span>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top:0.3rem;">
+                🔑 条目是 <span style="color:#c084fc;">外壳</span>，核心基因是 <span style="color:#fbbf24;">灵魂</span> —— 两者结合，解读才有力度
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SLIDE 3: 上下调分开 + 搭配 KEGG/GSEA ===== -->
+    <div class="slide">
+        <div class="title-sm reveal-item" data-duration="1200">策略三 · 上下调分开 + 搭配 KEGG/GSEA</div>
+        <div class="sub reveal-item" data-duration="1200">双向功能变化逻辑清晰，GO 提方向，KEGG 收细节</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width:1100px;">
+            <div class="two-col">
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #f59e0b;">
+                    <h3 style="color:#f59e0b;">⬆⬇ 上下调分开</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>上调与下调基因 <span class="highlight-gold">生物学方向不同</span></li>
+                        <li>混在一起 → 泛条目 <span class="highlight-gold">"免疫和代谢调控"</span></li>
+                        <li>分开解读 → <span class="highlight-gold">双向变化逻辑清晰</span></li>
+                    </ul>
+                    <div style="margin-top:0.3rem; background:rgba(245,158,11,0.06); border-radius:10px; padding:0.2rem 0.6rem; font-size:0.8rem; color:#9aabca;">
+                        📊 上调：<span style="color:#f472b6;">免疫激活 · 炎症应答 · 细胞迁移</span><br>
+                        📊 下调：<span style="color:#34d399;">氧化磷酸化 · 脂质代谢 · 稳态调控</span>
+                    </div>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">🔬 搭配 KEGG / GSEA</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>GO 给 <span class="highlight-cyan">宽泛方向</span>，KEGG 给 <span class="highlight-cyan">具体通路</span></li>
+                        <li>GO提示免疫异常 → KEGG落地为 <span class="highlight-cyan">TNF、IL-17、NF-κB</span></li>
+                        <li><span class="highlight-cyan">GSEA</span> 从全局验证功能趋势</li>
+                    </ul>
+                    <div class="success-box" style="margin-top:0.3rem;">
+                        <span class="label">💡 黄金组合</span> GO 负责 <span style="color:#fbbf24;">"做什么"</span>，KEGG 负责 <span style="color:#22d3ee;">"怎么实现"</span>
+                    </div>
+                </div>
+            </div>
+            <div class="formula-frame small-formula reveal-item" data-duration="3500" style="margin-top:0.4rem; border-left-color:#fbbf24; font-size:0.85rem;">
+                📌 上调基因富集于 <span style="color:#f472b6;">炎症通路</span>，下调基因富集于 <span style="color:#34d399;">代谢通路</span> → 疾病伴随 <span style="color:#fbbf24;">免疫激活</span> 与 <span style="color:#fbbf24;">代谢受损</span> 的双重改变
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top:0.3rem;">
+                🔑 分开写，有升有降，逻辑分明；GO + KEGG，宽泛变具体
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SLIDE 4: 讨论正确写法 + 总结 ===== -->
+    <div class="slide">
+        <div class="title-sm reveal-item" data-duration="1200">策略四 · 讨论正确写法 + 总结</div>
+        <div class="sub reveal-item" data-duration="1200">GO 提供线索，不过度解读；三件事让结果不空泛</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width:1100px;">
+            <div class="two-col">
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #ec4899;">
+                    <h3 style="color:#ec4899;">✍️ 讨论正确写法</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-pink">❌ 错误</span> "本研究证明该基因通过炎症通路发挥作用"</li>
+                        <li><span class="highlight-emerald">✅ 正确</span> "富集结果提示这些差异基因可能与炎症反应相关，为后续机制验证提供了方向"</li>
+                    </ul>
+                    <div style="margin-top:0.3rem; background:rgba(236,72,153,0.06); border-radius:10px; padding:0.2rem 0.6rem; font-size:0.8rem; color:#9aabca;">
+                        ⚠️ GO 仅基于注释的 <span style="color:#fbbf24;">功能富集分析</span>，只能提示 <span style="color:#f472b6;">相关性和趋势</span>，不能证明因果关系
+                    </div>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #fbbf24;">
+                    <h3 style="color:#fbbf24;">📋 总结 · 三件事</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-gold">① 删</span> 顶层泛词，剔除无信息条目</li>
+                        <li><span class="highlight-gold">② 合</span> 相似条目 → 功能模块，一句话讲清方向</li>
+                        <li><span class="highlight-gold">③ 回</span> 研究问题，贴合课题主线解释</li>
+                    </ul>
+                    <div class="tip-box" style="margin-top:0.3rem;">
+                        <span class="label">🎯 核心</span> GO 的价值不在于列出多少个显著条目，而在于帮你讲清楚 <span style="color:#fbbf24;">这批差异基因整体在改变什么功能、指向什么机制</span>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="3500" style="margin-top:0.4rem; background:rgba(124,58,237,0.10); border-color:rgba(168,139,255,0.2);">
+                💡 下次打开 GO 表格，先问自己：<span style="color:#fbbf24;">我是在翻译条目，还是在讲一个生物学故事？</span>
+            </div>
+            <div class="sub-sm reveal-item" data-duration="2000" style="margin-top:0.8rem; color:#a78bfa;">
+                GO 结果不泛 · 解读有深度 · 机制有方向
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 底部控件 ===== -->
+    <div class="progress-footer">
+        <div class="timeline-bar" id="timelineBar" style="display:none;"></div>
+    </div>
+    <div class="slide-counter" id="slideCounter">1 / 5</div>
+    <div class="control-hint" style="display:none;">␣ 暂停/播放 &nbsp;|&nbsp; ◀ ▶ 切换</div>
+
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.slide');
+            const timeline = document.getElementById('timelineBar');
+            const counterSpan = document.getElementById('slideCounter');
+            let currentIdx = 0;
+            const totalSlides = slides.length;
+            let autoPlay = true;
+
+            let currentSlideItems = [];
+            let currentDurations = [];
+            let currentItemIndex = 0;
+            let currentTotalDuration = 0;
+            let currentElapsed = 0;
+
+            let progressTimer = null;
+            let itemTimer = null;
+
+            function getRevealItems(slide) {
+                return Array.from(slide.querySelectorAll('.reveal-item'));
+            }
+
+            function computeSlideDurations(slide) {
+                const items = getRevealItems(slide);
+                const durations = [];
+                let total = 0;
+                for (let i = 0; i < items.length; i++) {
+                    let dur = items[i].getAttribute('data-duration');
+                    let durNum = dur ? parseInt(dur) : 2000;
+                    if (isNaN(durNum)) durNum = 2000;
+                    durations.push(durNum);
+                    total += durNum;
+                }
+                return { items, durations, total };
+            }
+
+            function resetRevealItems(slide) {
+                const items = getRevealItems(slide);
+                items.forEach(item => {
+                    item.classList.remove('revealed');
+                });
+            }
+
+            function stopAllTimers() {
+                if (progressTimer) {
+                    clearInterval(progressTimer);
+                    progressTimer = null;
+                }
+                if (itemTimer) {
+                    clearTimeout(itemTimer);
+                    itemTimer = null;
+                }
+            }
+
+            function showNextItem() {
+                if (!autoPlay) return;
+                if (currentItemIndex >= currentSlideItems.length) {
+                    if (itemTimer) clearTimeout(itemTimer);
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) {
+                            goToSlide((currentIdx + 1) % totalSlides);
+                        }
+                    }, 500);
+                    return;
+                }
+
+                const item = currentSlideItems[currentItemIndex];
+                if (item && !item.classList.contains('revealed')) {
+                    item.classList.add('revealed');
+                }
+
+                const duration = currentDurations[currentItemIndex];
+                if (itemTimer) clearTimeout(itemTimer);
+                itemTimer = setTimeout(() => {
+                    if (autoPlay) {
+                        currentItemIndex++;
+                        showNextItem();
+                    }
+                }, duration);
+            }
+
+            function startCurrentSlide() {
+                stopAllTimers();
+
+                resetRevealItems(slides[currentIdx]);
+
+                const { items, durations, total } = computeSlideDurations(slides[currentIdx]);
+                currentSlideItems = items;
+                currentDurations = durations;
+                currentTotalDuration = total;
+                currentItemIndex = 0;
+                currentElapsed = 0;
+
+                if (currentTotalDuration === 0 || items.length === 0) {
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) goToSlide((currentIdx + 1) % totalSlides);
+                    }, 2000);
+                    return;
+                }
+
+                let startTime = performance.now();
+                if (progressTimer) clearInterval(progressTimer);
+                progressTimer = setInterval(() => {
+                    if (!autoPlay) return;
+                    const now = performance.now();
+                    let elapsed = now - startTime;
+                    if (elapsed > currentTotalDuration) elapsed = currentTotalDuration;
+                    const percent = (elapsed / currentTotalDuration) * 100;
+                    timeline.style.width = `${percent}%`;
+                }, 50);
+
+                showNextItem();
+            }
+
+            function stopCurrentSlide() {
+                stopAllTimers();
+            }
+
+            function goToSlide(index) {
+                if (index === currentIdx) return;
+                if (index < 0) index = 0;
+                if (index >= totalSlides) index = 0;
+
+                stopCurrentSlide();
+
+                slides[currentIdx].classList.remove('active');
+                slides[index].classList.add('active');
+                currentIdx = index;
+                updateCounter();
+
+                timeline.style.width = '0%';
+
+                if (autoPlay) {
+                    startCurrentSlide();
+                } else {
+                    resetRevealItems(slides[currentIdx]);
+                    const firstItem = slides[currentIdx].querySelector('.reveal-item');
+                    if (firstItem) firstItem.classList.add('revealed');
+                    stopAllTimers();
+                }
+            }
+
+            function nextSlide() {
+                goToSlide((currentIdx + 1) % totalSlides);
+            }
+
+            function prevSlide() {
+                goToSlide((currentIdx - 1 + totalSlides) % totalSlides);
+            }
+
+            function toggleAutoPlay() {
+                autoPlay = !autoPlay;
+                if (autoPlay) {
+                    stopCurrentSlide();
+                    startCurrentSlide();
+                } else {
+                    stopAllTimers();
+                }
+            }
+
+            function updateCounter() {
+                counterSpan.innerText = `${currentIdx+1} / ${totalSlides}`;
+            }
+
+            function onKeyDown(e) {
+                const key = e.key;
+                if (key === ' ' || key === 'Space' || key === 'Spacebar') {
+                    e.preventDefault();
+                    toggleAutoPlay();
+                } else if (key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                } else if (key === 'ArrowRight') {
+                    e.preventDefault();
+                    nextSlide();
+                }
+            }
+
+            function init() {
+                slides.forEach((s, idx) => {
+                    if (idx === 0) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+                currentIdx = 0;
+                updateCounter();
+                autoPlay = true;
+                startCurrentSlide();
+                window.addEventListener('keydown', onKeyDown);
+            }
+
+            init();
+        })();
+    </script>
+
+<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
+<div class="sciviz-promo-no" aria-hidden="true">No.023 · 2026-07-26</div>
+<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
+padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
+border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
+letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+</body>
+</html>

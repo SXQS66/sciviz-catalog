@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="sciviz-promo" content="no=27;date=2026-08-30;id=027-grafify">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>No.027 · grafify online：绘图 + 统计一体</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --bg-deep: #05020c;
+            --glow-purple: #7c3aed;
+            --purple-light: #a78bfa;
+            --hot-pink: #ec4899;
+            --cyan-accent: #22d3ee;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --slate-dark: #1e293b;
+            --glass: rgba(15, 25, 45, 0.45);
+            --glass-border: rgba(168, 139, 255, 0.25);
+        }
+        body {
+            background: radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.3), transparent 60%),
+                radial-gradient(circle at 85% 90%, rgba(14, 165, 233, 0.2), transparent 55%),
+                #05020c;
+            font-family: 'Inter', system-ui, -apple-system, 'PingFang SC', 'Segoe UI', BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            color: #f0f2fe;
+            height: 100vh;
+            width: 100vw;
+        }
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: 2rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.96) translateY(18px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.7s ease;
+            pointer-events: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .slide::-webkit-scrollbar { width: 4px; background: rgba(255,255,255,0.1); }
+        .slide::-webkit-scrollbar-thumb { background: #a78bfa; border-radius: 10px; }
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+        .title-lg {
+            font-size: 3.2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.2rem;
+            line-height: 1.2;
+        }
+        .title-md {
+            font-size: 2.4rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(120deg, #e0d6ff, #fbcfe8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.4rem;
+            line-height: 1.2;
+        }
+        .sub {
+            font-size: 1.2rem;
+            color: #bac8e0;
+            text-align: center;
+            max-width: 85%;
+            margin-top: 0.2rem;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+        .sub-sm {
+            font-size: 0.95rem;
+            color: #9aabca;
+            text-align: center;
+            max-width: 90%;
+            margin-top: 0.3rem;
+        }
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 1.2rem 1.8rem;
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,58,237,0.2);
+            width: 100%;
+            max-width: 1100px;
+        }
+        .glow-card {
+            background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(14,165,233,0.1));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(168,85,247,0.65);
+            box-shadow: 0 0 32px rgba(124,58,237,0.4);
+        }
+        .glass-card-inner {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 18px;
+            padding: 0.6rem 1rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            text-align: center;
+            width: 100%;
+            margin: 0.6rem auto 0;
+        }
+        .formula-frame {
+            background: rgba(0,0,0,0.55);
+            border-radius: 40px;
+            padding: 0.6rem 1.4rem;
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 1.0rem;
+            font-weight: 600;
+            text-align: center;
+            border-left: 6px solid var(--cyan-accent);
+            color: #cffafe;
+            margin: 0.4rem 0;
+        }
+        .small-formula { font-size: 0.9rem; }
+        .two-col-compare {
+            display: block;
+            width: 100%;
+            margin-top: 0.4rem 0;
+        }
+        .three-col {
+            display: block;
+            width: 100%;
+            margin: 0.4rem 0;
+        }
+        .three-col .col-card {
+            width: 90%;
+            margin: 0 auto 0.6rem;
+            flex: none;
+        }
+        .three-col .col-card:last-child { margin-bottom: 0; }
+        .col-card {
+            background: rgba(10,12,35,0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            flex: 1;
+        }
+        .col-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.4rem;
+            margin-left: 0.6rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.6rem;
+        }
+        .col-card h3 .capsule {
+            display: inline-block;
+            border-radius: 20px;
+            padding: 0.1rem 0.7rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #c4b5fd;
+            vertical-align: middle;
+            line-height: 1.4;
+        }
+        .col-card h3 .capsule.ora { background: rgba(34,211,238,0.15); border-color: rgba(34,211,238,0.3); color: #22d3ee; }
+        .col-card h3 .capsule.fcs { background: rgba(249,115,22,0.15); border-color: rgba(249,115,22,0.3); color: #fb923c; }
+        .col-card h3 .capsule.pt  { background: rgba(192,132,252,0.15); border-color: rgba(192,132,252,0.3); color: #c084fc; }
+        .feature-list {
+            list-style: none;
+            margin-left: 1rem;
+            font-size: 1.2rem;
+            line-height: 1.4;
+        }
+        .feature-list li {
+            margin: 0.3rem 0;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .feature-list li::before {
+            content: "▹";
+            color: #22d3ee;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .feature-list-sm li { font-size: 1.1rem; margin: 0.2rem 0; }
+        .feature-list-gold li::before { color: #fbbf24; }
+        .feature-list-pink li::before { color: #f472b6; }
+        .feature-list-teal li::before { color: #22d3ee; }
+        .highlight-pink { color: #f472b6; font-weight: 600; }
+        .highlight-cyan { color: #22d3ee; font-weight: 600; }
+        .highlight-purple { color: #c084fc; font-weight: 600; }
+        .highlight-gold { color: #fbbf24; font-weight: 600; }
+        .highlight-emerald { color: #34d399; font-weight: 600; }
+        .highlight-rose { color: #fb7185; font-weight: 600; }
+        .highlight-white { color: #f0f2fe; font-weight: 600; }
+        .highlight-orange { color: #fb923c; font-weight: 600; }
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: #a78bfa;
+            padding: 0 0.1rem;
+        }
+        .quad-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+            margin: 0.4rem 0;
+        }
+        .unit-badge {
+            background: rgba(20,30,55,0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 0.4rem 1.0rem;
+            text-align: center;
+            border-top: 3px solid;
+            min-width: 80px;
+        }
+        .unit-badge span:first-child {
+            font-size: 1.25rem;
+            font-weight: 800;
+            display: block;
+        }
+        .unit-badge span:last-child {
+            font-size: 1.15rem;
+            color: #b9c7e0;
+        }
+        .badge-de { border-top-color: #22d3ee; }
+        .badge-en { border-top-color: #f97316; }
+        .badge-wg { border-top-color: #c084fc; }
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.2,0.9,0.3,1.1), transform 0.5s ease;
+        }
+        .reveal-item.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .progress-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: transparent;
+        }
+        .timeline-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #0ea5e9, #f97316);
+            width: 0%;
+            transition: width 0.05s linear;
+        }
+        .slide-counter {
+            position: fixed;
+            bottom: 16px;
+            right: 20px;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(12px);
+            padding: 4px 14px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #c4b5fd;
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 55;
+            font-family: monospace;
+        }
+        .warning-box {
+            background: rgba(251,191,36,0.08);
+            border-left: 4px solid #fbbf24;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            margin-top: 0.4rem;
+            font-size: 0.9rem;
+            color: #d4d4e8;
+        }
+        .warning-box .label {
+            color: #fbbf24;
+            font-weight: 600;
+            margin-right: 0.4rem;
+        }
+        .tip-box {
+            background: rgba(34,211,238,0.08);
+            border-left: 4px solid #22d3ee;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            margin-top: 0.4rem;
+            font-size: 0.9rem;
+            color: #d4d4e8;
+        }
+        .tip-box .label {
+            color: #22d3ee;
+            font-weight: 600;
+            margin-right: 0.4rem;
+        }
+        .story-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin: 0.6rem 0;
+        }
+        .story-flow .step {
+            background: rgba(20,30,55,0.6);
+            padding: 0.4rem 1.0rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.4rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .story-flow .step.de { border-color: #22d3ee; color: #22d3ee; }
+        .story-flow .step.en { border-color: #f97316; color: #f97316; }
+        .story-flow .step.wg { border-color: #c084fc; color: #c084fc; }
+        .story-flow .arrow {
+            color: #6b7a9a;
+            font-size: 1.2rem;
+        }
+        .screenshot-container {
+            width: 100%;
+            max-width: 750px;
+            margin: 0.3rem auto;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(168, 139, 255, 0.3);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+            background: #0a0c1a;
+        }
+        .screenshot-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 350px) {
+            .title-lg { font-size: 2.2rem; }
+            .title-md { font-size: 1.8rem; }
+            .sub { font-size: 1.2rem; }
+            .glass-card { padding: 1rem; }
+            .two-col-compare { flex-direction: column; gap: 0.6rem; }
+            .formula-frame { font-size: 1.25rem; padding: 0.4rem; }
+            .feature-list { font-size: 0.85rem; }
+            .col-card { padding: 0.6rem; }
+            .flow-arrow { font-size: 1.0rem; padding: 0.1rem 0; }
+            .quad-grid { gap: 0.4rem; }
+            .unit-badge { padding: 0.3rem 0.6rem; min-width: 60px; }
+            .story-flow { gap: 0.4rem; }
+            .story-flow .step { font-size: 0.8rem; padding: 0.3rem 0.7rem; }
+            .screenshot-container { max-width: 100%; border-radius: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 幻灯片 0：封面（嵌入截图） ===== -->
+    <div class="slide active">
+        <div class="title-lg reveal-item" style="background:linear-gradient(135deg,#e0d6ff,#fbcfe8,#a78bfa);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            📊 grafify online
+        </div>
+        <div class="sub reveal-item" style="margin:0.2rem 0 0.5rem;">
+            没学过R语言？也能一键出图+统计！
+        </div>
+        <div class="glass-card glow-card reveal-item" style="max-width: 950px; padding: 1rem 1.2rem;">
+            <div style="font-size:1rem; text-align:center; margin-bottom:0.3rem; color:#bac8e0; letter-spacing: 1px;">
+                📸 主页长这样 · 打开即用
+            </div>
+            <!-- 嵌入 main_page.png 截图 -->
+            <div class="screenshot-container">
+                <img src="assets/027-grafify/grafify_main_page.jpg" alt="grafify online 主页界面截图">
+            </div>
+            <div class="glass-card-inner" style="margin-top:0.6rem; border-color:rgba(168,139,255,0.2); font-size: 1.1rem;">
+                ⭐ 科研小白、医学生、生物老师的福音
+            </div>
+        </div>
+        <div class="sub-sm reveal-item" style="margin-top:0.3rem; display: none;">
+            ← → 翻页 · 空格 暂停/播放
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 1：谁适合用？ ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item" style="background:linear-gradient(120deg,#22d3ee,#67e8f9);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            🙋 谁适合用？
+        </div>
+        <div class="sub reveal-item">没有编程经验，但需要完成数据分析与作图</div>
+        <div class="glass-card reveal-item" style="max-width:1100px;">
+            <div class="two-col-compare">
+                <div class="col-card reveal-item" style="border-top:4px solid #22d3ee; flex:1.2;">
+                    <h3 style="color:#22d3ee; font-size:1.4rem;">🎯 完美适配</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>🧪 <span class="highlight-cyan">生物学/医学研究生</span> – 快速出图写论文</li>
+                        <li>👩‍🏫 <span class="highlight-cyan">高校教师</span> – 教学演示，无需学生装软件</li>
+                        <li>🔬 <span class="highlight-cyan">实验室技术员</span> – 日常数据探索与汇报</li>
+                        <li>📊 <span class="highlight-cyan">科研助理</span> – 帮老板整理数据，省时省力</li>
+                        <li>🧑‍💻 <span class="highlight-cyan">转行数据分析的新手</span> – 从图形化界面理解统计逻辑</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" style="border-top:4px solid #f472b6; flex:1;">
+                    <h3 style="color:#f472b6; font-size:1.4rem;">💡 为什么适合你？</h3>
+                    <ul class="feature-list feature-list-sm feature-list-pink">
+                        <li>✅ 无需安装任何软件，浏览器打开即用</li>
+                        <li>✅ 不用记代码，点选变量就能出图</li>
+                        <li>✅ 统计结果自动生成，含<span class="highlight-pink">效应量、置信区间、多重校正</span></li>
+                        <li>✅ 图表配色<span class="highlight-pink">色盲友好</span>，可直接用于发表</li>
+                        <li>✅ 数据不上传服务器（Shinylive本地版）或会话结束后自动清除</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" style="margin-top:0.6rem; font-size: 1.2rem;">
+                🌐 访问地址：<span class="highlight-cyan">grafifyonline.shinyapps.io/grafify/</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 2：能做什么？ ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item" style="background:linear-gradient(120deg,#f97316,#fb923c);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            ✨ 能做什么？核心功能一览
+        </div>
+        <div class="sub reveal-item">绘图 + 统计 + 诊断，一应俱全</div>
+        <div class="glass-card reveal-item" style="max-width:1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" style="border-top:4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee; font-size:1.3rem;">📊 多种图表</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>箱线图、小提琴图、柱状图</li>
+                        <li><span class="highlight-cyan">Before–After 连线图</span>（配对数据）</li>
+                        <li>散点图 + 趋势线</li>
+                        <li><span class="highlight-cyan">对数轴变换</span>（log10/log2）</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" style="border-top:4px solid #f97316;">
+                    <h3 style="color:#f97316; font-size:1.3rem;">📈 统计分析</h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li><span class="highlight-orange">线性模型</span>（OLS）替代传统ANOVA</li>
+                        <li><span class="highlight-orange">混合效应模型</span>（随机截距）</li>
+                        <li>事后两两比较 + <span class="highlight-orange">效应量 (Cohen's d)</span></li>
+                        <li>FDR多重检验校正（Benjamini-Hochberg）</li>
+                        <li>残差<span class="highlight-orange">QQ图 + 密度图</span>诊断</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" style="border-top:4px solid #c084fc;">
+                    <h3 style="color:#c084fc; font-size:1.3rem;">🔒 隐私与部署</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>在线版数据<span class="highlight-purple">仅存于当前会话</span></li>
+                        <li>Shinylive本地版<span class="highlight-purple">完全在浏览器</span>运行</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="formula-frame small-formula reveal-item" style="margin-top:0.4rem; border-left-color:#f97316; font-size: 1.2rem;">
+                🧠 图表与统计联动 — 变换轴后统计自动更新
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 3：三步上手 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item" style="background:linear-gradient(120deg,#c084fc,#a78bfa);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            🚀 三步上手 · 今天就能用
+        </div>
+        <div class="sub reveal-item">真的只要三步，没有代码，没有安装</div>
+        <div class="glass-card reveal-item" style="max-width:1100px;">
+            <div class="two-col-compare">
+                <div class="col-card reveal-item" style="border-top:4px solid #34d399; flex:1.2;">
+                    <h3 style="color:#34d399; font-size:1.4rem;">📌 Step 1：准备数据</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>Excel 或 CSV 格式，<span class="highlight-emerald">tidy 数据</span>（每列一个变量）</li>
+                        <li>示例数据可直接加载，先体验再上传自己的</li>
+                        <li>支持 <span class="highlight-emerald">.xlsx, .xls, .csv, .tsv</span></li>
+                    </ul>
+                    <div style="margin-top:0.6rem; background:rgba(52,211,153,0.06); border-radius:12px; padding:0.3rem 0.8rem; border-left:3px solid #34d399;">
+                        <span style="color:#9aabca; font-size:1.05rem;">💡 不会整理？官网有示例数据格式可参考</span>
+                    </div>
+                </div>
+                <div class="col-card reveal-item" style="border-top:4px solid #fbbf24; flex:1;">
+                    <h3 style="color:#fbbf24; font-size:1.4rem;">🎯 Step 2：选择变量 + 绘图</h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li>在“Graphs”标签页选择 <span class="highlight-gold">X轴、Y轴、分组</span></li>
+                        <li>点击“Variables chosen” → “graffy my data”</li>
+                        <li>自动生成图表，可切换不同图表类型</li>
+                    </ul>
+                    <div style="margin-top:0.6rem; background:rgba(251,191,36,0.06); border-radius:12px; padding:0.3rem 0.8rem; border-left:3px solid #fbbf24;">
+                        <span style="color:#9aabca; font-size:1.05rem;">💡 支持 log 变换，一键切换</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-card reveal-item" style="border-top:4px solid #f472b6; width:100%; margin-top:0.6rem;">
+                <h3 style="color:#f472b6; font-size:1.4rem;">📊 Step 3：分析 + 导出</h3>
+                <ul class="feature-list feature-list-sm feature-list-pink">
+                    <li>切换到“ANOVAs”标签，选择模型类型（简单/混合）</li>
+                    <li>点击“Analyse my data” → 获得统计结果表 + 残差诊断图</li>
+                    <li>图表可<span class="highlight-pink">直接下载为 PNG/SVG/PDF</span>，统计结果可复制</li>
+                </ul>
+            </div>
+            <div class="glass-card-inner reveal-item" style="margin-top:0.6rem; font-size:1.2rem; border-color:rgba(251,191,36,0.2);">
+                🌟 就是这么简单！马上打开浏览器试试吧 
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 底部控件 ===== -->
+    <div class="progress-footer" style="display: none;">
+        <div class="timeline-bar" id="timelineBar"></div>
+    </div>
+    <div class="slide-counter" id="slideCounter">1 / 4</div>
+
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.slide');
+            const timeline = document.getElementById('timelineBar');
+            const counterSpan = document.getElementById('slideCounter');
+            let currentIdx = 0;
+            const totalSlides = slides.length;
+            let autoPlay = true;
+
+            let currentSlideItems = [];
+            let currentDurations = [];
+            let currentItemIndex = 0;
+            let currentTotalDuration = 0;
+
+            let progressTimer = null;
+            let itemTimer = null;
+
+            function getRevealItems(slide) {
+                return Array.from(slide.querySelectorAll('.reveal-item'));
+            }
+
+            function computeSlideDurations(slide) {
+                const items = getRevealItems(slide);
+                const durations = [];
+                let total = 0;
+                for (let i = 0; i < items.length; i++) {
+                    let dur = items[i].getAttribute('data-duration');
+                    let durNum = dur ? parseInt(dur) : 2000;
+                    if (isNaN(durNum)) durNum = 2000;
+                    durations.push(durNum);
+                    total += durNum;
+                }
+                return { items, durations, total };
+            }
+
+            function resetRevealItems(slide) {
+                const items = getRevealItems(slide);
+                items.forEach(item => {
+                    item.classList.remove('revealed');
+                });
+            }
+
+            function stopAllTimers() {
+                if (progressTimer) {
+                    clearInterval(progressTimer);
+                    progressTimer = null;
+                }
+                if (itemTimer) {
+                    clearTimeout(itemTimer);
+                    itemTimer = null;
+                }
+            }
+
+            function showNextItem() {
+                if (!autoPlay) return;
+                if (currentItemIndex >= currentSlideItems.length) {
+                    if (itemTimer) clearTimeout(itemTimer);
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) {
+                            goToSlide((currentIdx + 1) % totalSlides);
+                        }
+                    }, 500);
+                    return;
+                }
+
+                const item = currentSlideItems[currentItemIndex];
+                if (item && !item.classList.contains('revealed')) {
+                    item.classList.add('revealed');
+                }
+
+                const duration = currentDurations[currentItemIndex];
+                if (itemTimer) clearTimeout(itemTimer);
+                itemTimer = setTimeout(() => {
+                    if (autoPlay) {
+                        currentItemIndex++;
+                        showNextItem();
+                    }
+                }, duration);
+            }
+
+            function startCurrentSlide() {
+                stopAllTimers();
+
+                resetRevealItems(slides[currentIdx]);
+
+                const { items, durations, total } = computeSlideDurations(slides[currentIdx]);
+                currentSlideItems = items;
+                currentDurations = durations;
+                currentTotalDuration = total;
+                currentItemIndex = 0;
+
+                if (currentTotalDuration === 0 || items.length === 0) {
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) goToSlide((currentIdx + 1) % totalSlides);
+                    }, 2000);
+                    return;
+                }
+
+                let startTime = performance.now();
+                if (progressTimer) clearInterval(progressTimer);
+                progressTimer = setInterval(() => {
+                    if (!autoPlay) return;
+                    const now = performance.now();
+                    let elapsed = now - startTime;
+                    if (elapsed > currentTotalDuration) elapsed = currentTotalDuration;
+                    const percent = (elapsed / currentTotalDuration) * 100;
+                    timeline.style.width = `${percent}%`;
+                }, 50);
+
+                showNextItem();
+            }
+
+            function stopCurrentSlide() {
+                stopAllTimers();
+            }
+
+            function goToSlide(index) {
+                if (index === currentIdx) return;
+                if (index < 0) index = 0;
+                if (index >= totalSlides) index = 0;
+
+                stopCurrentSlide();
+
+                slides[currentIdx].classList.remove('active');
+                slides[index].classList.add('active');
+                currentIdx = index;
+                updateCounter();
+
+                timeline.style.width = '0%';
+
+                if (autoPlay) {
+                    startCurrentSlide();
+                } else {
+                    resetRevealItems(slides[currentIdx]);
+                    const firstItem = slides[currentIdx].querySelector('.reveal-item');
+                    if (firstItem) firstItem.classList.add('revealed');
+                    stopAllTimers();
+                }
+            }
+
+            function nextSlide() {
+                goToSlide((currentIdx + 1) % totalSlides);
+            }
+
+            function prevSlide() {
+                goToSlide((currentIdx - 1 + totalSlides) % totalSlides);
+            }
+
+            function toggleAutoPlay() {
+                autoPlay = !autoPlay;
+                if (autoPlay) {
+                    stopCurrentSlide();
+                    startCurrentSlide();
+                } else {
+                    stopAllTimers();
+                }
+            }
+
+            function updateCounter() {
+                counterSpan.innerText = `${currentIdx+1} / ${totalSlides}`;
+            }
+
+            function onKeyDown(e) {
+                const key = e.key;
+                if (key === ' ' || key === 'Space' || key === 'Spacebar') {
+                    e.preventDefault();
+                    toggleAutoPlay();
+                } else if (key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                } else if (key === 'ArrowRight') {
+                    e.preventDefault();
+                    nextSlide();
+                }
+            }
+
+            function init() {
+                slides.forEach((s, idx) => {
+                    if (idx === 0) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+                currentIdx = 0;
+                updateCounter();
+                autoPlay = true;
+                startCurrentSlide();
+                window.addEventListener('keydown', onKeyDown);
+            }
+
+            init();
+        })();
+    </script>
+
+<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
+<div class="sciviz-promo-no" aria-hidden="true">No.027 · 2026-08-30</div>
+<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
+padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
+border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
+letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+</body>
+</html>

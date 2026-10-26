@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="sciviz-promo" content="no=2;date=2025-09-13;id=002-go-enrichment-handbook">
+<title>No.002 · GO 富集分析上手手册</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f9fc;color:#1b2437;
+font:16px/1.85 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+-webkit-text-size-adjust:100%}
+.wrap{max-width:760px;margin:0 auto;padding:34px 22px 60px;background:#fff;min-height:100vh}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:#5b6b85}
+.no{padding:2px 10px;border-radius:999px;background:#5b6ee1;color:#fff;font-weight:700;
+letter-spacing:.04em}
+h1{font-size:1.62rem;line-height:1.36;margin:16px 0 12px}
+.lede{margin:0 0 28px;padding-left:12px;border-left:3px solid #dde3fb;
+color:#5b6b85;font-size:.95rem}
+h2{font-size:1.12rem;margin:34px 0 10px}
+p{margin:0 0 15px}
+figure{margin:24px 0}
+figure img{display:block;width:100%;height:auto;border:1px solid #e3e9f2;border-radius:10px;
+background:#fff}
+figcaption{margin-top:8px;font-size:12.5px;color:#5b6b85;text-align:center}
+.foot{margin-top:46px;padding-top:14px;border-top:1px solid #e3e9f2;
+font-size:12px;color:#5b6b85;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="meta"><span class="no">No.002</span><span>2025-09-13</span><span>GO富集 · 超几何检验 · 上手</span></div>
+  <h1>GO 富集分析上手手册</h1>
+  <p class="lede">从差异基因列表走到 GO 富集结果：背景集怎么定、p 值怎么校正、结果怎么读。</p>
+  <p><strong>GO 富集分析上手手册：从差异基因列表到结果解读，一次跑通！</strong></p>
+  <p><strong>如果你刚读完《听说过 GO 和 KEGG 吗？》那篇科普（👈 还没看的建议先补课），那你已经知道 GO 是干啥的了。</strong></p>
+  <p>现在，是时候亲手做一次 GO 富集分析了！</p>
+  <p>🧬 什么是 GO？快速回顾</p>
+  <p>GO（Gene Ontology）从 3 个维度系统注释基因功能：</p>
+  <p>BP（生物过程）：如“细胞凋亡”、“免疫应答”</p>
+  <p>CC（细胞组分）：如“线粒体”、“核糖体”</p>
+  <p>MF（分子功能）：如“ATP酶活性”、“DNA 结合”</p>
+  <p>👉 一句话总结：GO 告诉我们基因“在哪儿、做什么、怎么工作”。</p>
+  <p>✅ 标准分析流程（0 基础友好版）</p>
+  <p>1️⃣ 读取差异分析结果 → 从 DE_results.csv 开始</p>
+  <p>2️⃣ 筛选差异基因：|log₂FC| ≥ 1，FDR &lt; 0.05</p>
+  <p>3️⃣ 基因 ID 转换 → ENTREZID / ENSEMBL（别再直接用 Symbol！）</p>
+  <p>4️⃣ 设定背景基因 → 一定要用“本次测序检测到的所有基因”</p>
+  <p>5️⃣ GO 富集分析（超几何检验 + BH 校正）</p>
+  <p>6️⃣ 结果解读与报告 → 结合你的科学问题，聚焦关键功能条目</p>
+  <p>🧪 实战开始！示例数据一览</p>
+  <p>以下为模拟差异分析结果 DE_results.csv 片段：</p>
+  <p>gene</p>
+  <p>log2FC</p>
+  <p>pvalue</p>
+  <p>padj</p>
+  <p>GeneA</p>
+  <p>2.5</p>
+  <p>0.0001</p>
+  <p>0.001</p>
+  <p>GeneB</p>
+  <p>-1.8</p>
+  <p>0.0005</p>
+  <p>0.003</p>
+  <p>GeneC</p>
+  <p>1.2</p>
+  <p>0.002</p>
+  <p>0.01</p>
+  <p>GeneD</p>
+  <p>-2.1</p>
+  <p>0.0002</p>
+  <p>0.002</p>
+  <p>…</p>
+  <p>…</p>
+  <p>…</p>
+  <p>…</p>
+  <p>👉 使用条件：padj &lt; 0.05 且 |log2FC| ≥ 1，筛选出的差异基因进入 GO 富集。</p>
+  <p>🔍 R 语言实战（从读取文件开始）</p>
+  <p># Install (first time only)</p>
+  <p># install.packages(&quot;BiocManager&quot;)</p>
+  <p># BiocManager::install(c(&quot;clusterProfiler&quot;, &quot;org.Mm.eg.db&quot;, &quot;enrichplot&quot;))</p>
+  <p>library(clusterProfiler)</p>
+  <p>library(org.Mm.eg.db)  # Use org.Hs.eg.db for human</p>
+  <p>library(dplyr)</p>
+  <p># 1) Load DEG</p>
+  <p>resultsde &lt;- read.csv(&quot;DE_results.csv&quot;)</p>
+  <p>deg &lt;- de %&gt;%  filter(abs(log2FoldChange) &gt;= 1, padj &lt; 0.05) %&gt;%  pull(gene_symbol)</p>
+  <p># 2) ID conversionid_</p>
+  <p>map &lt;- bitr(deg, fromType = &quot;SYMBOL&quot;, toType = &quot;ENTREZID&quot;, OrgDb = org.Mm.eg.db)</p>
+  <p>bg_map &lt;- bitr(unique(de$gene_symbol), fromType = &quot;SYMBOL&quot;, toType = &quot;ENTREZID&quot;, OrgDb = org.Mm.eg.db)</p>
+  <p># 3) GO enrichment (BP example)</p>
+  <p>ego_bp &lt;- enrichGO(  gene = id_map$ENTREZID,  universe      = bg_map$ENTREZID,  OrgDb = org.Mm.eg.db,  keyType       = &quot;ENTREZID&quot;,  ont           = &quot;BP&quot;,  pAdjustMethod= &quot;BH&quot;,  pvalueCutoff  = 0.05,  qvalueCutoff  = 0.05,  readable      = TRUE)</p>
+  <p># 4) Visualization</p>
+  <p>library(ggplot2)</p>
+  <p>barplot(ego_bp, showCategory = 20, title = &quot;GO-BP Enrichment (Top20)&quot;)</p>
+  <p>dotplot(ego_bp, showCategory = 20, title = &quot;GO-BP Dotplot (Top20)&quot;)</p>
+  <p># 5) Export results</p>
+  <p>write.csv(as.data.frame(ego_bp), &quot;GO_BP_enrichment.csv&quot;, row.names = FALSE)bar.png&quot;, dpi=150)</p>
+  <p>🐍 Python 版实战（同样从文件开始）</p>
+  <p># pip install gseapy pandas matplotlib</p>
+  <p>import pandas as pd</p>
+  <p>import gseapy as gp</p>
+  <p>import matplotlib.pyplot as plt</p>
+  <p>import numpy as np</p>
+  <p># 1) Load DEG results</p>
+  <p>df = pd.read_csv(&quot;DE_results.csv&quot;)</p>
+  <p>deg = df.query(&quot;abs(log2FoldChange) &gt;= 1 and padj &lt; 0.05&quot;)[&quot;gene_symbol&quot;].dropna().tolist()</p>
+  <p>bg  = df[&quot;gene_symbol&quot;].dropna().unique().tolist()</p>
+  <p># 2) GO enrichment (Mouse / Human)</p>
+  <p>enr = gp.enrichr(</p>
+  <p>gene_list=deg,</p>
+  <p>gene_sets=[&quot;GO_Biological_Process_2023&quot;,</p>
+  <p>&quot;GO_Cellular_Component_2023&quot;,</p>
+  <p>&quot;GO_Molecular_Function_2023&quot;],</p>
+  <p>background=bg,</p>
+  <p>organism=&quot;Mouse&quot;,  # change to &quot;Human&quot; for human</p>
+  <p>outdir=&quot;gseapy_out&quot;,</p>
+  <p>cutoff=0.05</p>
+  <p>)</p>
+  <p># 3) Extract BP Top20</p>
+  <p>bp = enr.results.query(&quot;Gene_set=='GO_Biological_Process_2023'&quot;) \</p>
+  <p>.sort_values(&quot;Adjusted P-value&quot;).head(20)</p>
+  <p># 4) Plot bar chart</p>
+  <p>terms = bp[&quot;Term&quot;].str.replace(r&quot;\(\d+\)$&quot;, &quot;&quot;, regex=True)</p>
+  <p>plt.figure(figsize=(8,6))</p>
+  <p>plt.barh(range(len(terms)), -np.log10(bp[&quot;Adjusted P-value&quot;]))</p>
+  <p>plt.yticks(range(len(terms)), terms)</p>
+  <p>plt.xlabel(&quot;-log10(FDR)&quot;)</p>
+  <p>plt.title(&quot;GO-BP Enrichment (Top20)&quot;)</p>
+  <p>plt.tight_layout()</p>
+  <p>plt.savefig(&quot;GO_BP_bar.png&quot;, dpi=300)</p>
+  <p>⚠️ 避坑指南：GO 富集常见误区</p>
+  <p>误区</p>
+  <p>建议</p>
+  <p>❌ 直接用 Gene Symbol 富集</p>
+  <p>✅ 先转 ENTREZID/ENSEMBL，避免匹配错误</p>
+  <p>❌ 背景基因设为全基因组</p>
+  <p>✅ 使用本次实验检测到的基因集作为背景</p>
+  <p>❌ 仅依赖 p-value 判断</p>
+  <p>✅ 看 FDR (q-value) &lt; 0.05，更稳健</p>
+  <p>❌ 只做 BP，忽略 CC/MF</p>
+  <p>✅ 三者结合，功能注释更完整</p>
+  <p>❌ 罗列全部显著条目</p>
+  <p>✅ 优先选择与研究最相关的3~5个富集条目，并引用文献</p>
+  <p>📊 结果怎么看？重点指标解析</p>
+  <p>GeneRatio：差异基因中落在该通路的基因数量 / 总差异基因数</p>
+  <p>BgRatio：背景基因中属于该通路的基因数量 / 总背景基因数</p>
+  <p>pvalue / p.adjust：经过多重检验校正的显著性指标，FDR &lt; 0.05 说明显著富集</p>
+  <p>🧭 总结：GO 富集的关键点</p>
+  <p>GO 分析不只是跑流程，更是从数据到生物学故事的桥梁。记住：“选对基因、设对背景、校正显著、聚焦功能”——你就能做出可信又有意义的富集结果！</p>
+  <p>👉 接下来我们还会详解 KEGG 富集、GSEA……关注【生信博士的图研所】，不做湿实验也能发高分！</p>
+  <p>💡 收藏 + 转发，帮助更多小伙伴摆脱转录组富集焦虑！</p>
+  <div class="foot"><span>SciViz Kit · 推文 No.002</span><span>2025-09-13</span></div>
+</div>
+</body>
+</html>

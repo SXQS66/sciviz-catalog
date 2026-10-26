@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="sciviz-promo" content="no=10;date=2026-03-31;id=010-ora-gsea-combined">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No.010 · ORA + GSEA 联合富集策略</title>
+    <style>
+        /* ===== 继承九象限图风格，扩展五页布局 ===== */
+        :root {
+            --bg-light: #eef2f7;
+            --bg-dark: #d9e1ec;
+            --text-primary: #1e2b3c;
+            --text-secondary: #3f5569;
+            --mantel-teal: #2e8b8b;
+            --mantel-blue: #4a80aa;
+            --mantel-gold: #b8864b;
+            --mantel-purple: #8a6d9c;
+            --gsea-coral: #e67e5a;
+            --hyper-teal: #2c9c8c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            width: 1300px;
+            height: auto;
+            min-height: 2150px;
+            font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(145deg, var(--bg-light) 0%, var(--bg-dark) 100%);
+            overflow-x: hidden;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: scale(0.5);
+            transform-origin: top left;
+            position: relative;
+        }
+
+        .video-container {
+            width: 1300px;
+            min-height: 2150px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        .scene-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; 
+            min-height: 2150px;
+            padding: 40px 48px;
+            display: none;
+            opacity: 0;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            transition: opacity 0.35s ease;
+        }
+
+        .scene-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scene-active { display: flex; opacity: 1; }
+
+        .text-center { text-align: center; }
+        
+        .section-badge {
+            display: inline-block;
+            background: var(--mantel-gold);
+            color: white;
+            padding: 8px 28px;
+            border-radius: 40px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            box-shadow: 0 6px 16px rgba(128, 98, 58, 0.25);
+        }
+
+        .badge-hybrid {
+            background: linear-gradient(95deg, var(--hyper-teal), var(--mantel-purple));
+        }
+
+        .main-title {
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #2c3e50 0%, var(--mantel-purple) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .feature-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+            margin: 18px 0 22px;
+            justify-content: center;
+            max-width: 1100px;
+        }
+
+        .feature-item {
+            background: #eef3f9;
+            border-radius: 50px;
+            padding: 8px 22px;
+            font-size: 26px;
+            font-weight: 500;
+            color: #1e3b5c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 5px solid var(--mantel-blue);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .feature-item::before {
+            content: '●';
+            color: var(--mantel-gold);
+            font-size: 28px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 32px;
+            padding: 24px 28px;
+            margin: 18px 0;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 1150px;
+            border: 1px solid rgba(46,139,139,0.3);
+        }
+
+        .card-title {
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--mantel-purple);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 5px solid var(--mantel-gold);
+            padding-left: 20px;
+        }
+
+        .desc-text {
+            font-size: 28px;
+            line-height: 1.45;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 16px 0;
+        }
+
+        .info-block {
+            background: #fef9e6;
+            border-left: 5px solid var(--mantel-gold);
+            padding: 18px;
+            border-radius: 24px;
+        }
+        .info-block strong {
+            font-size: 26px;
+            color: var(--mantel-teal);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .info-block li {
+            margin-left: 16px;
+        }
+
+
+        .badge-light {
+            background: #eef2fa;
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 28px;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--mantel-teal);
+            margin-bottom: 12px;
+        }
+
+        .step-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .step-list li {
+            font-size: 26px;
+            padding: 10px 0 10px 32px;
+            border-bottom: 1px solid #e9edf2;
+            position: relative;
+        }
+        .step-list li::before {
+            content: "▹";
+            color: var(--mantel-gold);
+            font-weight: bold;
+            font-size: 28px;
+            position: absolute;
+            left: 0;
+            top: 8px;
+        }
+
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .pill {
+            background: #eef3f9;
+            border-radius: 50px;
+            padding: 5px 16px;
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--mantel-blue);
+            border: 1px solid var(--mantel-blue);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 30px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #e2e8f0;
+            padding: 10px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .comparison-table th {
+            background: #eef2fa;
+            font-weight: 700;
+            color: var(--mantel-teal);
+        }
+
+        .back-btn {
+            background: var(--mantel-blue);
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            font-size: 22px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 16px;
+            box-shadow: 0 4px 10px rgba(74,128,170,0.25);
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--mantel-purple);
+            transform: scale(1.02);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            margin: 18px 0;
+            justify-content: center;
+        }
+
+        .progress-indicator {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 1000;
+            background: rgba(255,255,240,0.8);
+            padding: 6px 16px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(57,73,96,0.4);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .progress-dot-active {
+            background: var(--mantel-gold);
+            transform: scale(1.4);
+        }
+
+        hr { margin: 16px 0; border-color: #d0dbea; }
+        .footer-note {
+            margin: 24px 0 12px;
+            font-size: 18px;
+            color: var(--mantel-purple);
+            text-align: center;
+        }
+        .highlight-text {
+            background: linear-gradient(120deg, #f9f2e0 0%, #f9f2e0 40%, transparent);
+            font-weight: 600;
+            padding: 0 4px;
+        }
+        .quote-note {
+            font-size: 24px;
+            font-style: italic;
+            color: #5d6e7e;
+            background: #f4f8fe;
+            padding: 14px 20px;
+            border-radius: 28px;
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="video-container">
+    <!-- 页面1：方法基石 · 超几何检验 vs GSEA 原理与互补 -->
+    <div class="scene-container scene-active" id="scene-step1">
+        <div style="text-align: center;">
+            <div class="section-badge badge-hybrid">📐 方法基石 · 双重富集范式</div>
+            <h1 class="main-title">超几何检验 & GSEA：协同而非互斥</h1>
+            <div class="feature-grid">
+                <div class="feature-item">🎯 ORA: 基于差异基因列表</div>
+                <div class="feature-item">📈 GSEA: 基于全基因排序</div>
+                <div class="feature-item">⚡ 优势互补，全面捕获通路</div>
+            </div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">🔬 超几何检验 (Over-Representation Analysis)</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;基于严格阈值筛选的显著差异基因（|log₂FC|≥1, FDR<0.05），检验特定基因集是否显著富集。<strong>二元分割</strong>，关注强烈信号。</div>
+            <div class="grid-2col">
+                <div class="info-block"><strong>✅ 优势</strong><ul style="font-size: 24px; margin-top: 6px;"><li>直观易解释，经典可靠</li><li>快速锁定核心信号通路</li><li>适合上下调分开富集</li></ul></div>
+                <div class="info-block"><strong>⚠️ 局限</strong><ul style="font-size: 24px;"><li>丢失弱但协同变化的基因</li><li>依赖主观阈值</li><li>无法体现排序趋势</li></ul></div>
+            </div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">📊 基因集富集分析 (GSEA)</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;基于<strong>所有基因按log₂FC等排序的列表</strong>，不设硬阈值，检测基因集是否在排序顶部/底部显著富集。捕捉微效协同变化。</div>
+            <div class="grid-2col">
+                <div class="info-block"><strong>✨ 核心亮点</strong><ul style="font-size: 24px;"><li>无需硬阈值，无信息损失</li><li>富集得分(ES)与NES排序</li><li>Leading-edge基因揭示核心驱动</li></ul></div>
+                <div class="info-block"><strong>📊 关键指标</strong><ul style="font-size: 24px;"><li>NES & FDR q-value <0.25</li><li>Leading-edge subset</li><li>表型相关方向性</li></ul></div>
+            </div>
+            <div class="pill-group"><div class="pill">🔹 fgsea / clusterProfiler</div><div class="pill">🔹 预排序基因列表</div><div class="pill">🔹 MSigDB/KEGG</div></div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">🤝 为什么需要联合？</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ORA聚焦“强信号通路”，GSEA捕获“全局趋势通路”，两者交集提供<strong>高置信度生物学模块</strong>，共识基因更可靠。</div>
+            <div class="quote-note">💡 联合策略显著降低假阳性/假阴性，提升靶标筛选严谨性。</div>
+        </div>
+        <div class="btn-group"><button class="back-btn" onclick="switchToScene('step2')">下一步：独立富集与方向性 →</button></div>
+    </div>
+
+    <!-- 页面2：上下调分离富集 + 通路精选（方向性预处理）-->
+    <div class="scene-container" id="scene-step2">
+        <div style="text-align: center;">
+            <div class="section-badge">🎯 第2步 · 方向性富集与通路瘦身</div>
+            <h1 class="main-title">上下调分离 · 精选核心通路池</h1>
+            <div class="feature-grid"><div class="feature-item">📈 上调基因单独ORA</div><div class="feature-item">📉 下调基因单独ORA</div><div class="feature-item">✂️ 通路瘦身保留3~8条</div></div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">🔁 方向性富集必要性</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;混合上下调会导致正负调控相互抵消，丢失生物学方向。促炎模型中上调富集“炎症反应”，下调富集“氧化磷酸化”，意义完全不同。</div>
+            <div class="grid-2col"><div class="info-block"><strong>📈 上调基因富集</strong><p style="font-size: 26px;">激活过程: 增殖/炎症/信号转导</p></div><div class="info-block"><strong>📉 下调基因富集</strong><p style="font-size: 26px;">抑制过程: 凋亡/代谢/分化</p></div></div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">📊 通路瘦身标准</div>
+            <div class="step-list"><li><strong>筛选1：</strong>富集基因数10~100（避免过泛/过窄）</li><li><strong>筛选2：</strong>FDR < 0.05 严格控制假阳性</li><li><strong>筛选3：</strong>生物学相关性优先（与表型直接相关）</li><li><strong>筛选4：</strong>富集倍数排序，人工精选3~8条核心通路</li></div>
+            <div class="pill-group"><div class="pill">🎯 常用: clusterProfiler</div><div class="pill">🎯 阈值: p.adjust<0.05</div><div class="pill">🎯 基因数10~100</div></div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">📌 案例示意：植物激素处理番茄</div>
+            <table class="comparison-table"><thead><tr><th>方向</th><th>核心通路</th><th>p.adjust</th><th>基因数</th></tr></thead><tbody><tr><td>上调</td><td>植物激素信号转导</td><td>2.1e-05</td><td>38</td></tr><tr><td>上调</td><td>MAPK signaling</td><td>0.0003</td><td>29</td></tr><tr><td>下调</td><td>光合作用-天线蛋白</td><td>1.2e-04</td><td>21</td></tr></tbody></table>
+        </div>
+        <div class="btn-group"><button class="back-btn" style="background:#6c757d;" onclick="switchToScene('step1')">← 返回原理</button><button class="back-btn" onclick="switchToScene('step3')">下一步：GSEA全局富集 →</button></div>
+    </div>
+
+    <!-- 页面3：GSEA全局富集 + Leading-edge基因提取 -->
+    <div class="scene-container" id="scene-step3">
+        <div style="text-align: center;">
+            <div class="section-badge">⚙️ 第3步 · GSEA全局富集与核心基因挖掘</div>
+            <h1 class="main-title">排序驱动 · 捕捉微效协同信号</h1>
+            <div class="feature-grid"><div class="feature-item">📊 全基因log₂FC排序</div><div class="feature-item">🔍 鉴定显著富集基因集</div><div class="feature-item">⭐ 提取leading-edge基因</div></div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">📈 GSEA执行关键参数</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;基于所有基因的表达变化排序（log₂FC从高到低），利用MSigDB/KEGG数据库，通过排列检验计算NES及FDR。</div>
+            <div class="grid-2col"><div class="info-block"><strong>✅ 显著阈值</strong><ul style="font-size: 24px;"><li>|NES| > 1.5</li><li>FDR q-value < 0.25</li><li>Nominal p-value < 0.05</li></ul></div><div class="info-block"><strong>⭐ Leading-edge 定义</strong><ul style="font-size: 24px;"><li>对富集得分贡献最大的基因</li><li>位于排序列表顶端/底端核心</li><li>通常是通路调控关键因子</li></ul></div></div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">🔍 GSEA与ORA重叠通路识别</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;将GSEA显著通路（FDR<0.25，|NES|>1.5）与ORA富集通路（上下调合并）取交集，得到“共识通路”集合，这些通路在两种方法下均稳健富集。</div>
+            <table class="comparison-table"><thead><tr><th>通路名称</th><th>ORA p.adj</th><th>GSEA NES</th><th>共识状态</th></tr></thead><tbody><tr><td>MAPK signaling pathway</td><td>0.0012</td><td>2.13</td><td>✅ 共识核心</td></tr><tr><td>Plant hormone signal</td><td>2.1e-05</td><td>1.98</td><td>✅ 共识核心</td></tr><tr><td>Endocytosis</td><td>0.023</td><td>1.32</td><td>⚠️ ORA边缘</td></tr></tbody></table>
+            <div class="badge-light">🎯 共识通路同时具备强差异驱动及全局协同趋势，优先用于下游基因筛选。</div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">📦 提取leading-edge基因池</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;从GSEA显著通路中提取所有leading-edge基因，这些基因是各个通路富集的核心贡献者，与表型变化最相关。</div>
+            <div class="pill-group"><div class="pill">示例基因: MAPK3, WRKY33, CDPK, ERF1</div><div class="pill">通常数量: 80~200个</div></div>
+        </div>
+        <div class="btn-group"><button class="back-btn" style="background:#6c757d;" onclick="switchToScene('step2')">← 返回ORA通路</button><button class="back-btn" onclick="switchToScene('step4')">下一步：三重交集筛选 →</button></div>
+    </div>
+
+    <!-- 页面4：三重交集筛选 (ORA差异基因 ∩ GSEA leading-edge ∩ PPI枢纽) -->
+    <div class="scene-container" id="scene-step4">
+        <div style="text-align: center;">
+            <div class="section-badge">✂️ 第4步 · 三重交集锁定高置信靶标</div>
+            <h1 class="main-title">通路基因 ∩ 差异基因 ∩ PPI枢纽 = 核心候选</h1>
+            <div class="feature-grid"><div class="feature-item">📦 共识通路内差异基因</div><div class="feature-item">⭐ GSEA leading-edge基因</div><div class="feature-item">🕸️ PPI网络枢纽筛选</div><div class="feature-item">✨ 交集降维至10~30个</div></div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">🔗 交集策略详解</div>
+            <div class="step-list">
+                <li><strong>第一重：</strong>从ORA显著通路（上下调核心通路）中提取通路内差异基因集合 A。</li>
+                <li><strong>第二重：</strong>从GSEA显著通路提取所有leading-edge基因集合 B。</li>
+                <li><strong>第三重：</strong>将A ∩ B 得到的基因导入PPI网络（STRING/Cytoscape），筛选Degree及MCC排名前15~25的枢纽基因，得到高置信度靶标集合 C。</li>
+            </div>
+            <div class="badge-light">💡 三重交集确保了基因在“差异表达”、“通路富集驱动”及“蛋白互作核心”三个维度均表现突出。</div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">📊 模拟案例：肺癌数据三重交集结果</div>
+            <table class="comparison-table"><thead><tr><th>基因</th><th>所属共识通路</th><th>log₂FC</th><th>Degree</th><th>Leading-edge出现次数</th></tr></thead><tbody><tr><td>CDK1</td><td>Cell cycle, p53</td><td>3.2</td><td>42</td><td>3</td></tr><tr><td>AURKA</td><td>Cell cycle</td><td>2.8</td><td>38</td><td>2</td></tr><tr><td>MAPK3</td><td>MAPK, ErbB</td><td>2.1</td><td>55</td><td>4</td></tr><tr><td>EGFR</td><td>MAPK, Ras</td><td>2.5</td><td>61</td><td>3</td></tr></tbody></table>
+            <div class="quote-note">📌 最终获得12个高置信候选基因，作为后续深入功能验证的核心。</div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">🕸️ PPI网络筛选增强可信度</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;使用Cytoscape的cytoHubba插件，基于MCC、Degree等算法，从交集基因中提取拓扑重要性最高的基因，有效剔除“孤立”边缘基因。</div>
+            <div class="pill-group"><div class="pill">STRING数据库置信度>0.7</div><div class="pill">Cytoscape可视化</div><div class="pill">MCC算法最优</div></div>
+        </div>
+        <div class="btn-group"><button class="back-btn" style="background:#6c757d;" onclick="switchToScene('step3')">← 返回GSEA</button><button class="back-btn" onclick="switchToScene('step5')">下一步：优先级评分与验证 →</button></div>
+    </div>
+
+    <!-- 页面5：功能注释、优先级评分及实验验证路径 -->
+    <div class="scene-container" id="scene-step5">
+        <div style="text-align: center;">
+            <div class="section-badge">🧪 第5步 · 功能注释 + 实验优先级矩阵</div>
+            <h1 class="main-title">从统计显著到生物学验证</h1>
+            <div class="feature-grid"><div class="feature-item">📚 多维数据库注释</div><div class="feature-item">📖 文献证据支撑</div><div class="feature-item">🎯 评分体系定级</div><div class="feature-item">✅ 验证路径设计</div></div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">🔍 多维功能注释</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;整合NCBI/UniProt、植物同源数据库(TAIR/Phytozome)、StringDB及转录因子库，对候选基因进行全面功能描述。</div>
+            <div class="grid-2col"><div class="info-block"><strong>📚 主要数据库</strong><ul style="font-size: 24px;"><li>UniProt功能域</li><li>KEGG/Reactome通路定位</li><li>PlantTFDB (植物)</li></ul></div><div class="info-block"><strong>📖 文献支持检索</strong><ul style="font-size: 24px;"><li>PubMed + 表型关键词</li><li>同源基因功能报道</li><li>功能验证文献PMID记录</li></ul></div></div>
+        </div>
+        <div class="content-card">
+            <div class="card-title">🎯 优先级评分矩阵</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;综合差异倍数、PPI枢纽性、共识通路数量、文献支持、实验可行性五项指标加权评分，筛选出高优先级靶标。</div>
+            <table class="comparison-table"><thead><tr><th>评分维度</th><th>权重</th><th>高分标准</th></tr></thead><tbody><tr><td>|log₂FC| 幅度</td><td>25%</td><td>>2.0</td></tr><tr><td>PPI Degree (top10%)</td><td>20%</td><td>排名前10%</td></tr><tr><td>共识通路出现次数</td><td>20%</td><td>≥2条共识通路</td></tr><tr><td>GSEA leading-edge频率</td><td>20%</td><td>≥3个基因集</td></tr><tr><td>文献及注释完整性</td><td>15%</td><td>有功能报道+明确结构域</td></tr></tbody></table>
+        </div>
+        <div class="content-card">
+            <div class="card-title">🧬 实验验证路径设计</div>
+            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;针对综合评分前5~8个基因，设计qRT-PCR验证表达趋势；Western blot检测蛋白水平；进一步利用CRISPRi/siRNA进行功能丧失实验，解析表型关联。</div>
+            <div class="grid-2col"><div class="info-block"><strong>🔬 初级验证</strong><ul style="font-size: 24px;"><li>qRT-PCR (独立样本)</li><li>Western blot (蛋白)</li><li>组织表达谱定位</li></ul></div><div class="info-block"><strong>⚙️ 机制深入</strong><ul style="font-size: 24px;"><li>过表达/敲低功能表型</li><li>下游靶标ChIP/双荧光素酶</li><li>动物/类器官模型验证</li></ul></div></div>
+        </div>
+    
+        <div class="btn-group"><button class="back-btn" style="background:#6c757d;" onclick="switchToScene('step4')">← 返回交集筛选</button><button class="back-btn" onclick="switchToScene('step1')">🏠 回到首页</button></div>
+    </div>
+</div>
+
+<div class="progress-indicator" style="display: none;">
+    <div class="progress-dot progress-dot-active" data-scene="step1"></div>
+    <div class="progress-dot" data-scene="step2"></div>
+    <div class="progress-dot" data-scene="step3"></div>
+    <div class="progress-dot" data-scene="step4"></div>
+    <div class="progress-dot" data-scene="step5"></div>
+</div>
+
+<script>
+    (function() {
+        const scenes = ['step1', 'step2', 'step3', 'step4', 'step5'];
+        let currentScene = 'step1';
+        
+        const sceneElements = {
+            step1: document.getElementById('scene-step1'),
+            step2: document.getElementById('scene-step2'),
+            step3: document.getElementById('scene-step3'),
+            step4: document.getElementById('scene-step4'),
+            step5: document.getElementById('scene-step5')
+        };
+        
+        const progressDots = document.querySelectorAll('.progress-dot');
+
+        window.switchToScene = function(sceneId) {
+            Object.values(sceneElements).forEach(scene => {
+                if (scene) {
+                    scene.classList.remove('scene-active');
+                    scene.style.opacity = 0;
+                }
+            });
+            
+            const targetScene = sceneElements[sceneId];
+            if (targetScene) {
+                targetScene.classList.add('scene-active');
+                targetScene.style.opacity = 1;
+                targetScene.scrollTop = 0;
+            }
+            
+            progressDots.forEach((dot, idx) => {
+                dot.classList.remove('progress-dot-active');
+                if (idx < scenes.length && scenes[idx] === sceneId) {
+                    dot.classList.add('progress-dot-active');
+                }
+            });
+            currentScene = sceneId;
+        };
+
+        progressDots.forEach((dot, idx) => {
+            dot.addEventListener('click', function() {
+                if (idx < scenes.length) {
+                    switchToScene(scenes[idx]);
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            const currentIndex = scenes.indexOf(currentScene);
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                const nextIndex = (currentIndex + 1) % scenes.length;
+                switchToScene(scenes[nextIndex]);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const prevIndex = (currentIndex - 1 + scenes.length) % scenes.length;
+                switchToScene(scenes[prevIndex]);
+            }
+        });
+
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.scene-container').forEach(scene => {
+                scene.style.opacity = 0;
+            });
+            const step1Scene = sceneElements.step1;
+            if (step1Scene) {
+                step1Scene.classList.add('scene-active');
+                step1Scene.style.opacity = 1;
+            }
+        });
+    })();
+</script>
+
+<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
+<div class="sciviz-promo-no" aria-hidden="true">No.010 · 2026-03-31</div>
+<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
+padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
+border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
+letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+</body>
+</html>

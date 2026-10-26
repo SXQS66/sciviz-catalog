@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="sciviz-promo" content="no=28;date=2026-09-06;id=028-wgcna-sample-size">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>No.028 · WGCNA 到底要多少样本</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --bg-deep: #05020c;
+            --glow-purple: #7c3aed;
+            --purple-light: #a78bfa;
+            --hot-pink: #ec4899;
+            --cyan-accent: #22d3ee;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --slate-dark: #1e293b;
+            --glass: rgba(15, 25, 45, 0.45);
+            --glass-border: rgba(168, 139, 255, 0.25);
+            --orange-accent: #f97316;
+            --rose: #f43f5e;
+        }
+        body {
+            background: radial-gradient(ellipse at 15% 25%, rgba(124, 58, 237, 0.35), transparent 55%),
+                radial-gradient(circle at 80% 85%, rgba(14, 165, 233, 0.2), transparent 50%),
+                #05020c;
+            font-family: 'Inter', system-ui, -apple-system, 'PingFang SC', 'Segoe UI', BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            color: #f0f2fe;
+            height: 100vh;
+            width: 100vw;
+        }
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: 2rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.96) translateY(18px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.7s ease;
+            pointer-events: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .slide::-webkit-scrollbar {
+            width: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .slide::-webkit-scrollbar-thumb {
+            background: #a78bfa;
+            border-radius: 10px;
+        }
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+        .title-lg {
+            font-size: 3.2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.2rem;
+            line-height: 1.2;
+        }
+        .title-md {
+            font-size: 2.4rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(120deg, #e0d6ff, #fbcfe8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.4rem;
+            line-height: 1.2;
+        }
+        .sub {
+            font-size: 1.2rem;
+            color: #bac8e0;
+            text-align: center;
+            max-width: 85%;
+            margin-top: 0.2rem;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+        .sub-sm {
+            font-size: 0.95rem;
+            color: #9aabca;
+            text-align: center;
+            max-width: 90%;
+            margin-top: 0.3rem;
+        }
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 1.2rem 1.8rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(124, 58, 237, 0.2);
+            width: 100%;
+            max-width: 1100px;
+        }
+        .glow-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(14, 165, 233, 0.1));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(168, 85, 247, 0.65);
+            box-shadow: 0 0 32px rgba(124, 58, 237, 0.4);
+        }
+        .glass-card-inner {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 18px;
+            padding: 0.6rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+            width: 100%;
+            margin: 0.6rem auto 0;
+        }
+        .formula-frame {
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 40px;
+            padding: 0.6rem 1.4rem;
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 1.0rem;
+            font-weight: 600;
+            text-align: center;
+            border-left: 6px solid var(--cyan-accent);
+            color: #cffafe;
+            margin: 0.4rem 0;
+        }
+        .small-formula {
+            font-size: 0.9rem;
+        }
+        .col-card {
+            background: rgba(10, 12, 35, 0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            flex: 1;
+        }
+        .col-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.4rem;
+            margin-left: 0.6rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.6rem;
+        }
+        .feature-list {
+            list-style: none;
+            margin-left: 1rem;
+            font-size: 1.2rem;
+            line-height: 1.4;
+        }
+        .feature-list li {
+            margin: 0.3rem 0;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .feature-list li::before {
+            content: "▹";
+            color: #22d3ee;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .feature-list-sm li {
+            font-size: 1.1rem;
+            margin: 0.2rem 0;
+        }
+        .feature-list-gold li::before {
+            color: #fbbf24;
+        }
+        .feature-list-pink li::before {
+            color: #f472b6;
+        }
+        .feature-list-purple li::before {
+            color: #c084fc;
+        }
+        .feature-list-emerald li::before {
+            color: #34d399;
+        }
+        .feature-list-rose li::before {
+            color: #f43f5e;
+        }
+        .highlight-pink {
+            color: #f472b6;
+            font-weight: 600;
+        }
+        .highlight-cyan {
+            color: #22d3ee;
+            font-weight: 600;
+        }
+        .highlight-purple {
+            color: #c084fc;
+            font-weight: 600;
+        }
+        .highlight-gold {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+        .highlight-emerald {
+            color: #34d399;
+            font-weight: 600;
+        }
+        .highlight-orange {
+            color: #fb923c;
+            font-weight: 600;
+        }
+        .highlight-rose {
+            color: #f43f5e;
+            font-weight: 600;
+        }
+        .story-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin: 0.6rem 0;
+        }
+        .story-flow .step {
+            background: rgba(20, 30, 55, 0.6);
+            padding: 0.4rem 1.0rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .story-flow .arrow {
+            color: #6b7a9a;
+            font-size: 1.2rem;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin: 0.2rem 0;
+        }
+        .grid-2col .col-card {
+            margin: 0;
+        }
+        .grid-3col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.8rem;
+            margin: 0.2rem 0;
+        }
+        .grid-3col .col-card {
+            margin: 0;
+        }
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.5s ease;
+        }
+        .reveal-item.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-item-short {
+            /* 仅用于JS识别 */
+        }
+        .progress-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: transparent;
+        }
+        .timeline-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #0ea5e9, #f97316);
+            width: 0%;
+            transition: width 0.05s linear;
+        }
+        .slide-counter {
+            position: fixed;
+            bottom: 16px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(12px);
+            padding: 4px 14px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #c4b5fd;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 55;
+            font-family: monospace;
+        }
+        .tip-box {
+            background: rgba(34, 211, 238, 0.08);
+            border-left: 4px solid #22d3ee;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            margin-top: 0.4rem;
+            font-size: 0.9rem;
+            color: #d4d4e8;
+        }
+        .tip-box .label {
+            color: #22d3ee;
+            font-weight: 600;
+            margin-right: 0.4rem;
+        }
+        .tip-box-rose {
+            background: rgba(244, 63, 94, 0.08);
+            border-left-color: #f43f5e;
+        }
+        .tip-box-rose .label {
+            color: #f43f5e;
+        }
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            justify-content: center;
+            margin: 0.8rem 0 0.2rem;
+        }
+        .badge-list span {
+            background: rgba(34, 211, 238, 0.12);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: #22d3ee;
+        }
+        .badge-list .gold {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fbbf24;
+        }
+        .badge-list .pink {
+            background: rgba(236, 72, 153, 0.12);
+            color: #f472b6;
+        }
+        .badge-list .rose {
+            background: rgba(244, 63, 94, 0.12);
+            color: #f43f5e;
+        }
+        .radar-icon {
+            font-size: 3.5rem;
+            margin-bottom: 0.2rem;
+            display: block;
+            text-align: center;
+        }
+        .glass-card-centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 样本量示意图条 */
+        .sample-bar-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            margin: 0.6rem 0;
+        }
+        .sample-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            padding: 0.6rem 1.0rem;
+            min-width: 100px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .sample-bar .count {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        .sample-bar .label {
+            font-size: 0.85rem;
+            color: #9aabca;
+        }
+        .sample-bar.danger .count { color: #f43f5e; }
+        .sample-bar.warn .count { color: #fbbf24; }
+        .sample-bar.safe .count { color: #34d399; }
+        .figure-frame {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(168, 139, 255, 0.3);
+            border-radius: 22px;
+            padding: 0.8rem;
+            margin: 0.4rem 0;
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+        }
+        .figure-frame svg {
+            width: 100%;
+            max-height: 40vh;
+            border-radius: 14px;
+            display: block;
+            margin: 0 auto;
+        }
+        .figure-caption {
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            color: #9aabca;
+            line-height: 1.5;
+        }
+        .figure-caption .hl {
+            color: #c084fc;
+            font-weight: 600;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin: 0.4rem 0;
+            width: 100%;
+        }
+        .summary-item {
+            background: rgba(10, 12, 35, 0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 0.8rem 0.8rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: border-color 0.3s;
+        }
+        .summary-item .title {
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: #e0d6ff;
+            margin-bottom: 0.4rem;
+        }
+        .summary-item .desc {
+            font-size: 1.2rem;
+            color: #9aabca;
+            line-height: 1.5;
+        }
+        .summary-item:hover {
+            border-color: rgba(168, 139, 255, 0.4);
+        }
+        .stat-highlight {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f43f5e, #f97316);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 幻灯片 0：首页 ===== -->
+    <div class="slide active">
+        <div class="title-lg reveal-item reveal-item-short" style="background:linear-gradient(135deg,#e0d6ff,#fbcfe8,#a78bfa);background-clip:text;-webkit-background-clip:text;color:transparent; margin-bottom: 0.4rem;">
+            WGCNA 样本量
+        </div>
+        <div class="title-md reveal-item reveal-item-short" style="font-size:1.8rem; background:linear-gradient(120deg,#f43f5e,#f97316);background-clip:text;-webkit-background-clip:text;color:transparent; margin-bottom:0.4rem;">
+            最容易犯的错误：样本量不够还硬做
+        </div>
+        <div class="sub reveal-item reveal-item-short" style="margin:0.2rem 0 0.8rem;">
+            代码能跑出结果 ≠ 结果可信 <br> 小样本下的"完美"模块大多是统计假象
+        </div>
+        <div class="glass-card reveal-item reveal-item-short glass-card-centered" style="max-width:450px; display: none;">
+            <div class="figure-frame">
+                <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0" y="0" width="400" height="220" rx="12" fill="rgba(10,12,35,0.4)" />
+                    <!-- 模拟散点：小样本下的虚假模块 -->
+                    <circle cx="80" cy="80" r="5" fill="#f43f5e" opacity="0.9" />
+                    <circle cx="95" cy="72" r="5" fill="#f43f5e" opacity="0.9" />
+                    <circle cx="110" cy="85" r="5" fill="#f43f5e" opacity="0.9" />
+                    <circle cx="85" cy="95" r="5" fill="#f43f5e" opacity="0.9" />
+                    <circle cx="105" cy="100" r="5" fill="#f43f5e" opacity="0.9" />
+                    <circle cx="280" cy="60" r="5" fill="#34d399" opacity="0.9" />
+                    <circle cx="295" cy="55" r="5" fill="#34d399" opacity="0.9" />
+                    <circle cx="310" cy="70" r="5" fill="#34d399" opacity="0.9" />
+                    <circle cx="285" cy="75" r="5" fill="#34d399" opacity="0.9" />
+                    <circle cx="305" cy="80" r="5" fill="#34d399" opacity="0.9" />
+                    <circle cx="200" cy="140" r="4" fill="#6b7a9a" opacity="0.5" />
+                    <circle cx="215" cy="135" r="4" fill="#6b7a9a" opacity="0.5" />
+                    <circle cx="190" cy="150" r="4" fill="#6b7a9a" opacity="0.5" />
+                    <circle cx="230" cy="145" r="4" fill="#6b7a9a" opacity="0.5" />
+                    <circle cx="160" cy="120" r="4" fill="#6b7a9a" opacity="0.5" />
+                    <circle cx="320" cy="130" r="4" fill="#6b7a9a" opacity="0.5" />
+                    <circle cx="50" cy="150" r="4" fill="#6b7a9a" opacity="0.5" />
+                    <!-- 虚线框：假模块 -->
+                    <ellipse cx="95" cy="85" rx="38" ry="28" fill="none" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" />
+                    <ellipse cx="295" cy="68" rx="38" ry="28" fill="none" stroke="#34d399" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" />
+                    <text x="75" y="130" fill="#f43f5e" font-size="11" opacity="0.8">虚假模块A</text>
+                    <text x="275" y="115" fill="#34d399" font-size="11" opacity="0.8">虚假模块B</text>
+                    <text x="150" y="195" fill="#9aabca" font-size="11" text-anchor="middle">n = 12 个样本 · 看似完美的模块划分</text>
+                </svg>
+            </div>
+        </div>
+        <div class="glass-card glow-card reveal-item" style="max-width:1000px;">
+            <div style="font-size:1.1rem; text-align:center; margin-bottom:0.5rem; color:#bac8e0;">
+                📌 样本越少，模块越"漂亮" —— 但越不可信
+            </div>
+            <div class="story-flow">
+                <span class="step" style="border-color:#f43f5e;color:#f43f5e;">📊 十几个样本</span>
+                <span class="arrow">→</span>
+                <span class="step" style="border-color:#fbbf24;color:#fbbf24;">⚙️ 硬跑WGCNA</span>
+                <span class="arrow">→</span>
+                <div>
+                    <span class="step" style="border-color:#34d399;color:#34d399;">📈 r=0.9 热图</span>
+                    <span class="arrow">→</span>
+                    <span class="step" style="border-color:#f43f5e;color:#f43f5e;">❌ 参数一变就消失</span>
+                </div>
+            </div>
+            <div class="glass-card-inner" style="margin-top:1rem; border-color:rgba(168,139,255,0.2); font-size:1.2rem;">
+                🔑 WGCNA 官方建议：<span class="highlight-rose">至少 15 个样本</span>，<span class="highlight-gold">最好 20 个以上</span>
+            </div>
+            <div class="badge-list">
+                <span class="rose">⚠️ 样本 &lt; 15：不推荐</span>
+                <span class="gold">📊 15–20：勉强可行</span>
+                <span class="pink">✅ ≥ 20：推荐起步</span>
+            </div>
+        </div>
+        <div class="sub-sm reveal-item" style="margin-top:0.3rem; display:none;">
+            ← → 翻页 · 空格 暂停/播放
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 1：WGCNA 分析的是什么 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item reveal-item-short" style="background:linear-gradient(120deg,#c084fc,#e879f9);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            🧬 WGCNA 分析的不是单个基因
+        </div>
+        <div class="sub reveal-item reveal-item-short">而是基因与基因之间的 <span class="highlight-purple">共表达关联</span></div>
+        <div class="glass-card reveal-item reveal-item-short" style="max-width:1000px;">
+            <div class="grid-2col">
+                <div class="col-card reveal-item" style="border-top:4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee; font-size:1.3rem;">📊 差异分析</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>对比两组样本的<span class="highlight-cyan">表达均值差异</span></li>
+                        <li>对样本量容错率相对较高</li>
+                        <li>每个基因独立检验</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" style="border-top:4px solid #f43f5e;">
+                    <h3 style="color:#f43f5e; font-size:1.3rem;">🔗 WGCNA</h3>
+                    <ul class="feature-list feature-list-sm feature-list-rose">
+                        <li>捕捉<span class="highlight-rose">基因间的共表达相关性</span></li>
+                        <li><span class="highlight-rose">需要足够样本清关联结构才稳定</span></li>
+                        <li>样本太少时，相关性极易被个别样本拉高</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="formula-frame reveal-item" style="margin-top:0.5rem; border-left-color:#f43f5e; font-size:1.0rem;">
+                样本不足 → 相关估计噪声过大 → 模块无生物学意义
+            </div>
+            <div class="tip-box tip-box-rose reveal-item" style="margin-top:0.6rem; font-size:1.05rem;">
+                <span class="label">⚠️</span> WGCNA 官方 FAQ 明确指出：<span class="highlight-rose">少于 15 个样本的数据集，相关性估计噪声过大，网络难以具有生物学意义</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 2：小样本的"相关性虚高"陷阱 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item reveal-item-short" style="background:linear-gradient(120deg,#f43f5e,#fb923c);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            📈 小样本 = 相关性虚高
+        </div>
+        <div class="sub reveal-item reveal-item-short">样本越少，模块与表型的相关系数反而越夸张</div>
+        <div class="glass-card reveal-item reveal-item-short" style="max-width:1000px;">
+            <div class="grid-2col">
+                <div class="col-card reveal-item" style="border-top:4px solid #f43f5e;">
+                    <h3 style="color:#f43f5e; font-size:1.3rem;">🧪 现象</h3>
+                    <ul class="feature-list feature-list-sm feature-list-rose">
+                        <li>n = 12 时，模块与表型 <span class="highlight-rose">r = 0.85</span></li>
+                        <li>删掉 1 个离群样本 → <span class="highlight-rose">r 跌到 0.4</span></li>
+                        <li>换一种缺失值处理方法 → 最相关模块变了</li>
+                        <li>漂亮的热图 ≠ 稳定的信号</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" style="border-top:4px solid #fbbf24;">
+                    <h3 style="color:#fbbf24; font-size:1.3rem;">🔍 原因</h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li>相关系数在 <span class="highlight-gold">小样本下极不稳定</span></li>
+                        <li><span class="highlight-gold">单个高表达样本就能拉高整个相关系数</span></li>
+                        <li>有限样本量下比较网络结构 → 易产生虚假发现</li>
+                        <li>高相关 ≠ 信号强，往往是统计假象</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" style="margin-top:0.6rem; border-color:rgba(244,63,94,0.3); font-size:1.05rem; border-left:4px solid #f43f5e;">
+                ⚠️ 小样本的高相关，不代表结果好 —— 大概率是 <span class="highlight-rose">不稳定的统计假象</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 3：样本量对 Hub Gene 的影响 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item reveal-item-short" style="background:linear-gradient(120deg,#f472b6,#ec4899);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            🎯 Hub Gene 对样本量极其敏感
+        </div>
+        <div class="sub reveal-item reveal-item-short">模块不稳定 → Hub Gene 自然也不稳定</div>
+        <div class="glass-card reveal-item reveal-item-short" style="max-width:1000px;">
+            <div class="grid-2col">
+                <div class="col-card reveal-item" style="border-top:4px solid #ec4899;">
+                    <h3 style="color:#ec4899; font-size:1.3rem;">🔄 同一个数据，不同设置</h3>
+                    <ul class="feature-list feature-list-sm feature-list-pink">
+                        <li>第一次分析 → <span class="highlight-pink">Hub Gene A</span></li>
+                        <li>换个软阈值 → <span class="highlight-pink">Hub Gene B</span></li>
+                        <li>删除一个异常样本 → 关键模块被拆开</li>
+                        <li>重新选高变基因 → Hub 名单全换</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" style="border-top:4px solid #fbbf24;">
+                    <h3 style="color:#fbbf24; font-size:1.3rem;">💡 为什么</h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li>Hub Gene = 模块内连接强度最高的基因</li>
+                        <li>模块本身不稳定 → Hub 必然漂移</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tip-box tip-box-rose reveal-item" style="margin-top:0.6rem; font-size:0.95rem;">
+                <span class="label">⚠️</span> 小样本下跑出的 Top Hub Gene，换个参数就可能完全消失 —— 这不是偶然，是样本量不足的必然
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 4：别拿差异基因来"解决"样本不足 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item reveal-item-short" style="background:linear-gradient(120deg,#fb923c,#f97316);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            🚫 别拿差异基因跑 WGCNA
+        </div>
+        <div class="sub reveal-item reveal-item-short">先筛 DEG 再跑 WGCNA = 自欺欺人，解决不了样本不足</div>
+        <div class="glass-card reveal-item reveal-item-short" style="max-width:1000px;">
+            <div class="grid-2col">
+                <div class="col-card reveal-item" style="border-top:4px solid #f97316;">
+                    <h3 style="color:#f97316; font-size:1.3rem;">❌ 问题</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>先筛差异基因 → 人为预设了组间差异</li>
+                        <li>后续模块与疾病高度相关 → 前期筛选带来的人为偏差</li>
+                        <li>不是网络分析真实挖掘出的规律</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" style="border-top:4px solid #34d399;">
+                    <h3 style="color:#34d399; font-size:1.3rem;">✅ 正确做法</h3>
+                    <ul class="feature-list feature-list-sm feature-list-emerald">
+                        <li>WGCNA 应使用低表达过滤后的大部分基因</li>
+                        <li>或一定数量的高变基因</li>
+                        <li>从全局共表达网络中无偏挖掘模块</li>
+                        <li>提前塞入显著基因 → 分析意义已改变</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" style="margin-top:0.6rem; border-color:rgba(251,191,36,0.3); font-size:1.05rem; border-left:4px solid #fbbf24;">
+                💡 WGCNA 的核心价值是 <span class="highlight-gold">无偏挖掘</span>，不是给 DEG 做二次验证
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 5：如何判断结果稳不稳 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item reveal-item-short" style="background:linear-gradient(120deg,#34d399,#6ee7b7);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            🔬 稳定性测试：结果可信的试金石
+        </div>
+        <div class="sub reveal-item reveal-item-short">参数微调、样本扰动后依然稳定，才是真正可信的结果</div>
+        <div class="glass-card reveal-item reveal-item-short" style="max-width:1000px;">
+            <div class="grid-2col">
+                <div class="col-card reveal-item" style="border-top:4px solid #34d399;">
+                    <h3 style="color:#34d399; font-size:1.3rem;">🧪 测试方法</h3>
+                    <ul class="feature-list feature-list-sm feature-list-emerald">
+                        <li>删除一个样本后重新分析 → 关键模块还在吗？</li>
+                        <li>更换合理范围内的软阈值 → 模块划分大幅变化？</li>
+                        <li>调整高变基因数量 → 候选模块/Hub 稳定？</li>
+                        <li>有独立队列 → <span class="highlight-emerald">模块保留性分析</span></li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" style="border-top:4px solid #f43f5e;">
+                    <h3 style="color:#f43f5e; font-size:1.3rem;">📋 判断标准</h3>
+                    <ul class="feature-list feature-list-sm feature-list-rose">
+                        <li>稍微改参数结果就变 → 稳定性有限</li>
+                        <li>关键模块、功能方向、候选基因在不同设置下仍相近</li>
+                        <li>→ <span class="highlight-emerald">结果才值得继续往下做</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tip-box reveal-item" style="margin-top:0.6rem; font-size:0.95rem;">
+                <span class="label">💡</span> WGCNA 不是跑一次出图就结束了。尤其是样本不多时，<span class="highlight-cyan">稳定性检查比多画几张网络图更重要</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 6：总结 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item reveal-item-short" style="background:linear-gradient(120deg,#a78bfa,#c084fc);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            🧭 核心要点
+        </div>
+        <div class="sub reveal-item reveal-item-short">代码能跑完 ≠ 结果可信 · 稳定才是硬道理</div>
+        <div class="glass-card reveal-item" style="max-width:1000px;">
+            <div class="summary-grid">
+                <div class="summary-item reveal-item" style="border-top:3px solid #f43f5e;">
+                    <div class="title">⚠️ 样本量门槛</div>
+                    <div class="desc">官方建议 <span class="highlight-rose">≥ 15</span>，<span class="highlight-gold">最好 ≥ 20</span></div>
+                </div>
+                <div class="summary-item reveal-item" style="border-top:3px solid #fbbf24;">
+                    <div class="title">📈 相关性虚高</div>
+                    <div class="desc">小样本下 r=0.9 不一定是信号强，往往是 <span class="highlight-gold">统计假象</span></div>
+                </div>
+                <div class="summary-item reveal-item" style="border-top:3px solid #f472b6;">
+                    <div class="title">🎯 Hub 不稳定</div>
+                    <div class="desc">模块不稳 → Hub Gene 漂移 → 换个参数 Top 名单全变</div>
+                </div>
+                <div class="summary-item reveal-item" style="border-top:3px solid #34d399;">
+                    <div class="title">🔬 稳定性验证</div>
+                    <div class="desc">删样本、换阈值、调参数 —— <span class="highlight-emerald">结果不变才可信</span></div>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" style="margin-top:0.6rem; border-color:rgba(168,139,255,0.2); font-size:1.2rem;">
+                ⚡ WGCNA 真正有价值的，是找到 <span class="highlight-cyan">能够重复出现的共表达结构</span>，而不是给每个项目配一张彩色模块图
+            </div>
+            <div class="badge-list reveal-item" style="margin-top:0.6rem;">
+                <span class="rose">📊 样本不足 → 不硬做</span>
+                <span class="gold">🧪 稳定性测试 → 必须做</span>
+                <span class="pink">✅ 结果稳定 → 才可信</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 底部控件 ===== -->
+    <div class="progress-footer" style="display:none;">
+        <div class="timeline-bar" id="timelineBar"></div>
+    </div>
+    <div class="slide-counter" id="slideCounter">1 / 7</div>
+
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.slide');
+            const timeline = document.getElementById('timelineBar');
+            const counterSpan = document.getElementById('slideCounter');
+            let currentIdx = 0;
+            const totalSlides = slides.length;
+            let autoPlay = true;
+
+            let currentSlideItems = [];
+            let currentDurations = [];
+            let currentItemIndex = 0;
+            let currentTotalDuration = 0;
+
+            let progressTimer = null;
+            let itemTimer = null;
+
+            function getRevealItems(slide) {
+                return Array.from(slide.querySelectorAll('.reveal-item'));
+            }
+
+            function computeSlideDurations(slide) {
+                const items = getRevealItems(slide);
+                const durations = [];
+                let total = 0;
+                for (let i = 0; i < items.length; i++) {
+                    const el = items[i];
+                    let dur = el.getAttribute('data-duration');
+                    if (dur !== null) {
+                        dur = parseInt(dur);
+                    } else {
+                        if (el.classList.contains('reveal-item-short')) {
+                            dur = 700;
+                        } else {
+                            dur = 1500;
+                        }
+                    }
+                    if (isNaN(dur)) dur = 1500;
+                    durations.push(dur);
+                    total += dur;
+                }
+                return { items, durations, total };
+            }
+
+            function resetRevealItems(slide) {
+                const items = getRevealItems(slide);
+                items.forEach(item => {
+                    item.classList.remove('revealed');
+                });
+            }
+
+            function stopAllTimers() {
+                if (progressTimer) {
+                    clearInterval(progressTimer);
+                    progressTimer = null;
+                }
+                if (itemTimer) {
+                    clearTimeout(itemTimer);
+                    itemTimer = null;
+                }
+            }
+
+            function showNextItem() {
+                if (!autoPlay) return;
+                if (currentItemIndex >= currentSlideItems.length) {
+                    if (itemTimer) clearTimeout(itemTimer);
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) {
+                            goToSlide((currentIdx + 1) % totalSlides);
+                        }
+                    }, 400);
+                    return;
+                }
+
+                const item = currentSlideItems[currentItemIndex];
+                if (item && !item.classList.contains('revealed')) {
+                    item.classList.add('revealed');
+                }
+
+                const duration = currentDurations[currentItemIndex];
+                if (itemTimer) clearTimeout(itemTimer);
+                itemTimer = setTimeout(() => {
+                    if (autoPlay) {
+                        currentItemIndex++;
+                        showNextItem();
+                    }
+                }, duration);
+            }
+
+            function startCurrentSlide() {
+                stopAllTimers();
+
+                resetRevealItems(slides[currentIdx]);
+
+                const { items, durations, total } = computeSlideDurations(slides[currentIdx]);
+                currentSlideItems = items;
+                currentDurations = durations;
+                currentTotalDuration = total;
+                currentItemIndex = 0;
+
+                if (currentTotalDuration === 0 || items.length === 0) {
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) goToSlide((currentIdx + 1) % totalSlides);
+                    }, 1500);
+                    return;
+                }
+
+                let startTime = performance.now();
+                if (progressTimer) clearInterval(progressTimer);
+                progressTimer = setInterval(() => {
+                    if (!autoPlay) return;
+                    const now = performance.now();
+                    let elapsed = now - startTime;
+                    if (elapsed > currentTotalDuration) elapsed = currentTotalDuration;
+                    const percent = (elapsed / currentTotalDuration) * 100;
+                    timeline.style.width = `${percent}%`;
+                }, 50);
+
+                showNextItem();
+            }
+
+            function stopCurrentSlide() {
+                stopAllTimers();
+            }
+
+            function goToSlide(index) {
+                if (index === currentIdx) return;
+                if (index < 0) index = 0;
+                if (index >= totalSlides) index = 0;
+
+                stopCurrentSlide();
+
+                slides[currentIdx].classList.remove('active');
+                slides[index].classList.add('active');
+                currentIdx = index;
+                updateCounter();
+
+                timeline.style.width = '0%';
+
+                if (autoPlay) {
+                    startCurrentSlide();
+                } else {
+                    resetRevealItems(slides[currentIdx]);
+                    const firstItem = slides[currentIdx].querySelector('.reveal-item');
+                    if (firstItem) firstItem.classList.add('revealed');
+                    stopAllTimers();
+                }
+            }
+
+            function nextSlide() {
+                goToSlide((currentIdx + 1) % totalSlides);
+            }
+
+            function prevSlide() {
+                goToSlide((currentIdx - 1 + totalSlides) % totalSlides);
+            }
+
+            function toggleAutoPlay() {
+                autoPlay = !autoPlay;
+                if (autoPlay) {
+                    stopCurrentSlide();
+                    startCurrentSlide();
+                } else {
+                    stopAllTimers();
+                }
+            }
+
+            function updateCounter() {
+                counterSpan.innerText = `${currentIdx+1} / ${totalSlides}`;
+            }
+
+            function onKeyDown(e) {
+                const key = e.key;
+                if (key === ' ' || key === 'Space' || key === 'Spacebar') {
+                    e.preventDefault();
+                    toggleAutoPlay();
+                } else if (key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                } else if (key === 'ArrowRight') {
+                    e.preventDefault();
+                    nextSlide();
+                }
+            }
+
+            function init() {
+                slides.forEach((s, idx) => {
+                    if (idx === 0) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+                currentIdx = 0;
+                updateCounter();
+                autoPlay = true;
+                startCurrentSlide();
+                window.addEventListener('keydown', onKeyDown);
+            }
+
+            init();
+        })();
+    </script>
+
+<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
+<div class="sciviz-promo-no" aria-hidden="true">No.028 · 2026-09-06</div>
+<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
+padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
+border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
+letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+</body>
+</html>

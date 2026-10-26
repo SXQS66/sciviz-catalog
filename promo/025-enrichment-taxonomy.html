@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="sciviz-promo" content="no=25;date=2026-08-16;id=025-enrichment-taxonomy">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>No.025 · 富集分析完整十法</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --bg-deep: #05020c;
+            --glow-purple: #7c3aed;
+            --purple-light: #a78bfa;
+            --hot-pink: #ec4899;
+            --cyan-accent: #22d3ee;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --slate-dark: #1e293b;
+            --glass: rgba(15, 25, 45, 0.45);
+            --glass-border: rgba(168, 139, 255, 0.25);
+            --reactome-teal: #0ea5e9;
+            --reactome-orange: #f97316;
+        }
+        body {
+            background: radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.3), transparent 60%),
+                radial-gradient(circle at 85% 90%, rgba(14, 165, 233, 0.2), transparent 55%),
+                #05020c;
+            font-family: 'Inter', system-ui, -apple-system, 'PingFang SC', 'Segoe UI', BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            color: #f0f2fe;
+            height: 100vh;
+            width: 100vw;
+        }
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: 2rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.96) translateY(18px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.7s ease;
+            pointer-events: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .slide::-webkit-scrollbar { width: 4px; background: rgba(255,255,255,0.1); }
+        .slide::-webkit-scrollbar-thumb { background: #a78bfa; border-radius: 10px; }
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+        .title-lg {
+            font-size: 3.6rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.2rem;
+            line-height: 1.2;
+        }
+        .title-md {
+            font-size: 2.6rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(120deg, #e0d6ff, #fbcfe8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.4rem;
+            line-height: 1.2;
+        }
+        .sub {
+            font-size: 1.3rem;
+            color: #bac8e0;
+            text-align: center;
+            max-width: 85%;
+            margin-top: 0.2rem;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+        .sub-sm {
+            font-size: 1.0rem;
+            color: #9aabca;
+            text-align: center;
+            max-width: 90%;
+            margin-top: 0.3rem;
+        }
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 1.2rem 1.8rem;
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,58,237,0.2);
+            width: 100%;
+            max-width: 1100px;
+        }
+        .glow-card {
+            background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(14,165,233,0.1));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(168,85,247,0.65);
+            box-shadow: 0 0 32px rgba(124,58,237,0.4);
+        }
+        .glass-card-inner {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 18px;
+            padding: 0.6rem 1rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            text-align: center;
+            width: 100%;
+            margin: 0.6rem auto 0;
+        }
+        .formula-frame {
+            background: rgba(0,0,0,0.55);
+            border-radius: 40px;
+            padding: 0.6rem 1.4rem;
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            border-left: 6px solid var(--cyan-accent);
+            color: #cffafe;
+            margin: 0.4rem 0;
+        }
+        .small-formula { font-size: 0.95rem; }
+        .two-col-compare {
+            display: flex;
+            gap: 1.2rem;
+            width: 100%;
+            margin-top: 0.4rem;
+        }
+        .three-col {
+            display: block;
+            width: 100%;
+            margin: 0.4rem 0;
+        }
+        .three-col .col-card {
+            width: 90%;
+            margin: 0 auto 0.6rem;
+            flex: none;
+        }
+        .three-col .col-card:last-child { margin-bottom: 0; }
+        .col-card {
+            background: rgba(10,12,35,0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            flex: 1;
+        }
+        .col-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            margin-left: 0.6rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.6rem;
+        }
+        .col-card h3 .capsule {
+            display: inline-block;
+            border-radius: 20px;
+            padding: 0.1rem 0.7rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #c4b5fd;
+            vertical-align: middle;
+            line-height: 1.4;
+        }
+        .col-card h3 .capsule.ora { background: rgba(34,211,238,0.15); border-color: rgba(34,211,238,0.3); color: #22d3ee; }
+        .col-card h3 .capsule.fcs { background: rgba(249,115,22,0.15); border-color: rgba(249,115,22,0.3); color: #fb923c; }
+        .col-card h3 .capsule.pt  { background: rgba(192,132,252,0.15); border-color: rgba(192,132,252,0.3); color: #c084fc; }
+        .feature-list {
+            list-style: none;
+            margin-left: 1rem;
+            font-size: 0.92rem;
+            line-height: 1.3;
+        }
+        .feature-list li {
+            margin: 0.3rem 0;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .feature-list li::before {
+            content: "▹";
+            color: #22d3ee;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .feature-list-sm li { font-size: 0.95rem; margin: 0.2rem 0; }
+        .feature-list-gold li::before { color: #fbbf24; }
+        .feature-list-pink li::before { color: #f472b6; }
+        .feature-list-teal li::before { color: #22d3ee; }
+        .highlight-pink { color: #f472b6; font-weight: 600; }
+        .highlight-cyan { color: #22d3ee; font-weight: 600; }
+        .highlight-purple { color: #c084fc; font-weight: 600; }
+        .highlight-gold { color: #fbbf24; font-weight: 600; }
+        .highlight-emerald { color: #34d399; font-weight: 600; }
+        .highlight-rose { color: #fb7185; font-weight: 600; }
+        .highlight-white { color: #f0f2fe; font-weight: 600; }
+        .highlight-teal { color: #22d3ee; font-weight: 600; }
+        .highlight-orange { color: #fb923c; font-weight: 600; }
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: #a78bfa;
+            padding: 0 0.1rem;
+        }
+        .quad-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+            margin: 0.4rem 0;
+        }
+        .unit-badge {
+            background: rgba(20,30,55,0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 0.4rem 1.0rem;
+            text-align: center;
+            border-top: 3px solid;
+            min-width: 80px;
+        }
+        .unit-badge span:first-child {
+            font-size: 0.95rem;
+            font-weight: 800;
+            display: block;
+        }
+        .unit-badge span:last-child {
+            font-size: 0.85rem;
+            color: #b9c7e0;
+        }
+        .badge-ora { border-top-color: #22d3ee; }
+        .badge-fcs { border-top-color: #f97316; }
+        .badge-pt { border-top-color: #c084fc; }
+        .badge-go { border-top-color: #22d3ee; }
+        .badge-kegg { border-top-color: #0ea5e9; }
+        .badge-reactome { border-top-color: #f97316; }
+        .badge-gsea { border-top-color: #f472b6; }
+        .badge-ssgsea { border-top-color: #34d399; }
+        .badge-gsva { border-top-color: #fbbf24; }
+        .badge-spia { border-top-color: #fb923c; }
+        .badge-netgsa { border-top-color: #a78bfa; }
+        .badge-clipper { border-top-color: #ec4899; }
+        .badge-degraph { border-top-color: #f43f5e; }
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.2,0.9,0.3,1.1), transform 0.5s ease;
+        }
+        .reveal-item.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .progress-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: transparent;
+        }
+        .timeline-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #0ea5e9, #f97316);
+            width: 0%;
+            transition: width 0.05s linear;
+        }
+        .slide-counter {
+            position: fixed;
+            bottom: 16px;
+            right: 20px;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(12px);
+            padding: 4px 14px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #c4b5fd;
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 55;
+            font-family: monospace;
+        }
+        .control-hint {
+            position: fixed;
+            bottom: 16px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            padding: 4px 12px;
+            border-radius: 32px;
+            font-size: 0.7rem;
+            color: #b9c7e0;
+            z-index: 55;
+            display: none;
+        }
+        @keyframes softFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-icon { animation: softFloat 2.5s ease-in-out infinite; display: inline-block; }
+        .logo-main {
+            max-width: 40%;
+            height: auto;
+            display: block;
+            margin: 0 auto 0.5rem auto;
+        }
+        .logo-inline {
+            display: inline-block;
+            height: 1.4em;
+            vertical-align: middle;
+            margin: 0 0.05em;
+            filter: drop-shadow(0 0 8px rgba(168,139,255,0.3));
+        }
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            margin: 0.3rem 0;
+        }
+        .compare-table td, .compare-table th {
+            padding: 0.3rem 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            text-align: left;
+        }
+        .compare-table th { color: #c4b5fd; font-weight: 600; font-size: 0.78rem; }
+        .compare-table tr:last-child td { border-bottom: none; }
+        .compare-table .cat-ora { border-left: 3px solid #22d3ee; }
+        .compare-table .cat-fcs { border-left: 3px solid #f97316; }
+        .compare-table .cat-pt { border-left: 3px solid #c084fc; }
+
+        @media (max-width: 850px) {
+            .title-lg { font-size: 2.2rem; }
+            .title-md { font-size: 1.8rem; }
+            .title-sm { font-size: 1.3rem; }
+            .sub { font-size: 1.35rem; }
+            .glass-card { padding: 1rem; }
+            .two-col-compare { flex-direction: flex; gap: 0.6rem; }
+            .formula-frame { font-size: 0.9rem; padding: 0.4rem; }
+            .feature-list { font-size: 0.85rem; }
+            .col-card { padding: 0.6rem; }
+            .flow-arrow { font-size: 1.0rem; padding: 0.1rem 0; }
+            .quad-grid { gap: 0.4rem; }
+            .unit-badge { padding: 0.3rem 0.6rem; min-width: 60px; }
+            .unit-badge span:first-child { font-size: 1.2rem; }
+            .unit-badge span:last-child { font-size: 0.9rem; }
+            .logo-main { max-width: 50% !important; }
+            .logo-inline { height: 1.1em; }
+            .compare-table { font-size: 0.7rem; }
+            .compare-table td, .compare-table th { padding: 0.2rem 0.3rem; }
+            .col-card h3 { font-size: 1.25rem; }
+            .col-card h3 .capsule { font-size: 0.9rem; padding: 0.05rem 0.5rem; }
+            /* 移动端封面卡片恢复全宽，保证可读性 */
+            .cover-card-container {
+                max-width: 100% !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .title-lg { font-size: 1.8rem; }
+            .title-md { font-size: 1.3rem; }
+            .title-sm { font-size: 1.1rem; }
+            .sub { font-size: 1.05rem; }
+            .slide { padding: 1rem 0.6rem; }
+            .glass-card { padding: 0.6rem; border-radius: 18px; }
+            .feature-list { font-size: 0.78rem; }
+            .formula-frame { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
+            .compare-table { font-size: 0.6rem; }
+            .compare-table td, .compare-table th { padding: 0.12rem 0.2rem; }
+            .logo-inline { height: 1em; }
+            .col-card h3 { font-size: 0.9rem; }
+            .col-card h3 .capsule { font-size: 0.55rem; padding: 0.05rem 0.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 幻灯片 0：封面（已应用黄金比例居中） ===== -->
+    <div class="slide active">
+        <div style="font-size: 4rem; margin-bottom: 0.3rem; text-shadow: 0 0 40px rgba(124,58,237,0.5);">🔬</div>
+        <div class="title-lg reveal-item" data-duration="800" style="font-size:2.8rem; background:linear-gradient(135deg,#e0d6ff,#fbcfe8,#a78bfa);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            富集分析 · 十种方法
+        </div>
+        <div class="sub reveal-item" data-duration="1200" style="margin-bottom:0.8rem;">
+            从 ORA 到 PT · 从 GO 到 DEGraph
+        </div>
+        <div class="glass-card glow-card reveal-item" data-duration="1400" style="max-width:1100px;">
+            <div style="font-size:1.2rem; font-weight:500; text-align:center; margin-bottom:0.6rem; line-height:1.6; color:#bac8e0;">
+                <span style="color:#f0f2fe;">📌</span> 富集分析 = 把零散的分子变化翻译成可理解的生物学功能
+            </div>
+            <!-- 核心调整：应用黄金比例 (61.8%) 并居中 -->
+            <div class="two-col-compare cover-card-container" style="margin-top:0.2rem; margin-left:auto; margin-right:auto; ">
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee; font-size:1.2rem;">📊 三大范式</h3>
+                    <ul class="feature-list feature-list">
+                        <li><span class="highlight-cyan">ORA</span> · 过表征分析</li>
+                        <li><span class="highlight-cyan">FCS</span> · 功能集打分</li>
+                        <li><span class="highlight-cyan">PT</span> · 通路拓扑分析</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #f97316;">
+                    <h3 style="color:#f97316; font-size:1.2rem;">🎯 十种方法</h3>
+                    <ul class="feature-list feature-list feature-list-gold">
+                        <li>GO · KEGG · Reactome</li>
+                        <li>GSEA · ssGSEA · GSVA</li>
+                        <li>SPIA · NetGSA · Clipper · DEGraph</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="formula-frame small-formula reveal-item" data-duration="3000" style="margin-top:1.2rem; font-size:1.05rem; border-left-color:#f97316;">
+                💡 选对方法 = 问对问题 · 十种工具对应十种分析场景
+            </div>
+        </div>
+        <div class="sub-sm reveal-item" data-duration="2500" style="margin-top:0.6rem; display: none;">
+            按 ⌨️ 空格暂停 · ← → 翻页
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 1：三大范式总览 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1200">富集分析的三大范式</div>
+        <div class="sub reveal-item" data-duration="1200">ORA · FCS · PT — 三代方法的演进</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width:1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" data-duration="2000" style="border-top:4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">
+                        📊 第一代 · ORA
+                        <span class="capsule ora">过表征分析</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>输入：<span class="highlight-cyan">差异基因列表</span></li>
+                        <li>统计：超几何检验 / Fisher 精确检验</li>
+                        <li>代表：GO、KEGG、Reactome</li>
+                        <li><span class="highlight-cyan">优点：</span>直观、易解释</li>
+                        <li><span class="highlight-pink">局限：</span>依赖人为阈值、忽略基因间关系</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #f97316;">
+                    <h3 style="color:#f97316;">
+                        📈 第二代 · FCS
+                        <span class="capsule fcs">功能集打分</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li>输入：<span class="highlight-orange">全基因排序列表</span></li>
+                        <li>统计：Kolmogorov-Smirnov 类统计量</li>
+                        <li>代表：GSEA、ssGSEA、GSVA</li>
+                        <li><span class="highlight-orange">优点：</span>不设阈值、发现微弱协调信号</li>
+                        <li><span class="highlight-pink">局限：</span>仍忽略通路内部结构</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #c084fc;">
+                    <h3 style="color:#c084fc;">
+                        🔗 第三代 · PT
+                        <span class="capsule pt">通路拓扑分析</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>输入：<span class="highlight-purple">差异表达 + 通路结构</span></li>
+                        <li>统计：整合拓扑位置、相互作用</li>
+                        <li>代表：SPIA、NetGSA、Clipper、DEGraph</li>
+                        <li><span class="highlight-purple">优点：</span>考虑基因在通路中的位置权重</li>
+                        <li><span class="highlight-pink">局限：</span>依赖高质量通路注释</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top:0.6rem; border-color:rgba(168,139,255,0.2);">
+                🔑 三者 <span class="highlight-gold">不是替代关系</span>，而是 <span class="highlight-gold">层层递进</span> — 从“有没有”到“有多少”再到“在哪里”
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 2：ORA 三剑客 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1200">ORA 三剑客 · GO / KEGG / Reactome</div>
+        <div class="sub reveal-item" data-duration="1200">差异基因列表 → 功能/通路富集</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width:1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" data-duration="2000" style="border-top:4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee; font-size:1rem;">
+                        🧬 GO
+                        <span class="capsule" style="background:rgba(34,211,238,0.15); border-color:rgba(34,211,238,0.3); color:#22d3ee;">Gene Ontology</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>三大维度：BP / CC / MF</li>
+                        <li>覆盖面最广（~42.3% 人类基因注释）</li>
+                        <li>适合回答：<span class="highlight-cyan">这批基因跟哪些生物学功能有关？</span></li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #0ea5e9;">
+                    <h3 style="color:#0ea5e9; font-size:1rem;">
+                        🗺️ KEGG
+                        <span class="capsule" style="background:rgba(14,165,233,0.15); border-color:rgba(14,165,233,0.3); color:#0ea5e9;">Kyoto Encyclopedia</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>经典通路地图 · 直观</li>
+                        <li>覆盖 ~12.4% 人类基因注释</li>
+                        <li>适合回答：<span class="highlight-cyan">差异基因集中在哪些经典通路？</span></li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #f97316;">
+                    <h3 style="color:#f97316; font-size:1rem;">
+                        📖 Reactome
+                        <span class="capsule" style="background:rgba(249,115,22,0.15); border-color:rgba(249,115,22,0.3); color:#f97316;">反应级通路数据库</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li>以“生物反应”为核心 · 层级结构</li>
+                        <li>覆盖 ~26.3% 人类基因注释</li>
+                        <li>适合回答：<span class="highlight-orange">变化发生在哪个具体反应环节？</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="warning-box reveal-item" data-duration="3500" style="margin-top:0.8rem;">
+                <span class="label">💡 核心洞察</span> GO 看功能全貌 · KEGG 看通路框架 · Reactome 看反应细节 — <span class="highlight-gold">三者互补</span>
+            </div>
+            <div class="formula-frame small-formula reveal-item" data-duration="2500" style="margin-top:0.8rem; font-size:0.85rem; border-left-color:#f97316;">
+                📌 KEGG 无结果时，Reactome 往往是突破口 — 因为信号可能集中在某个具体反应步骤
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 3：FCS 三兄弟 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1200">FCS 三兄弟 · GSEA / ssGSEA / GSVA</div>
+        <div class="sub reveal-item" data-duration="1200">全基因排序 → 基因集整体偏移</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width:1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" data-duration="2000" style="border-top:4px solid #f472b6;">
+                    <h3 style="color:#f472b6; font-size:1rem;">
+                        📊 GSEA
+                        <span class="capsule" style="background:rgba(244,114,182,0.15); border-color:rgba(244,114,182,0.3); color:#f472b6;">基因集富集分析</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm feature-list-pink">
+                        <li>输入：<span class="highlight-pink">全基因排序列表</span> + 分组</li>
+                        <li>输出：NES（方向 + 强度）</li>
+                        <li>适合回答：<span class="highlight-pink">某基因集是否整体偏向变化谱一端？</span></li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #34d399;">
+                    <h3 style="color:#34d399; font-size:1rem;">
+                        🧪 ssGSEA
+                        <span class="capsule" style="background:rgba(52,211,153,0.15); border-color:rgba(52,211,153,0.3); color:#34d399;">单样本 GSEA</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>输入：<span class="highlight-emerald">表达矩阵</span>（无需分组）</li>
+                        <li>输出：每个样本 × 每条通路的富集分数</li>
+                        <li>适合回答：<span class="highlight-emerald">每个样本的通路活性高不高？</span></li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #fbbf24;">
+                    <h3 style="color:#fbbf24; font-size:1rem;">
+                        📈 GSVA
+                        <span class="capsule" style="background:rgba(251,191,36,0.15); border-color:rgba(251,191,36,0.3); color:#fbbf24;">基因集变异分析</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>输入：<span class="highlight-gold">表达矩阵</span>（跨样本核密度估计）</li>
+                        <li>输出：通路活性矩阵（与 ssGSEA 目标相同）</li>
+                        <li>适合回答：<span class="highlight-gold">样本间通路活性是否存在系统差异？</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tip-box reveal-item" data-duration="3500" style="margin-top:0.8rem; margin-left: 1.5rem; margin-right: 1.5rem;">
+                <span class="label">💡 关键区别</span> GSEA 需要 <span class="highlight-cyan">分组信息</span>，ssGSEA/GSVA 不需要 — 后者适合 <span class="highlight-gold">无监督探索和个体化分析</span>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top:0.8rem;">
+                🔑 GSEA = 组间比较 · ssGSEA/GSVA = 个体特征提取
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 4：PT 上（SPIA + NetGSA） ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1200">🔗 PT 方法（上）· 位置与连接</div>
+        <div class="sub reveal-item" data-duration="1200">SPIA 看“位置” · NetGSA 看“连接”</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width:1100px;">
+            <div style="background:rgba(192,132,252,0.08); border-radius:12px; padding:0.3rem 0.8rem; margin-bottom:0.6rem; text-align:center; font-size:1.05rem; color:#c4b5fd; border:1px solid rgba(192,132,252,0.15);">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⚡ PT 方法共同点：在 ORA/FCS 基础上，额外整合<span class="highlight-purple">通路拓扑结构</span>（基因位置、边方向、网络关系）
+            </div>
+            <div class="two-col-compare" style="flex-direction: column;"> 
+                <div class="col-card reveal-item" data-duration="2000" style="border-top:4px solid #fb923c; flex:1;">
+                    <h3 style="color:#fb923c; font-size:1rem;">
+                        📍 SPIA
+                        <span class="capsule" style="background:rgba(251,146,60,0.15); border-color:rgba(251,146,60,0.3); color:#fb923c;">信号通路影响分析</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li><span class="highlight-orange">核心思想</span>：整合差异倍数 + 拓扑位置</li>
+                        <li>计算 <span class="highlight-orange">P<sub>NDE</sub></span>（ORA 富集）和 <span class="highlight-orange">P<sub>PERT</sub></span>（拓扑扰动）</li>
+                        <li><span class="highlight-orange">适用场景</span>：信号通路（有向边），想知道“上游 vs 下游”哪个环节受扰动</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #a78bfa; flex:1;">
+                    <h3 style="color:#a78bfa; font-size:1rem;">
+                        🔗 NetGSA
+                        <span class="capsule" style="background:rgba(167,139,250,0.15); border-color:rgba(167,139,250,0.3); color:#a78bfa;">基于网络的基因集分析</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-purple">核心思想</span>：整合差异表达 + 网络边权重</li>
+                        <li>不仅看基因是否差异，还看基因间的 <span class="highlight-purple">相互作用模式</span></li>
+                        <li><span class="highlight-purple">适用场景</span>：已知基因-基因网络（KEGG/Reactome），研究调控网络重编程</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="formula-frame small-formula reveal-item" data-duration="3500" style="margin-top:0.8rem; font-size:0.85rem; border-left-color:#c084fc;">
+                📌 SPIA 回答“<span style="color:#fb923c;">在通路哪个位置</span>” · NetGSA 回答“<span style="color:#a78bfa;">网络连接怎么变</span>”
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 5：PT 下（Clipper + DEGraph） ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1200">🔗 PT 方法（下）· 子结构与全网络</div>
+        <div class="sub reveal-item" data-duration="1200">Clipper 找“子结构” · DEGraph 验“全网络”</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width:1100px;">
+            <div class="two-col-compare" style="flex-direction: column;">
+                <div class="col-card reveal-item" data-duration="2000" style="border-top:4px solid #ec4899; flex:1;">
+                    <h3 style="color:#ec4899; font-size:1rem;">
+                        ✂️ Clipper
+                        <span class="capsule" style="background:rgba(236,72,153,0.15); border-color:rgba(236,72,153,0.3); color:#ec4899;">图分解通路分析</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm feature-list-pink">
+                        <li><span class="highlight-pink">核心思想</span>：基于图分解理论，两步检验</li>
+                        <li>① 检验通路均值/协方差 ② 定位最相关信号路径</li>
+                        <li><span class="highlight-pink">适用场景</span>：想找通路内“哪一段子结构”最受扰动，无需 p 值的 FDR 控制</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #f43f5e; flex:1;">
+                    <h3 style="color:#f43f5e; font-size:1rem;">
+                        📉 DEGraph
+                        <span class="capsule" style="background:rgba(244,63,94,0.15); border-color:rgba(244,63,94,0.3); color:#f43f5e;">差异表达图检验</span>
+                    </h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-rose">核心思想</span>：多元 Hotelling T² 检验</li>
+                        <li>直接检验<span class="highlight-rose">整个基因网络</span>是否在两组间差异表达</li>
+                        <li><span class="highlight-rose">适用场景</span>：敏感性要求极高，但特异性相对较低，需交叉验证</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="warning-box reveal-item" data-duration="3500" style="margin-top:0.4rem;">
+                <span class="label">⚠️ PT 方法使用建议</span> 优先用 SPIA/NetGSA（更稳健），Clipper/DEGraph 作为<span class="highlight-gold">深度补充</span>，结合 ORA/FCS 结果交叉验证。
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top:0.5rem; border-color:rgba(236,72,153,0.2);">
+                🔑 Clipper 找“<span class="highlight-pink">哪一段</span>” · DEGraph 问“<span class="highlight-rose">整个网络</span>” — 两者视角互补
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 6：实际分析怎么选 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1200">🧭 实际分析 · 怎么选？</div>
+        <div class="sub reveal-item" data-duration="1200">三步定位法</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width:1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" data-duration="2000" style="border-top:4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">第一步 · 看输入</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>只有 <span class="highlight-cyan">差异基因列表</span> → GO / KEGG / Reactome</li>
+                        <li>有 <span class="highlight-cyan">全基因排序</span> → GSEA</li>
+                        <li>有 <span class="highlight-cyan">完整表达矩阵</span> → ssGSEA / GSVA / PT 方法</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #f97316;">
+                    <h3 style="color:#f97316;">第二步 · 看问题</h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li><span class="highlight-orange">组间差异</span> → GO/KEGG/Reactome + GSEA</li>
+                        <li><span class="highlight-orange">个体特征</span> → ssGSEA / GSVA</li>
+                        <li><span class="highlight-orange">精细机制</span> → Reactome + SPIA / NetGSA</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #c084fc;">
+                    <h3 style="color:#c084fc;">第三步 · 看深度</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-purple">初筛</span>：GO + KEGG（宏观方向）</li>
+                        <li><span class="highlight-purple">深化</span>：Reactome + GSEA（精细定位）</li>
+                        <li><span class="highlight-purple">精雕</span>：SPIA / NetGSA / Clipper / DEGraph（拓扑洞察）</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="formula-frame small-formula reveal-item" data-duration="3500" style="margin-top:0.8rem; font-size:0.9rem; border-left-color:#f97316;">
+                🧬 推荐组合：<span style="color:#fbbf24;">GO + KEGG + Reactome</span>（基础）→ <span style="color:#fbbf24;">GSEA</span>（验证）→ <span style="color:#fbbf24;">SPIA</span>（深度机制）
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top:0.8rem;">
+                🔑 富集分析的重点不是 <span class="highlight-pink">把所有方法都跑一遍</span>，而是 <span class="highlight-gold">想清楚数据能回答什么问题</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 7：总结 ===== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1200">📌 总结 · 十种方法一张图</div>
+        <div class="sub reveal-item" data-duration="1200">ORA → FCS → PT · 从“有没有”到“在哪里”</div>
+        <div class="glass-card glow-card reveal-item" data-duration="1500" style="max-width:1100px;">
+            <div class="quad-grid" style="gap:0.6rem; margin-bottom:0.4rem;">
+                <div class="unit-badge badge-ora" style="min-width:100px;">
+                    <span style="color:#22d3ee;">📊 ORA</span>
+                    <span style="font-size:0.95rem; color:#b9c7e0;">GO · KEGG · Reactome</span>
+                </div>
+                <div class="unit-badge badge-fcs" style="min-width:100px;">
+                    <span style="color:#f97316;">📈 FCS</span>
+                    <span style="font-size:0.95rem; color:#b9c7e0;">GSEA · ssGSEA · GSVA</span>
+                </div>
+                <div class="unit-badge badge-pt" style="min-width:100px;">
+                    <span style="color:#c084fc;">🔗 PT</span>
+                    <span style="font-size:0.95rem; color:#b9c7e0;">SPIA · NetGSA · Clipper · DEGraph</span>
+                </div>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:0.3rem; justify-content:center; margin:0.3rem 0; font-size:1.05rem; color:#9aabca;">
+                <span style="background:rgba(34,211,238,0.1); padding:0.1rem 0.6rem; border-radius:10px;">⬅️ 越往左越宏观</span>
+                <span style="background:rgba(192,132,252,0.1); padding:0.1rem 0.6rem; border-radius:10px;">➡️ 越往右越精细</span>
+            </div>
+            <div class="three-col" style="margin-top:0.2rem;">
+                <div class="col-card reveal-item" data-duration="2500" style="border-top:4px solid #f97316;">
+                    <h3 style="color:#f97316; font-size:0.95rem;">✅ 核心要点</h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li>富集分析有 <span class="highlight-orange">三大范式、十种常用方法</span></li>
+                        <li>ORA 回答“<span class="highlight-orange">有没有</span>” · FCS 回答“<span class="highlight-orange">有多少</span>” · PT 回答“<span class="highlight-orange">在哪里</span>”</li>
+                        <li>没有“最好”的方法，只有“<span class="highlight-orange">最合适</span>”的方法</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top:4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee; font-size:0.95rem;">🧠 论文写作建议</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>先展示 GO/KEGG → 提出 <span class="highlight-cyan">宏观方向</span></li>
+                        <li>再用 Reactome/GSEA → 定位 <span class="highlight-cyan">具体环节</span></li>
+                        <li>必要时用 SPIA/NetGSA → 提供 <span class="highlight-cyan">拓扑证据</span></li>
+                        <li>避免只写“通过 XX 通路”，而是 <span class="highlight-cyan">“通过 XX 通路中 YY 环节的 ZZ 机制”</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="formula-frame small-formula reveal-item" data-duration="2500" style="margin-top:0.4rem; font-size:0.85rem; border-left-color:#f97316;">
+                🧬 可靠的机制研究 = 高质量数据 + <span style="color:#fbbf24;">正确的方法选择</span> + 深入的生物学解读
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="2000" style="margin-top:0.3rem; background:rgba(249,115,22,0.08); border-color:rgba(249,115,22,0.15);">
+                💡 下次分析时，问自己：<span style="color:#f97316;">我的数据适合哪种输入？我想回答什么问题？我需要多深的机制洞察？</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 底部控件 ===== -->
+    <div class="progress-footer">
+        <div class="timeline-bar" id="timelineBar" style="display:none;"></div>
+    </div>
+    <div class="slide-counter" id="slideCounter">1 / 8</div>
+    <div class="control-hint" style="display:none;">␣ 暂停/播放 &nbsp;|&nbsp; ◀ ▶ 切换</div>
+
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.slide');
+            const timeline = document.getElementById('timelineBar');
+            const counterSpan = document.getElementById('slideCounter');
+            let currentIdx = 0;
+            const totalSlides = slides.length;
+            let autoPlay = true;
+
+            let currentSlideItems = [];
+            let currentDurations = [];
+            let currentItemIndex = 0;
+            let currentTotalDuration = 0;
+            let currentElapsed = 0;
+
+            let progressTimer = null;
+            let itemTimer = null;
+
+            function getRevealItems(slide) {
+                return Array.from(slide.querySelectorAll('.reveal-item'));
+            }
+
+            function computeSlideDurations(slide) {
+                const items = getRevealItems(slide);
+                const durations = [];
+                let total = 0;
+                for (let i = 0; i < items.length; i++) {
+                    let dur = items[i].getAttribute('data-duration');
+                    let durNum = dur ? parseInt(dur) : 2000;
+                    if (isNaN(durNum)) durNum = 2000;
+                    durations.push(durNum);
+                    total += durNum;
+                }
+                return { items, durations, total };
+            }
+
+            function resetRevealItems(slide) {
+                const items = getRevealItems(slide);
+                items.forEach(item => {
+                    item.classList.remove('revealed');
+                });
+            }
+
+            function stopAllTimers() {
+                if (progressTimer) {
+                    clearInterval(progressTimer);
+                    progressTimer = null;
+                }
+                if (itemTimer) {
+                    clearTimeout(itemTimer);
+                    itemTimer = null;
+                }
+            }
+
+            function showNextItem() {
+                if (!autoPlay) return;
+                if (currentItemIndex >= currentSlideItems.length) {
+                    if (itemTimer) clearTimeout(itemTimer);
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) {
+                            goToSlide((currentIdx + 1) % totalSlides);
+                        }
+                    }, 500);
+                    return;
+                }
+
+                const item = currentSlideItems[currentItemIndex];
+                if (item && !item.classList.contains('revealed')) {
+                    item.classList.add('revealed');
+                }
+
+                const duration = currentDurations[currentItemIndex];
+                if (itemTimer) clearTimeout(itemTimer);
+                itemTimer = setTimeout(() => {
+                    if (autoPlay) {
+                        currentItemIndex++;
+                        showNextItem();
+                    }
+                }, duration);
+            }
+
+            function startCurrentSlide() {
+                stopAllTimers();
+
+                resetRevealItems(slides[currentIdx]);
+
+                const { items, durations, total } = computeSlideDurations(slides[currentIdx]);
+                currentSlideItems = items;
+                currentDurations = durations;
+                currentTotalDuration = total;
+                currentItemIndex = 0;
+                currentElapsed = 0;
+
+                if (currentTotalDuration === 0 || items.length === 0) {
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) goToSlide((currentIdx + 1) % totalSlides);
+                    }, 2000);
+                    return;
+                }
+
+                let startTime = performance.now();
+                if (progressTimer) clearInterval(progressTimer);
+                progressTimer = setInterval(() => {
+                    if (!autoPlay) return;
+                    const now = performance.now();
+                    let elapsed = now - startTime;
+                    if (elapsed > currentTotalDuration) elapsed = currentTotalDuration;
+                    const percent = (elapsed / currentTotalDuration) * 100;
+                    timeline.style.width = `${percent}%`;
+                }, 50);
+
+                showNextItem();
+            }
+
+            function stopCurrentSlide() {
+                stopAllTimers();
+            }
+
+            function goToSlide(index) {
+                if (index === currentIdx) return;
+                if (index < 0) index = 0;
+                if (index >= totalSlides) index = 0;
+
+                stopCurrentSlide();
+
+                slides[currentIdx].classList.remove('active');
+                slides[index].classList.add('active');
+                currentIdx = index;
+                updateCounter();
+
+                timeline.style.width = '0%';
+
+                if (autoPlay) {
+                    startCurrentSlide();
+                } else {
+                    resetRevealItems(slides[currentIdx]);
+                    const firstItem = slides[currentIdx].querySelector('.reveal-item');
+                    if (firstItem) firstItem.classList.add('revealed');
+                    stopAllTimers();
+                }
+            }
+
+            function nextSlide() {
+                goToSlide((currentIdx + 1) % totalSlides);
+            }
+
+            function prevSlide() {
+                goToSlide((currentIdx - 1 + totalSlides) % totalSlides);
+            }
+
+            function toggleAutoPlay() {
+                autoPlay = !autoPlay;
+                if (autoPlay) {
+                    stopCurrentSlide();
+                    startCurrentSlide();
+                } else {
+                    stopAllTimers();
+                }
+            }
+
+            function updateCounter() {
+                counterSpan.innerText = `${currentIdx+1} / ${totalSlides}`;
+            }
+
+            function onKeyDown(e) {
+                const key = e.key;
+                if (key === ' ' || key === 'Space' || key === 'Spacebar') {
+                    e.preventDefault();
+                    toggleAutoPlay();
+                } else if (key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                } else if (key === 'ArrowRight') {
+                    e.preventDefault();
+                    nextSlide();
+                }
+            }
+
+            function init() {
+                slides.forEach((s, idx) => {
+                    if (idx === 0) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+                currentIdx = 0;
+                updateCounter();
+                autoPlay = true;
+                startCurrentSlide();
+                window.addEventListener('keydown', onKeyDown);
+            }
+
+            init();
+        })();
+    </script>
+
+<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
+<div class="sciviz-promo-no" aria-hidden="true">No.025 · 2026-08-16</div>
+<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
+padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
+border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
+letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+</body>
+</html>

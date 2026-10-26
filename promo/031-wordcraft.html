@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="sciviz-promo" content="no=31;date=2026-10-11;id=031-wordcraft">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>No.031 · WordCraft：Rust 重写的开源 Word 平替</title>
+    <link rel="preload" as="image" href="00.icon.png">
+    <link rel="preload" as="image" href="assets/031-wordcraft/01.jpg">
+    <link rel="preload" as="image" href="assets/031-wordcraft/02.jpg">
+    <link rel="preload" as="image" href="assets/031-wordcraft/03.jpg">
+    <link rel="preload" as="image" href="assets/031-wordcraft/04.jpg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-deep: #05020c;
+            --glass: rgba(15, 25, 45, 0.45);
+            --glass-border: rgba(168, 139, 255, 0.25);
+        }
+        body {
+            background: radial-gradient(ellipse at 15% 25%, rgba(124, 58, 237, 0.35), transparent 55%),
+                radial-gradient(circle at 80% 85%, rgba(14, 165, 233, 0.2), transparent 50%),
+                #05020c;
+            font-family: 'Inter', system-ui, -apple-system, 'PingFang SC', 'Segoe UI', BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            color: #f0f2fe;
+            height: 100vh;
+            width: 100vw;
+        }
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: 1.6rem 1.2rem 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.96) translateY(18px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.7s ease;
+            pointer-events: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .slide::-webkit-scrollbar { width: 4px; background: rgba(255,255,255,0.1); }
+        .slide::-webkit-scrollbar-thumb { background: #a78bfa; border-radius: 10px; }
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+        .title-lg {
+            font-size: 3.6rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.2rem;
+            line-height: 1.2;
+        }
+        .title-md {
+            font-size: 2.4rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(120deg, #e0d6ff, #fbcfe8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.4rem;
+            line-height: 1.2;
+        }
+        .sub {
+            font-size: 1.85rem;
+            color: #bac8e0;
+            text-align: center;
+            max-width: 88%;
+            margin-top: 0.2rem;
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+        }
+        .sub-sm {
+            font-size: 1.5rem;
+            color: #9aabca;
+            text-align: center;
+            max-width: 90%;
+            margin-top: 0.3rem;
+        }
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 1.1rem 1.6rem;
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,58,237,0.2);
+            width: 100%;
+            max-width: 1100px;
+        }
+        .glow-card {
+            background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(14,165,233,0.1));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(168,85,247,0.65);
+            box-shadow: 0 0 32px rgba(124,58,237,0.4);
+        }
+        .glass-card-inner {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 18px;
+            padding: 0.6rem 1rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            text-align: center;
+            width: 100%;
+            margin: 0.6rem auto 0;
+        }
+        .col-card {
+            background: rgba(10,12,35,0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 0.8rem 1.1rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            flex: 1;
+        }
+        .col-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.6rem;
+        }
+        .feature-list { list-style: none; margin-left: 0.9rem; font-size: 1.05rem; line-height: 1.45; }
+        .feature-list li {
+            margin: 0.28rem 0;
+            position: relative;
+            padding-left: 1.15rem;
+            line-height: 1.45;
+        }
+        .feature-list li::before {
+            content: "▹";
+            color: #22d3ee;
+            font-size: 0.8rem;
+            position: absolute;
+            left: 0;
+            top: 0.16em;
+            line-height: 1;
+        }
+        .feature-list-sm li { font-size: 0.98rem; margin: 0.22rem 0; }
+        .feature-list-gold li::before { color: #fbbf24; }
+        .feature-list-pink li::before { color: #f472b6; }
+        .feature-list-purple li::before { color: #c084fc; }
+        .feature-list-emerald li::before { color: #34d399; }
+        .feature-list-rose li::before { color: #f43f5e; }
+
+        .highlight-pink, .highlight-cyan, .highlight-purple, .highlight-gold,
+        .highlight-emerald, .highlight-orange, .highlight-rose {
+            display: inline; font-weight: 600; white-space: normal;
+        }
+        .highlight-pink { color: #f472b6; }
+        .highlight-cyan { color: #22d3ee; }
+        .highlight-purple { color: #c084fc; }
+        .highlight-gold { color: #fbbf24; }
+        .highlight-emerald { color: #34d399; }
+        .highlight-orange { color: #fb923c; }
+        .highlight-rose { color: #f43f5e; }
+
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin: 0.2rem 0; }
+        .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin: 0.2rem 0; }
+        .chip-row {
+            display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin: 0.4rem 0 0.2rem;
+        }
+        .chip {
+            padding: 0.3rem 0.9rem; border-radius: 30px;
+            font-weight: 700; font-size: 0.98rem;
+            border: 1px solid; background: rgba(255,255,255,0.04);
+        }
+        .num-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 1.5rem; height: 1.5rem; border-radius: 50%;
+            font-size: 0.85rem; font-weight: 800;
+            background: rgba(124,58,237,0.28);
+            border: 1px solid rgba(168,139,255,0.5);
+            color: #e0d6ff; margin-right: 0.4rem; flex-shrink: 0;
+        }
+
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1),
+                        transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            will-change: opacity, transform;
+        }
+        .reveal-item.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .img-slot.reveal-item[data-anim="zoom"] {
+            transform: translateY(30px) scale(0.7);
+            opacity: 0;
+        }
+        .img-slot.reveal-item[data-anim="zoom"].revealed {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1),
+                        transform 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+        }
+
+        .img-slot.reveal-item[data-anim="left"] {
+            transform: translateX(-120px) rotate(-3deg);
+            opacity: 0;
+        }
+        .img-slot.reveal-item[data-anim="left"].revealed {
+            transform: translateX(0) rotate(0);
+            opacity: 1;
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1),
+                        transform 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+        }
+
+        .img-slot.reveal-item[data-anim="right"] {
+            transform: translateX(120px) rotate(3deg);
+            opacity: 0;
+        }
+        .img-slot.reveal-item[data-anim="right"].revealed {
+            transform: translateX(0) rotate(0);
+            opacity: 1;
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1),
+                        transform 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+        }
+
+        .img-slot.reveal-item[data-anim="flip"] {
+            transform: perspective(800px) rotateY(70deg) scale(0.85);
+            opacity: 0;
+        }
+        .img-slot.reveal-item[data-anim="flip"].revealed {
+            transform: perspective(800px) rotateY(0) scale(1);
+            opacity: 1;
+            transition: opacity 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1),
+                        transform 0.9s cubic-bezier(0.2, 0.8, 0.3, 1.15);
+        }
+
+        .progress-footer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: transparent; }
+        .timeline-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #0ea5e9, #f97316);
+            width: 0%;
+            transition: width 0.05s linear;
+        }
+        .slide-counter {
+            position: fixed; bottom: 16px; right: 20px;
+            background: rgba(0,0,0,0.65); backdrop-filter: blur(12px);
+            padding: 4px 14px; border-radius: 60px;
+            font-size: 0.8rem; color: #c4b5fd;
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 55; font-family: monospace;
+        }
+        .badge-list {
+            display: flex; flex-wrap: wrap; gap: 0.4rem;
+            justify-content: center; margin: 0.7rem 0 0.1rem;
+        }
+        .badge-list span {
+            background: rgba(34,211,238,0.12);
+            padding: 0.2rem 0.8rem; border-radius: 30px;
+            font-size: 1.08rem; color: #22d3ee;
+        }
+        .badge-list .gold { background: rgba(251,191,36,0.12); color: #fbbf24; }
+        .badge-list .pink { background: rgba(236,72,153,0.12); color: #f472b6; }
+        .badge-list .emerald { background: rgba(52,211,153,0.12); color: #34d399; }
+        .badge-list .purple { background: rgba(192,132,252,0.12); color: #c084fc; }
+        .badge-list .rose { background: rgba(244,63,94,0.12); color: #f43f5e; }
+
+        .price-compare {
+            display: flex; gap: 0.8rem; align-items: stretch; margin: 0.6rem 0; width: 100%;
+        }
+        .price-box {
+            flex: 1; border-radius: 20px; padding: 0.8rem 0.5rem;
+            text-align: center; border: 1px solid; backdrop-filter: blur(10px);
+        }
+        .price-box.adobe { background: rgba(244,63,94,0.08); border-color: rgba(244,63,94,0.4); }
+        .price-box.free {
+            background: rgba(52,211,153,0.1);
+            border-color: rgba(52,211,153,0.55);
+            box-shadow: 0 0 26px rgba(52,211,153,0.2);
+        }
+        .price-box .label { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .price-box.adobe .label { color: #f43f5e; }
+        .price-box.free .label { color: #34d399; }
+        .price-box .amount { font-size: 1.9rem; font-weight: 800; line-height: 1.15; }
+        .price-box.adobe .amount { color: #f43f5e; }
+        .price-box.free .amount { color: #34d399; }
+        .price-box .note { font-size: 1.02rem; color: #9aabca; margin-top: 0.15rem; }
+
+        .icon-header {
+            display: flex; align-items: center; gap: 0.7rem;
+            margin-bottom: 0.4rem; justify-content: center;
+        }
+        .icon-header img {
+            width: 56px; height: 56px; border-radius: 14px;
+            object-fit: cover;
+            box-shadow: 0 8px 20px rgba(124,58,237,0.4);
+            border: 1px solid rgba(168,139,255,0.4);
+        }
+
+        .img-slot {
+            width: 100%;
+            border-radius: 20px;
+            margin: 1rem 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .img-slot img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            border-radius: 20px;
+        }
+        .img-slot-lg { height: 280px; }
+        .img-slot-md { height: 260px; }
+
+        .big-number {
+            font-size: 3.2rem; font-weight: 800;
+            line-height: 1.1; text-align: center; margin: 0.1rem 0;
+        }
+
+        .summary-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem;
+            margin: 0.3rem 0; width: 100%;
+        }
+        .summary-item {
+            background: rgba(10,12,35,0.5); backdrop-filter: blur(8px);
+            border-radius: 20px; padding: 0.8rem 0.8rem;
+            text-align: center; border: 1px solid rgba(255,255,255,0.06);
+        }
+        .summary-item .title { font-weight: 800; font-size: 1.6rem; margin-bottom: 0.25rem; }
+        .summary-item .desc { font-size: 0.98rem; color: #9aabca; line-height: 1.4; }
+
+        .progress-track {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            height: 14px;
+            overflow: hidden;
+            margin: 0.3rem 0;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #7c3aed, #22d3ee);
+            transition: width 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            width: 0%;
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.92rem;
+            color: #9aabca;
+            margin-bottom: 0.15rem;
+        }
+
+        @media (max-width: 900px) {
+            .title-lg { font-size: 2.8rem; }
+            .title-md { font-size: 2.1rem; }
+            .sub { font-size: 1.24rem; }
+            .price-box .amount { font-size: 1.5rem; }
+            .big-number { font-size: 2rem; }
+            .img-slot-lg { height: 240px; }
+            .img-slot-md { height: 220px; }
+            .icon-header img { width: 44px; height: 44px; border-radius: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 幻灯片 0：首页（12秒） ===== -->
+    <div class="slide active" data-slide-time="12000">
+        <div class="icon-header reveal-item" data-duration="600">
+            <img src="00.icon.png" alt="WordCraft 图标">
+        </div>
+        <div class="title-lg reveal-item" data-duration="600"
+             style="background:linear-gradient(135deg,#e0d6ff,#fbcfe8,#a78bfa);background-clip:text;-webkit-background-clip:text;color:transparent; margin-bottom: 0.5rem;">
+            WordCraft
+        </div>
+        <div class="title-md reveal-item" data-duration="700"
+             style="font-size:1.5rem; background:linear-gradient(120deg,#22d3ee,#f472b6);background-clip:text;-webkit-background-clip:text;color:transparent; margin-bottom:0.2rem;">
+            Rust 重写的开源 Word 平替 · AI 可改文档
+        </div>
+        <div class="sub reveal-item" data-duration="800" style="margin:1rem 0 0.6rem; font-size:1.15rem;">
+            纯 Rust · 61ms 布局 188 页 · 389 条 MCP 命令
+        </div>
+
+        <div class="glass-card glow-card reveal-item" data-duration="2500" style="max-width:1000px;">
+            <div class="price-compare">
+                <div class="price-box adobe">
+                    <div class="label">Microsoft Word</div>
+                    <div class="amount">¥398</div>
+                    <div class="note">/年 · 家庭版订阅</div>
+                </div>
+                <div class="price-box free">
+                    <div class="label">WordCraft</div>
+                    <div class="amount">免费</div>
+                    <div class="note">开源 · 无订阅</div>
+                </div>
+            </div>
+
+            <div class="img-slot img-slot-lg" data-anim="zoom" style="transform-origin:center;">
+                <img src="assets/031-wordcraft/01.jpg" alt="WordCraft 主界面">
+            </div>
+
+            <div class="chip-row reveal-item" data-duration="1500">
+                <span class="chip" style="color:#22d3ee;border-color:rgba(34,211,238,0.6);">🦀 纯 Rust</span>
+                <span class="chip" style="color:#f472b6;border-color:rgba(244,114,182,0.6);">⚡ 61ms 布局</span>
+                <span class="chip" style="color:#fbbf24;border-color:rgba(251,191,36,0.6);">🤖 389 条命令</span>
+                <span class="chip" style="color:#34d399;border-color:rgba(52,211,153,0.6);">🌐 全平台</span>
+            </div>
+
+            <div class="badge-list reveal-item" data-duration="1500">
+                <span>MIT 开源</span>
+                <span class="emerald">v0.3.0</span>
+                <span class="purple">DOCX / ODT / RTF</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 1：性能实测（8秒） ===== -->
+    <div class="slide" data-slide-time="8000">
+        <div class="title-md reveal-item" data-duration="500"
+             style="background:linear-gradient(120deg,#22d3ee,#67e8f9);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            ⚡ 性能实测
+        </div>
+        <div class="sub reveal-item" data-duration="500">Rust + egui 开发 · 不是 Electron</div>
+
+        <div class="glass-card reveal-item" data-duration="1500" style="max-width:1050px;">
+            <div class="grid-2col">
+                <div class="col-card reveal-item" data-duration="600" style="border-top:4px solid #22d3ee; margin: 0 0.4rem; text-align:center;">
+                    <div class="big-number" style="color:#22d3ee;">61ms</div>
+                    <div class="sub" style="margin:0 auto;font-size:0.9rem;">188 页文档 · 首次完整布局</div>
+                </div>
+                <div class="col-card reveal-item" data-duration="600" style="border-top:4px solid #f472b6; margin: 0 0.4rem; text-align:center;">
+                    <div class="big-number" style="color:#f472b6;">1.4ms</div>
+                    <div class="sub" style="margin:0 auto;font-size:0.9rem;">修改文字 · 局部重新布局</div>
+                </div>
+            </div>
+
+            <div class="img-slot img-slot-md reveal-item" data-anim="left" data-duration="1200" style="margin-top:0.6rem;">
+                <img src="assets/031-wordcraft/02.jpg" alt="性能演示 · 长文档排版">
+            </div>
+
+            <div class="grid-2col" style="margin-top:0.4rem;">
+                <div class="col-card reveal-item" data-duration="700" style="border-top:4px solid #fbbf24; margin: 0 0.4rem;">
+                    <h3 style="color:#fbbf24;"><span class="num-badge">1</span>原生运行</h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li>Windows / macOS / Linux / 浏览器</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="700" style="border-top:4px solid #34d399; margin: 0 0.4rem;">
+                    <h3 style="color:#34d399;"><span class="num-badge">2</span>中文界面</h3>
+                    <ul class="feature-list feature-list-sm feature-list-emerald">
+                        <li>简体中文 · 深色主题</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 2：排版功能（9秒） ===== -->
+    <div class="slide" data-slide-time="9000">
+        <div class="title-md reveal-item" data-duration="500"
+             style="background:linear-gradient(120deg,#c084fc,#a78bfa);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            📝 常用排版，基本都有了
+        </div>
+        <div class="sub reveal-item" data-duration="500">技术手册、项目方案、设备说明书都能写</div>
+
+        <div class="glass-card reveal-item" data-duration="1500" style="max-width:1050px;">
+            <div class="grid-3col">
+                <div class="col-card reveal-item" data-duration="600" style="border-top:4px solid #22d3ee; margin: 0 0.4rem;">
+                    <h3 style="color:#22d3ee; font-size:1.1rem;">📄 文字排版</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>字体 / 字号 / 段落间距</li>
+                        <li>标题样式 / 多级编号</li>
+                        <li>自动生成目录 + 导航跳转</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="600" style="border-top:4px solid #f472b6; margin: 0 0.4rem;">
+                    <h3 style="color:#f472b6; font-size:1.1rem;">📊 表格能力</h3>
+                    <ul class="feature-list feature-list-sm feature-list-pink">
+                        <li>合并 / 拆分单元格</li>
+                        <li>边框 / 底色调整</li>
+                        <li>跨页重复标题行</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="600" style="border-top:4px solid #fbbf24; margin: 0 0.4rem;">
+                    <h3 style="color:#fbbf24; font-size:1.1rem;">📐 页面控制</h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li>纸张 / 页边距 / 分栏</li>
+                        <li>页眉页脚 / 图片环绕</li>
+                        <li>设计主题 / 水印 / 边框</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="img-slot img-slot-md reveal-item" data-anim="right" data-duration="1200" style="margin-top:0.6rem;">
+                <img src="assets/031-wordcraft/03.jpg" alt="排版功能演示">
+            </div>
+
+            <div class="glass-card-inner reveal-item" data-duration="800" style="border-color:rgba(168,139,255,0.25); font-size:1rem; margin-top:0.5rem;">
+                ✅ 普通文档的大部分需求，已经覆盖
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 3：修订模式（8秒） ===== -->
+    <div class="slide" data-slide-time="8000">
+        <div class="title-md reveal-item" data-duration="500"
+             style="background:linear-gradient(120deg,#f43f5e,#fbbf24);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            ✏️ 修订 · 批注 · 文档比较
+        </div>
+        <div class="sub reveal-item" data-duration="500">客户改参数、逐条接受或拒绝</div>
+
+        <div class="glass-card reveal-item" data-duration="1200" style="max-width:1050px;">
+            <div class="grid-2col">
+                <div class="col-card reveal-item" data-duration="600" style="border-top:4px solid #f43f5e; margin: 0 0.4rem;">
+                    <h3 style="color:#f43f5e;"><span class="num-badge">1</span>已实现</h3>
+                    <ul class="feature-list feature-list-sm feature-list-rose">
+                        <li>修订模式：删除 / 新增标记</li>
+                        <li>逐条接受或拒绝</li>
+                        <li>批注 + 文档比较</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="600" style="border-top:4px solid #fbbf24; margin: 0 0.4rem;">
+                    <h3 style="color:#fbbf24;"><span class="num-badge">2</span>当前缺陷</h3>
+                    <ul class="feature-list feature-list-sm feature-list-gold">
+                        <li><span class="highlight-rose">全部替换</span>未进修订记录</li>
+                        <li>字体 / 加粗格式记录不全</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="img-slot img-slot-md reveal-item" data-anim="flip" data-duration="1200" style="margin-top:0.6rem;">
+                <img src="assets/031-wordcraft/04.jpg" alt="修订模式界面">
+            </div>
+
+            <div class="glass-card-inner reveal-item" data-duration="800" style="border-color:rgba(244,63,94,0.35); font-size:1.02rem; margin-top:0.5rem;">
+                ⚠️ 修订漏一条就可能影响审核 —— 正式合同暂时别用它
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 4：AI + MCP（9秒） ===== -->
+    <div class="slide" data-slide-time="9000">
+        <div class="title-md reveal-item" data-duration="500"
+             style="background:linear-gradient(120deg,#f472b6,#ec4899);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            🤖 AI 直接修改 Word
+        </div>
+        <div class="sub reveal-item" data-duration="500">389 条命令 · 界面能用，AI 也能调用</div>
+
+        <div class="glass-card reveal-item" data-duration="1500" style="max-width:1050px;">
+            <div class="grid-2col" style="margin-top:0.4rem;">
+                <div class="col-card reveal-item" data-duration="700" style="border-top:4px solid #ec4899; margin: 0 0.4rem;">
+                    <h3 style="color:#ec4899;"><span class="num-badge">1</span>MCP 能力</h3>
+                    <ul class="feature-list feature-list-sm feature-list-pink">
+                        <li>读取 / 修改 / 保存文档</li>
+                        <li>操作表格 · 调整格式</li>
+                        <li>重新检查文档结构</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="700" style="border-top:4px solid #22d3ee; margin: 0 0.4rem;">
+                    <h3 style="color:#22d3ee;"><span class="num-badge">2</span>典型场景</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>型号升级 · 批量替换</li>
+                        <li>改文字 · 导出 PDF</li>
+                        <li>批量生成报告 / 整理文档</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="glass-card-inner reveal-item" data-duration="900" style="font-family:monospace;font-size:0.95rem;color:#f472b6;border-color:rgba(244,114,182,0.3); margin-top:0.5rem;">
+                claude mcp add wordcraft -- wordcraft-cli mcp
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 5：兼容性与短板（6秒） ===== -->
+    <div class="slide" data-slide-time="6000">
+        <div class="title-md reveal-item" data-duration="400"
+             style="background:linear-gradient(120deg,#fbbf24,#fb923c);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            ⚖️ 87% 覆盖 · 62% 完整度
+        </div>
+        <div class="sub reveal-item" data-duration="400">功能做出来快，细节才是硬骨头</div>
+
+        <div class="glass-card reveal-item" data-duration="1000" style="max-width:1050px;">
+            <div class="reveal-item" data-duration="600" style="margin-bottom:0.6rem;">
+                <div class="progress-label">
+                    <span>功能命令覆盖率</span>
+                    <span style="color:#22d3ee;font-weight:700;">87%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" data-width="87%" style="background:linear-gradient(90deg,#7c3aed,#22d3ee);"></div>
+                </div>
+            </div>
+            <div class="reveal-item" data-duration="600" style="margin-bottom:0.6rem;">
+                <div class="progress-label">
+                    <span>实际功能完整度</span>
+                    <span style="color:#f43f5e;font-weight:700;">62%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" data-width="62%" style="background:linear-gradient(90deg,#f43f5e,#fbbf24);"></div>
+                </div>
+            </div>
+
+            <div class="grid-2col" style="margin-top:0.4rem;">
+                <div class="col-card reveal-item" data-duration="500" style="border-top:4px solid #34d399; margin: 0 0.4rem;">
+                    <h3 style="color:#34d399;"><span class="num-badge">✓</span>已支持格式</h3>
+                    <ul class="feature-list feature-list-sm feature-list-emerald">
+                        <li>DOCX / ODT / RTF</li>
+                        <li>HTML / Markdown / TXT</li>
+                        <li>导出 PDF · 模板新建</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="500" style="border-top:4px solid #f43f5e; margin: 0 0.4rem;">
+                    <h3 style="color:#f43f5e;"><span class="num-badge">✗</span>尚未完善</h3>
+                    <ul class="feature-list feature-list-sm feature-list-rose">
+                        <li>特殊换行丢失</li>
+                        <li>PDF 交叉引用异常</li>
+                        <li>图表 / SmartArt / 公式编辑器</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="glass-card-inner reveal-item" data-duration="600" style="border-color:rgba(251,191,36,0.35); font-size:1.02rem; margin-top:0.5rem;">
+                💡 适合体验和研究，正式工作文档还是成熟软件更稳妥
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 幻灯片 6：总结（8秒） ===== -->
+    <div class="slide" data-slide-time="8000">
+        <div class="title-md reveal-item" data-duration="500"
+             style="background:linear-gradient(120deg,#a78bfa,#c084fc);background-clip:text;-webkit-background-clip:text;color:transparent;">
+            📌 我的结论
+        </div>
+        <div class="sub reveal-item" data-duration="500">AI 做软件越来越快，细节决定敢不敢用</div>
+
+        <div class="glass-card reveal-item" data-duration="1200" style="max-width:1050px;">
+            <div class="summary-grid">
+                <div class="summary-item reveal-item" data-duration="400" style="border-top:4px solid #34d399;">
+                    <div class="title" style="color:#34d399;">功能快</div>
+                    <div class="desc">AI 短时间做出功能齐全版本</div>
+                </div>
+                <div class="summary-item reveal-item" data-duration="400" style="border-top:4px solid #22d3ee;">
+                    <div class="title" style="color:#22d3ee;">细节难</div>
+                    <div class="desc">DOCX 兼容性决定敢不敢用</div>
+                </div>
+                <div class="summary-item reveal-item" data-duration="400" style="border-top:4px solid #f472b6;">
+                    <div class="title" style="color:#f472b6;">MCP 香</div>
+                    <div class="desc">文档能力开放给 AI，新路径</div>
+                </div>
+                <div class="summary-item reveal-item" data-duration="400" style="border-top:4px solid #fbbf24;">
+                    <div class="title" style="color:#fbbf24;">再等等</div>
+                    <div class="desc">现阶段继续用 Word，等兼容性补全</div>
+                </div>
+            </div>
+
+            <div class="glass-card-inner reveal-item" data-duration="600" style="border-color:rgba(168,139,255,0.25); font-size:1rem; margin-top:0.6rem;">
+                ⚡ 兼容性做扎实 + AI 批量处理，这个项目会非常有吸引力
+            </div>
+
+            <div class="badge-list reveal-item" data-duration="600" style="margin-top:1.5rem;">
+                <span>61ms</span>
+                <span class="emerald">389 命令</span>
+                <span class="purple">MCP</span>
+                <span class="gold">MIT 开源</span>
+                <span class="rose">87% vs 62%</span>
+            </div>
+
+            <div class="glass-card-inner reveal-item" data-duration="600" style="border-color:rgba(168,139,255,0.25); font-size:0.98rem; margin-top:0.5rem; font-family:monospace; color:#c084fc;">
+                github.com/storytold/wordcraft
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 底部控件 ===== -->
+    <div class="progress-footer" style="display: none;">
+        <div class="timeline-bar" id="timelineBar"></div>
+    </div>
+    <div class="slide-counter" id="slideCounter">1 / 7</div>
+
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.slide');
+            const timeline = document.getElementById('timelineBar');
+            const counterSpan = document.getElementById('slideCounter');
+            let currentIdx = 0;
+            const totalSlides = slides.length;
+            let autoPlay = true;
+
+            let currentSlideItems = [];
+            let currentDurations = [];
+            let currentItemIndex = 0;
+            let currentTotalDuration = 0;
+
+            let progressTimer = null;
+            let itemTimer = null;
+
+            function getRevealItems(slide) {
+                return Array.from(slide.querySelectorAll('.reveal-item'));
+            }
+
+            function computeSlideDurations(slide) {
+                const items = getRevealItems(slide);
+                const durations = [];
+                let total = 0;
+                for (let i = 0; i < items.length; i++) {
+                    const el = items[i];
+                    let dur = el.getAttribute('data-duration');
+                    if (dur !== null) {
+                        dur = parseInt(dur);
+                    } else {
+                        dur = 700;
+                    }
+                    if (isNaN(dur)) dur = 700;
+                    durations.push(dur);
+                    total += dur;
+                }
+                return { items, durations, total };
+            }
+
+            function resetRevealItems(slide) {
+                const items = getRevealItems(slide);
+                items.forEach(item => {
+                    item.classList.remove('revealed');
+                });
+                slide.querySelectorAll('.progress-fill').forEach(bar => {
+                    bar.style.width = '0%';
+                });
+            }
+
+            function stopAllTimers() {
+                if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+                if (itemTimer) { clearTimeout(itemTimer); itemTimer = null; }
+            }
+
+            function animateProgressBars(slide) {
+                setTimeout(() => {
+                    slide.querySelectorAll('.progress-fill').forEach(bar => {
+                        const w = bar.getAttribute('data-width');
+                        if (w) bar.style.width = w;
+                    });
+                }, 200);
+            }
+
+            function showNextItem() {
+                if (!autoPlay) return;
+                if (currentItemIndex >= currentSlideItems.length) {
+                    const slideTime = slides[currentIdx].getAttribute('data-slide-time');
+                    if (!slideTime) {
+                        if (itemTimer) clearTimeout(itemTimer);
+                        itemTimer = setTimeout(() => {
+                            if (autoPlay) goToSlide((currentIdx + 1) % totalSlides);
+                        }, 500);
+                    }
+                    return;
+                }
+
+                const item = currentSlideItems[currentItemIndex];
+                if (item && !item.classList.contains('revealed')) {
+                    item.classList.add('revealed');
+                    if (item.querySelector('.progress-fill')) {
+                        animateProgressBars(item);
+                    }
+                }
+
+                const duration = currentDurations[currentItemIndex];
+                if (itemTimer) clearTimeout(itemTimer);
+                itemTimer = setTimeout(() => {
+                    if (autoPlay) {
+                        currentItemIndex++;
+                        showNextItem();
+                    }
+                }, duration);
+            }
+
+            function startCurrentSlide() {
+                stopAllTimers();
+                resetRevealItems(slides[currentIdx]);
+
+                const { items, durations, total } = computeSlideDurations(slides[currentIdx]);
+                currentSlideItems = items;
+                currentDurations = durations;
+                currentTotalDuration = total;
+                currentItemIndex = 0;
+
+                const slideTime = slides[currentIdx].getAttribute('data-slide-time');
+                if (slideTime) {
+                    if (itemTimer) clearTimeout(itemTimer);
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) goToSlide((currentIdx + 1) % totalSlides);
+                    }, parseInt(slideTime));
+                }
+
+                if (currentTotalDuration === 0 || items.length === 0) {
+                    if (!slideTime) {
+                        itemTimer = setTimeout(() => {
+                            if (autoPlay) goToSlide((currentIdx + 1) % totalSlides);
+                        }, 1500);
+                    }
+                    return;
+                }
+
+                let startTime = performance.now();
+                if (progressTimer) clearInterval(progressTimer);
+                progressTimer = setInterval(() => {
+                    if (!autoPlay) return;
+                    const now = performance.now();
+                    let elapsed = now - startTime;
+                    const totalDuration = slideTime ? parseInt(slideTime) : currentTotalDuration;
+                    if (elapsed > totalDuration) elapsed = totalDuration;
+                    const percent = (elapsed / totalDuration) * 100;
+                    timeline.style.width = `${percent}%`;
+                }, 50);
+
+                showNextItem();
+            }
+
+            function stopCurrentSlide() { stopAllTimers(); }
+
+            function goToSlide(index) {
+                if (index === currentIdx) return;
+                if (index < 0) index = 0;
+                if (index >= totalSlides) index = 0;
+
+                stopCurrentSlide();
+                slides[currentIdx].classList.remove('active');
+                slides[index].classList.add('active');
+                currentIdx = index;
+                updateCounter();
+                timeline.style.width = '0%';
+
+                if (autoPlay) {
+                    startCurrentSlide();
+                } else {
+                    resetRevealItems(slides[currentIdx]);
+                    const firstItem = slides[currentIdx].querySelector('.reveal-item');
+                    if (firstItem) firstItem.classList.add('revealed');
+                    stopAllTimers();
+                }
+            }
+
+            function nextSlide() { goToSlide((currentIdx + 1) % totalSlides); }
+            function prevSlide() { goToSlide((currentIdx - 1 + totalSlides) % totalSlides); }
+
+            function toggleAutoPlay() {
+                autoPlay = !autoPlay;
+                if (autoPlay) { stopCurrentSlide(); startCurrentSlide(); }
+                else { stopAllTimers(); }
+            }
+
+            function updateCounter() {
+                counterSpan.innerText = `${currentIdx+1} / ${totalSlides}`;
+            }
+
+            function onKeyDown(e) {
+                const key = e.key;
+                if (key === ' ' || key === 'Space' || key === 'Spacebar') {
+                    e.preventDefault(); toggleAutoPlay();
+                } else if (key === 'ArrowLeft') {
+                    e.preventDefault(); prevSlide();
+                } else if (key === 'ArrowRight') {
+                    e.preventDefault(); nextSlide();
+                }
+            }
+
+            function init() {
+                slides.forEach((s, idx) => {
+                    if (idx === 0) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+                currentIdx = 0;
+                updateCounter();
+                autoPlay = true;
+                startCurrentSlide();
+                window.addEventListener('keydown', onKeyDown);
+            }
+
+            init();
+        })();
+    </script>
+
+<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
+<div class="sciviz-promo-no" aria-hidden="true">No.031 · 2026-10-11</div>
+<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
+padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
+border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
+letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+</body>
+</html>

@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="sciviz-promo" content="no=9;date=2026-03-23;id=009-key-gene-screening">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No.009 · KEGG / GO 关键基因筛选三步工作流</title>
+    <style>
+        /* ===== 继承九象限图风格 ===== */
+        :root {
+            --bg-light: #eef2f7;
+            --bg-dark: #d9e1ec;
+            --text-primary: #1e2b3c;
+            --text-secondary: #3f5569;
+            --mantel-teal: #2e8b8b;
+            --mantel-blue: #4a80aa;
+            --mantel-gold: #b8864b;
+            --mantel-purple: #8a6d9c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            width: 1300px;
+            height: 2150px;
+            font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(145deg, var(--bg-light) 0%, var(--bg-dark) 100%);
+            overflow: hidden;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: scale(0.5);
+            transform-origin: top left;
+            position: relative;
+        }
+
+        .video-container {
+            width: 1300px;
+            height: 2150px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        .scene-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            padding: 45px 50px;
+            display: none;
+            opacity: 0;
+            flex-direction: column;
+            justify-content: center;  /* 垂直居中 */
+            align-items: center;      /* 水平居中 */
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .scene-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scene-active { display: flex; }
+
+        .text-center { text-align: center; }
+        
+        /* 标题徽章 */
+        .section-badge {
+            display: inline-block;
+            background: var(--mantel-gold);
+            color: white;
+            padding: 10px 32px;
+            border-radius: 40px;
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(128, 98, 58, 0.3);
+        }
+
+        .main-title {
+            font-size: 44px;
+            font-weight: 800;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #2c3e50 0%, var(--mantel-purple) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* 特性网格 */
+        .feature-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 18px;
+            margin: 20px 0 25px;
+            justify-content: center;
+            max-width: 1100px;
+        }
+
+        .feature-item {
+            background: #eef3f9;
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-size: 28px;
+            font-weight: 500;
+            color: #1e3b5c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 5px solid var(--mantel-blue);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .feature-item::before {
+            content: '●';
+            color: var(--mantel-gold);
+            font-size: 30px;
+        }
+
+        /* 卡片内容区 */
+        .content-card {
+            background: white;
+            border-radius: 36px;
+            padding: 28px 32px;
+            margin: 20px 0;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 1150px;
+            border: 2px solid var(--mantel-teal);
+        }
+
+        .card-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--mantel-purple);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 5px solid var(--mantel-gold);
+            padding-left: 20px;
+        }
+
+        .desc-text {
+            font-size: 30px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin: 18px 0;
+        }
+
+        .info-block {
+            background: #fef9e6;
+            border-left: 5px solid var(--mantel-gold);
+            padding: 20px;
+            border-radius: 24px;
+        }
+        .info-block strong {
+            font-size: 28px;
+            color: var(--mantel-teal);
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .badge-light {
+            background: #eef2fa;
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 28px;
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--mantel-teal);
+            margin-bottom: 12px;
+        }
+
+        .step-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .step-list li {
+            font-size: 28px;
+            padding: 12px 0 12px 32px;
+            border-bottom: 1px solid #e9edf2;
+            position: relative;
+        }
+        .step-list li::before {
+            content: "▹";
+            color: var(--mantel-gold);
+            font-weight: bold;
+            font-size: 30px;
+            position: absolute;
+            left: 0;
+            top: 10px;
+        }
+
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .pill {
+            background: #eef3f9;
+            border-radius: 50px;
+            padding: 6px 18px;
+            font-size: 28px;
+            font-weight: 500;
+            color: var(--mantel-blue);
+            border: 1px solid var(--mantel-blue);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 20px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #e2e8f0;
+            padding: 12px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .comparison-table th {
+            background: #eef2fa;
+            font-weight: 700;
+            color: var(--mantel-teal);
+        }
+
+        .back-btn {
+            background: var(--mantel-blue);
+            color: white;
+            border: none;
+            padding: 10px 28px;
+            font-size: 22px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 6px 12px rgba(74,128,170,0.25);
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--mantel-purple);
+            transform: scale(1.02);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 18px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .progress-indicator {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .progress-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(57,73,96,0.3);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .progress-dot-active {
+            background: var(--mantel-gold);
+            transform: scale(1.3);
+        }
+
+        hr { margin: 18px 0; border-color: #d0dbea; }
+
+        .footer-note {
+            margin: 30px 0 15px;
+            font-size: 18px;
+            color: var(--mantel-purple);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="video-container">
+    <!-- 页面1：方向性过滤 + 通路富集瘦身 -->
+    <div class="scene-container scene-active" id="scene-step1">
+        <div style="text-align: center;">
+            <div class="section-badge">🎯 第1步 · 方向性过滤</div>
+            <h1 class="main-title">上下调分离 · 锁定关键通路</h1>
+            <div class="feature-grid">
+                <div class="feature-item">📈 上调基因单独富集</div>
+                <div class="feature-item">📉 下调基因单独富集</div>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-item">🧬 避免方向信息稀释</div>
+                <div class="feature-item">🎯 匹配表型生物学方向</div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-title">🔬 为什么必须分开上下调？</div>
+            <div class="desc-text">
+                将上下调基因混合进行GO/KEGG富集，会导致正负调控信号相互抵消，掩盖真实的生物学故事。<br>
+                例如：促炎模型中，<strong>上调基因</strong>富集“炎症反应”，<strong>下调基因</strong>富集“氧化磷酸化”——两者生物学意义完全不同。
+            </div>
+            <div class="grid-2col">
+                <div class="info-block">
+                    <strong>📈 上调基因富集</strong>
+                    <p style="font-size: 28px; margin-top: 8px;">关注激活的生物学过程<br>如：细胞增殖、炎症反应、信号转导<br>与处理效应正向关联</p>
+                </div>
+                <div class="info-block">
+                    <strong>📉 下调基因富集</strong>
+                    <p style="font-size: 28px; margin-top: 8px;">关注抑制的生物学过程<br>如：细胞凋亡、代谢通路、分化<br>与处理效应负向关联</p>
+                </div>
+            </div>
+            <div class="badge-light">💡 小技巧：分别输出上下调的富集气泡图，对比呈现更清晰</div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-title">📊 通路瘦身 · 精选核心通路</div>
+            <div class="desc-text">
+                富集结果往往包含数十条通路，需要进一步筛选出与研究最相关的3~5条核心通路。
+            </div>
+            <div class="step-list">
+                <li><strong>筛选标准1：富集基因数适中</strong> — 保留10~100个基因的通路，避免过泛（如“代谢过程”）或过窄（<5个基因）</li>
+                <li><strong>筛选标准2：FDR < 0.05</strong> — 严格控制假阳性率</li>
+                <li><strong>筛选标准3：生物学相关性</strong> — 优先选择与实验处理/表型直接相关的通路（如处理为激素处理，优先“植物激素信号转导”）</li>
+                <li><strong>筛选标准4：富集倍数(Enrichment Score)排序</strong> — 取前10条候选，再人工精选3~5条</li>
+            </div>
+            <div class="pill-group">
+                <div class="pill">🔹 常用工具: clusterProfiler</div>
+                <div class="pill">🔹 阈值: p.adjust < 0.05</div>
+                <div class="pill">🔹 基因数范围: 10~100</div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="back-btn" onclick="switchToScene('step2')">下一步：通路-基因交集 →</button>
+        </div>
+    </div>
+
+    <!-- 页面2：通路-差异基因交集 + PPI枢纽筛选 -->
+    <div class="scene-container" id="scene-step2">
+        <div style="text-align: center;">
+            <div class="section-badge">🔗 第2步 · 交集筛选</div>
+            <h1 class="main-title">通路基因 ∩ 差异基因 ∩ PPI枢纽</h1>
+            <div class="feature-grid">
+                <div class="feature-item">📦 提取核心通路内基因</div>
+                <div class="feature-item">⚡ 与差异基因取交集</div>
+                <div class="feature-item">🕸️ 蛋白互作网络找Hub</div>
+                <div class="feature-item">✨ 三重交集锁定候选</div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-title">📦 Step A: 通路基因与差异基因交集</div>
+            <div class="desc-text">
+                从Step1筛选出的3~5条核心通路中，提取所有基因，与显著差异表达基因（|log₂FC| ≥ 1, FDR < 0.05）取交集。
+            </div>
+            <div class="table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr><th>核心通路</th><th>通路内基因数</th><th>与DEG交集数</th><th>交集占比</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>植物激素信号转导</td><td>142</td><td>38</td><td>26.8%</td></tr>
+                        <tr><td>MAPK信号通路</td><td>108</td><td>29</td><td>26.9%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="badge-light">🎯 交集基因数量通常从几百降至50~150个，缩小了候选范围</div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-title">🕸️ Step B: PPI网络筛选枢纽基因</div>
+            <div class="desc-text">
+                将交集基因导入STRING数据库或Cytoscape，构建蛋白互作网络，筛选拓扑重要性高的Hub基因。
+            </div>
+            <div class="grid-2col">
+                <div class="info-block">
+                    <strong>📊 常用拓扑指标</strong>
+                    <ul style="font-size: 24px; margin-top: 8px; padding-left: 20px;">
+                        <li>Degree（度中心性）— 连接数量</li>
+                        <li>Betweenness（介数中心性）— 桥梁作用</li>
+                        <li>Closeness（紧密中心性）— 信息传递效率</li>
+                        <li>MCC（最大团中心性）—  Cytoscape cytoHubba推荐</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <strong>🎯 Hub筛选策略</strong>
+                    <ul style="font-size: 24px; margin-top: 8px; padding-left: 20px;">
+                        <li>取Degree排名前10~20的基因</li>
+                        <li>与MCC排名前10取交集</li>
+                        <li>获得高置信度枢纽基因（通常10~30个）</li>
+                        <li>结合log₂FC绝对值排序</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pill-group">
+                <div class="pill">🔹 STRING数据库</div>
+                <div class="pill">🔹 Cytoscape</div>
+                <div class="pill">🔹 物种特异性数据库</div>
+                <div class="pill">🔹 置信度 > 0.4</div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-title">📊 番茄数据模拟示例</div>
+            <div class="desc-text">
+                以番茄转录组为例，经过三重交集筛选后，候选基因从1265个差异基因缩减至18个高置信度Hub基因。
+            </div>
+            <div class="table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr><th>基因ID</th><th>log₂FC</th><th>所属通路</th><th>Degree</th><th>MCC排名</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Solyc06g066830</td><td>4.06</td><td>植物激素信号转导</td><td>28</td><td>3</td></tr>
+                        <tr><td>Solyc07g053110</td><td>4.06</td><td>MAPK信号通路</td><td>31</td><td>2</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="back-btn" style="background:#6c757d;" onclick="switchToScene('step1')">← 返回上一步</button>
+            <button class="back-btn" onclick="switchToScene('step3')">下一步：功能注释与优先级 →</button>
+        </div>
+    </div>
+
+    <!-- 页面3：功能注释 + 实验验证优先级 -->
+    <div class="scene-container" id="scene-step3">
+        <div style="text-align: center;">
+            <div class="section-badge">📚 第3步 · 功能验证优先级</div>
+            <h1 class="main-title">从统计显著到生物学合理</h1>
+            <div class="feature-grid">
+                <div class="feature-item">🔍 数据库功能注释</div>
+                <div class="feature-item">📖 同领域文献支持</div>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-item">🧪 实验验证可行性</div>
+                <div class="feature-item">✅ 最终候选清单</div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-title">🔍 多维功能注释</div>
+            <div class="desc-text">
+                仅靠统计指标不足以确定关键基因，需要结合多种数据库进行功能注释，确保候选基因与表型的生物学逻辑一致。
+            </div>
+            <div class="grid-2col">
+                <div class="info-block">
+                    <strong>📚 主要注释数据库</strong>
+                    <ul style="font-size: 24px; margin-top: 8px; padding-left: 20px;">
+                        <li>NCBI / UniProt — 基础功能描述</li>
+                        <li>TAIR / Phytozome — 植物同源基因</li>
+                        <li>StringDB — 互作网络与通路</li>
+                        <li>PlantTFDB — 转录因子注释</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <strong>📖 文献验证策略</strong>
+                    <ul style="font-size: 24px; margin-top: 8px; padding-left: 20px;">
+                        <li>PubMed检索基因名 + 表型关键词</li>
+                        <li>关注同源基因在相似处理中的报道</li>
+                        <li>优先选择有功能验证文献的基因</li>
+                        <li>记录支持文献PMID供论文引用</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-title">🎯 优先级排序矩阵</div>
+            <div class="desc-text">
+                综合多个维度，为候选基因建立优先级评分体系，指导后续实验验证。
+            </div>
+            <div class="table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr><th>评分维度</th><th>权重</th><th>高分标准</th><th>低分标准</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>差异表达幅度 |log₂FC|</td><td>25%</td><td>> 2</td><td>< 1.5</td></tr>
+                        <tr><td>PPI枢纽程度 (Degree)</td><td>25%</td><td>> 20</td><td>< 10</td></tr>
+                        <tr><td>核心通路数量</td><td>20%</td><td>≥ 2条核心通路</td><td>仅1条通路</td></tr>
+                        <tr><td>功能注释完整性</td><td>15%</td><td>已知功能 + 文献支持</td><td>功能未知</td></tr>
+                        <tr><td>实验可行性</td><td>15%</td><td>引物可用，表达量适中</td><td>低表达/无引物</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="badge-light" style="margin-top: 12px;">💡 最终选择综合评分前5~10的基因进行qPCR/Western Blot等初步验证</div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-title">⚠️ 常见误区与避坑指南</div>
+            <div class="grid-2col">
+                <div class="info-block" style="background: #ffece5;">
+                    <strong>❌ 应避免的做法</strong>
+                    <ul style="font-size: 24px; margin-top: 8px; padding-left: 20px;">
+                        <li>只看P值最小通路，忽略生物学逻辑</li>
+                        <li>直接取富集通路所有基因作为候选</li>
+                        <li>忽略低表达基因（原始counts < 10）</li>
+                        <li>仅凭单一软件结果下结论</li>
+                    </ul>
+                </div>
+                <div class="info-block" style="background: #e3f0ec;">
+                    <strong>✅ 推荐实践</strong>
+                    <ul style="font-size: 24px; margin-top: 8px; padding-left: 20px;">
+                        <li>上下调基因分开富集</li>
+                        <li>多维度交集筛选（通路+差异+PPI）</li>
+                        <li>结合文献支持提高可信度</li>
+                        <li>保留原始表达量数据进行复核</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="back-btn" style="background:#6c757d;" onclick="switchToScene('step2')">← 返回上一步</button>
+            <button class="back-btn" onclick="switchToScene('step1')">🏠 回到首页</button>
+        </div>
+    </div>
+</div>
+
+<!-- 进度点 (共3页) -->
+<div class="progress-indicator">
+    <div class="progress-dot progress-dot-active" data-scene="step1"></div>
+    <div class="progress-dot" data-scene="step2"></div>
+    <div class="progress-dot" data-scene="step3"></div>
+</div>
+
+<script>
+    (function() {
+        const scenes = ['step1', 'step2', 'step3'];
+        let currentScene = 'step1';
+        
+        const sceneElements = {
+            step1: document.getElementById('scene-step1'),
+            step2: document.getElementById('scene-step2'),
+            step3: document.getElementById('scene-step3')
+        };
+        
+        const progressDots = document.querySelectorAll('.progress-dot');
+
+        window.switchToScene = function(sceneId) {
+            Object.values(sceneElements).forEach(scene => {
+                if (scene) {
+                    scene.classList.remove('scene-active');
+                    scene.style.opacity = 0;
+                }
+            });
+            
+            const targetScene = sceneElements[sceneId];
+            if (targetScene) {
+                targetScene.classList.add('scene-active');
+                targetScene.style.opacity = 1;
+                targetScene.scrollTop = 0;
+            }
+            
+            progressDots.forEach((dot, idx) => {
+                dot.classList.remove('progress-dot-active');
+                if (idx < scenes.length && scenes[idx] === sceneId) {
+                    dot.classList.add('progress-dot-active');
+                }
+            });
+            currentScene = sceneId;
+        };
+
+        progressDots.forEach((dot, idx) => {
+            dot.addEventListener('click', function() {
+                if (idx < scenes.length) {
+                    switchToScene(scenes[idx]);
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            const currentIndex = scenes.indexOf(currentScene);
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                const nextIndex = (currentIndex + 1) % scenes.length;
+                switchToScene(scenes[nextIndex]);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const prevIndex = (currentIndex - 1 + scenes.length) % scenes.length;
+                switchToScene(scenes[prevIndex]);
+            }
+        });
+
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.scene-container').forEach(scene => {
+                scene.style.opacity = 0;
+            });
+            const step1Scene = sceneElements.step1;
+            if (step1Scene) {
+                step1Scene.classList.add('scene-active');
+                step1Scene.style.opacity = 1;
+            }
+        });
+    })();
+</script>
+
+<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
+<div class="sciviz-promo-no" aria-hidden="true">No.009 · 2026-03-23</div>
+<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
+padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
+border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
+letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+</body>
+</html>

@@ -1,0 +1,427 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "updatedAt": "2026-10-26",
+  "generatedAt": "2026-10-26T01:28:50.337Z",
+  "items": [
+    {
+      "id": "033-circular-tree",
+      "title": "Science 神图复刻：环形细胞注释树（R / Python）",
+      "summary": "环状树 + 多轨道热图，R 与 Python 两套完整代码与输入数据。",
+      "date": "2026-10-18",
+      "tags": [
+        "环状树",
+        "多轨道热图",
+        "顶刊复刻",
+        "R",
+        "Python"
+      ],
+      "path": "033-circular-tree.html"
+    },
+    {
+      "id": "032-photocraft",
+      "title": "PhotoCraft：Rust 重写的开源 Photoshop 平替",
+      "summary": "图层、蒙版、滤镜的轻量替代，处理期刊要求的位图够用。",
+      "date": "2026-10-12",
+      "tags": [
+        "PhotoCraft",
+        "位图",
+        "Rust",
+        "开源"
+      ],
+      "path": "032-photocraft.html"
+    },
+    {
+      "id": "031-wordcraft",
+      "title": "WordCraft：Rust 重写的开源 Word 平替",
+      "summary": "本地优先、格式兼容、启动快，写论文初稿够用的那一档。",
+      "date": "2026-10-11",
+      "tags": [
+        "WordCraft",
+        "文档",
+        "Rust",
+        "开源"
+      ],
+      "path": "031-wordcraft.html"
+    },
+    {
+      "id": "030-vectorcraft",
+      "title": "VectorCraft：开源 AI 矢量插画",
+      "summary": "用一句话生成矢量图，导出 SVG 再进 Illustrator 改细节。",
+      "date": "2026-10-10",
+      "tags": [
+        "VectorCraft",
+        "矢量图",
+        "SVG",
+        "AI"
+      ],
+      "path": "030-vectorcraft.html"
+    },
+    {
+      "id": "029-ip-coip",
+      "title": "互作实验五兄弟：IP / CoIP / ChIP / pull-down / BiFC",
+      "summary": "五种互作验证实验的适用边界，以及各自最常见的假阳性来源。",
+      "date": "2026-09-12",
+      "tags": [
+        "IP",
+        "CoIP",
+        "ChIP",
+        "互作"
+      ],
+      "path": "029-ip-coip.html"
+    },
+    {
+      "id": "028-wgcna-sample-size",
+      "title": "WGCNA 到底要多少样本",
+      "summary": "样本量、软阈值与模块稳定性之间的关系，以及样本偏少时的替代方案。",
+      "date": "2026-09-06",
+      "tags": [
+        "WGCNA",
+        "样本量",
+        "软阈值"
+      ],
+      "path": "028-wgcna-sample-size.html"
+    },
+    {
+      "id": "027-grafify",
+      "title": "grafify online：绘图 + 统计一体",
+      "summary": "选图、跑统计检验、标显著性一次做完，适合不想写 R 的人。",
+      "date": "2026-08-30",
+      "tags": [
+        "grafify",
+        "统计检验",
+        "绘图"
+      ],
+      "path": "027-grafify.html"
+    },
+    {
+      "id": "026-de-enrichment-wgcna",
+      "title": "转录组故事线：差异 · 富集 · WGCNA",
+      "summary": "三块分析怎么串成一条能讲的故事线，而不是三张互不相干的图。",
+      "date": "2026-08-22",
+      "tags": [
+        "转录组",
+        "差异分析",
+        "富集",
+        "WGCNA"
+      ],
+      "path": "026-de-enrichment-wgcna.html"
+    },
+    {
+      "id": "025-enrichment-taxonomy",
+      "title": "富集分析完整十法",
+      "summary": "ORA / GSEA / ssGSEA / GSVA … 十种方法的适用前提与选择路径。",
+      "date": "2026-08-16",
+      "tags": [
+        "富集",
+        "ORA",
+        "GSEA",
+        "方法学"
+      ],
+      "path": "025-enrichment-taxonomy.html"
+    },
+    {
+      "id": "024-sequence-display",
+      "title": "序列展示可视化工具全景",
+      "summary": "十六张实拍对比：蛋白结构域、基因结构、多序列比对各该用哪个工具。",
+      "date": "2026-08-01",
+      "tags": [
+        "序列展示",
+        "结构域",
+        "多序列比对",
+        "工具"
+      ],
+      "path": "024-sequence-display.html"
+    },
+    {
+      "id": "023-go-interpretation",
+      "title": "GO 富集结果怎么解读",
+      "summary": "富集到不等于结论成立：层级冗余、基因数、背景集三个最常见误读。",
+      "date": "2026-07-26",
+      "tags": [
+        "GO",
+        "富集",
+        "解读",
+        "背景集"
+      ],
+      "path": "023-go-interpretation.html"
+    },
+    {
+      "id": "022-p-value-vs-log2fc",
+      "title": "差异分析：p 值 vs log2FC",
+      "summary": "统计显著不等于生物学重要；双重阈值怎么定，火山图四个角分别是什么。",
+      "date": "2026-07-17",
+      "tags": [
+        "p值",
+        "log2FC",
+        "差异分析",
+        "火山图"
+      ],
+      "path": "022-p-value-vs-log2fc.html"
+    },
+    {
+      "id": "021-reactome",
+      "title": "Reactome：机制拆解说明书",
+      "summary": "通路层级、反应细节与引用来源，比 KEGG 更适合讲机制的一条线。",
+      "date": "2026-07-14",
+      "tags": [
+        "Reactome",
+        "通路",
+        "机制"
+      ],
+      "path": "021-reactome.html"
+    },
+    {
+      "id": "020-gene-id-intro",
+      "title": "基因 ID，你真的分清了吗",
+      "summary": "Ensembl / Entrez / Symbol / RefSeq 互转时的坑：版本号、别名、大小写。",
+      "date": "2026-07-11",
+      "tags": [
+        "基因ID",
+        "Ensembl",
+        "Entrez",
+        "ID转换"
+      ],
+      "path": "020-gene-id-intro.html"
+    },
+    {
+      "id": "019-common-databases",
+      "title": "生信常用数据库全景",
+      "summary": "从通用（NCBI / Ensembl / UniProt）到特异（GEO / TCGA / 单细胞）一张图定位。",
+      "date": "2026-07-04",
+      "tags": [
+        "数据库",
+        "NCBI",
+        "Ensembl",
+        "GEO"
+      ],
+      "path": "019-common-databases.html"
+    },
+    {
+      "id": "018-wgcna-advanced",
+      "title": "WGCNA 进阶：模块-性状热图怎么读",
+      "summary": "从聚类树到模块-性状相关性：颜色块、相关系数、p 值三者怎么一起看。",
+      "date": "2026-06-27",
+      "tags": [
+        "WGCNA",
+        "模块",
+        "性状",
+        "聚类树"
+      ],
+      "path": "018-wgcna-advanced.html"
+    },
+    {
+      "id": "017-wgcna-intro",
+      "title": "WGCNA 入门：加权基因共表达网络",
+      "summary": "软阈值、模块、hub 基因三件事，以及样本量与数据清洗的前置要求。",
+      "date": "2026-06-21",
+      "tags": [
+        "WGCNA",
+        "共表达",
+        "软阈值"
+      ],
+      "path": "017-wgcna-intro.html"
+    },
+    {
+      "id": "016-split-enrichment-update",
+      "title": "方向性富集（更新版）：通路瘦身策略",
+      "summary": "上一期的补充：阈值怎么定，通路太胖时先砍哪一层。",
+      "date": "2026-06-14",
+      "tags": [
+        "富集",
+        "上下调",
+        "通路瘦身"
+      ],
+      "path": "016-split-enrichment-update.html"
+    },
+    {
+      "id": "015-rnaseq-quantification-update",
+      "title": "RNA-seq 定量指南（更新版）",
+      "summary": "Count → RPKM → FPKM → TPM 的换算链条更新，以及最常见的几种错误换算。",
+      "date": "2026-06-06",
+      "tags": [
+        "RNA-seq",
+        "定量",
+        "更新"
+      ],
+      "path": "015-rnaseq-quantification-update.html"
+    },
+    {
+      "id": "014-log2fc",
+      "title": "Log2 Fold Change 到底怎么算",
+      "summary": "从原始 counts 到 log2FC：加不加伪计数、要不要标准化、符号怎么解释。",
+      "date": "2026-05-31",
+      "tags": [
+        "log2FC",
+        "差异分析",
+        "标准化"
+      ],
+      "path": "014-log2fc.html"
+    },
+    {
+      "id": "013-split-enrichment",
+      "title": "方向性富集：上下调分开做",
+      "summary": "混在一起做富集会让相反方向互相抵消；上下调分开后，通路才瘦得下来。",
+      "date": "2026-04-25",
+      "tags": [
+        "富集",
+        "上下调",
+        "方向性"
+      ],
+      "path": "013-split-enrichment.html"
+    },
+    {
+      "id": "012-data-to-viz",
+      "title": "Data to Viz：先选对图，再谈画法",
+      "summary": "按数据结构倒推图型的决策树，R / Python / D3 三条实现路径都给了。",
+      "date": "2026-04-13",
+      "tags": [
+        "选图",
+        "决策树",
+        "R",
+        "Python"
+      ],
+      "path": "012-data-to-viz.html"
+    },
+    {
+      "id": "011-naming-rules",
+      "title": "基因 · 蛋白命名权威指南",
+      "summary": "人 / 小鼠 / 模式生物五页规范：大小写、斜体、别名与旧名，投稿前逐条对。",
+      "date": "2026-04-06",
+      "tags": [
+        "命名规范",
+        "基因",
+        "蛋白",
+        "投稿"
+      ],
+      "path": "011-naming-rules.html"
+    },
+    {
+      "id": "010-ora-gsea-combined",
+      "title": "ORA + GSEA 联合富集策略",
+      "summary": "超几何检验回答「有没有」，GSEA 回答「趋势在不在」，两套结果怎么合起来读。",
+      "date": "2026-03-31",
+      "tags": [
+        "ORA",
+        "GSEA",
+        "富集",
+        "联合分析"
+      ],
+      "path": "010-ora-gsea-combined.html"
+    },
+    {
+      "id": "009-key-gene-screening",
+      "title": "KEGG / GO 关键基因筛选三步工作流",
+      "summary": "从通路里捞出关键基因：交集、拓扑中心性、表达一致性三步走。",
+      "date": "2026-03-23",
+      "tags": [
+        "KEGG",
+        "GO",
+        "关键基因",
+        "Hub gene"
+      ],
+      "path": "009-key-gene-screening.html"
+    },
+    {
+      "id": "008-rnaseq-count-units",
+      "title": "RNAseq 定量单位：Count / RPKM / FPKM / TPM",
+      "summary": "四个单位各自解决什么问题、什么时候必须换算、什么时候千万别换算。",
+      "date": "2026-02-22",
+      "tags": [
+        "RNA-seq",
+        "定量",
+        "TPM",
+        "FPKM"
+      ],
+      "path": "008-rnaseq-count-units.html"
+    },
+    {
+      "id": "003-go-kegg-introduction",
+      "title": "GO 富集可视化：同一份结果，四种画法",
+      "summary": "barplot / dotplot / cnetplot / enrichmap 各解决什么问题，附 R 脚本与示例数据。",
+      "date": "2026-01-18",
+      "tags": [
+        "GO",
+        "富集",
+        "可视化",
+        "R"
+      ],
+      "path": "003-go-kegg-introduction.html"
+    },
+    {
+      "id": "004-kegg-visualization",
+      "title": "KEGG 可视化：从气泡图到通路地图",
+      "summary": "KEGG 结果不止一张气泡图：dot / network / pathview 三条路线，附 mmu01200 实测。",
+      "date": "2026-01-18",
+      "tags": [
+        "KEGG",
+        "pathview",
+        "通路",
+        "可视化"
+      ],
+      "path": "004-kegg-visualization.html"
+    },
+    {
+      "id": "005-ccgraph-flower-plot",
+      "title": "ccgraph 花瓣图：五组以上交集怎么画",
+      "summary": "组数一多 Venn 就糊成一片，花瓣图用固定的花瓣排布把「谁独有、谁共有」数清。",
+      "date": "2026-01-18",
+      "tags": [
+        "花瓣图",
+        "交集",
+        "Venn",
+        "ccgraph"
+      ],
+      "path": "005-ccgraph-flower-plot.html"
+    },
+    {
+      "id": "006-plottie",
+      "title": "plottie：像逛图书馆一样挑图",
+      "summary": "按图型分类、按需求检索，主页 / 分类 / 详图三屏看清一个图表工具该长什么样。",
+      "date": "2026-01-18",
+      "tags": [
+        "图表工具",
+        "选图",
+        "plottie"
+      ],
+      "path": "006-plottie.html"
+    },
+    {
+      "id": "007-color-palettes",
+      "title": "配色三件套：ColorBrewer / colorspace / Coolors",
+      "summary": "离散与连续怎么挑色板、色盲安全怎么保证、临时配色去哪里找现成的。",
+      "date": "2026-01-18",
+      "tags": [
+        "配色",
+        "色盲安全",
+        "ColorBrewer"
+      ],
+      "path": "007-color-palettes.html"
+    },
+    {
+      "id": "001-what-are-go-and-kegg",
+      "title": "听说过 GO 和 KEGG 吗？",
+      "summary": "多组学最常用的两大数据库：GO 的 BP/MF/CC 三个维度，与 KEGG 的通路地图。",
+      "date": "2025-09-13",
+      "tags": [
+        "GO",
+        "KEGG",
+        "功能注释",
+        "入门"
+      ],
+      "path": "001-what-are-go-and-kegg.html"
+    },
+    {
+      "id": "002-go-enrichment-handbook",
+      "title": "GO 富集分析上手手册",
+      "summary": "从差异基因列表走到 GO 富集结果：背景集怎么定、p 值怎么校正、结果怎么读。",
+      "date": "2025-09-13",
+      "tags": [
+        "GO富集",
+        "超几何检验",
+        "上手"
+      ],
+      "path": "002-go-enrichment-handbook.html"
+    }
+  ]
+}

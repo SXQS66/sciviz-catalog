@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="sciviz-promo" content="no=13;date=2026-04-25;id=013-split-enrichment">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>No.013 · 方向性富集：上下调分开做</title>
+    <style>
+        /* ===== 点图工具 3.0 核心风格 + 三页分屏切换布局 ===== */
+        :root {
+            --bg-light: #f8f5f2;
+            --bg-dark: #ece4db;
+            --text-primary: #2c2a2a;
+            --text-secondary: #5a4a42;
+            --point-accent: #845EC2;
+            --point-gold: #c29b4a;
+            --point-teal: #508c7b;
+            --point-purple: #9b6fa3;
+            --card-white: #ffffff;
+            --shadow-sm: 0 10px 20px rgba(0,0,0,0.05);
+            --shadow-md: 0 12px 28px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, var(--bg-light) 0%, var(--bg-dark) 100%);
+            font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+            color: var(--text-primary);
+            line-height: 1.45;
+            padding: 28px 20px 56px;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* 头部通用标识 */
+        .global-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(105deg, var(--point-accent), #a27bcb);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 10px rgba(132, 94, 194, 0.25);
+        }
+
+        .main-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2d2a5e 0%, var(--point-purple) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 12px;
+            letter-spacing: -0.2px;
+        }
+
+        .subhead {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            background: rgba(255,250,240,0.8);
+            backdrop-filter: blur(2px);
+            padding: 6px 18px;
+            border-radius: 48px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        /* 三页容器 - 单页显示 */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* 卡片样式 (同点图工具) */
+        .card {
+            background: var(--card-white);
+            border-radius: 28px;
+            padding: 26px 24px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s;
+            border: 1px solid rgba(132,94,194,0.12);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--point-gold);
+        }
+
+        .card-title {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--point-accent);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 5px solid var(--point-gold);
+            padding-left: 18px;
+        }
+
+        .desc-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            margin-bottom: 16px;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .info-card {
+            background: #f9f7f4;
+            border-radius: 24px;
+            padding: 20px 18px;
+            border-left: 6px solid var(--point-teal);
+        }
+
+        .info-card strong {
+            font-size: 1.2rem;
+            color: var(--point-purple);
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .step-list {
+            list-style: none;
+            margin: 18px 0;
+        }
+
+        .step-list li {
+            margin-bottom: 14px;
+            padding-left: 28px;
+            position: relative;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .step-list li::before {
+            content: "▹";
+            position: absolute;
+            left: 6px;
+            color: var(--point-gold);
+            font-weight: bold;
+        }
+
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0 10px;
+        }
+
+        .pill {
+            background: #f2edf9;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--point-accent);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fefcf8;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e9e2d9;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #e7dfd4;
+            font-weight: 700;
+        }
+
+        .callout-box {
+            background: #fef5e8;
+            border-left: 8px solid var(--point-gold);
+            padding: 18px 22px;
+            border-radius: 24px;
+            margin: 24px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            background: var(--point-accent);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(132,94,194,0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn.secondary {
+            background: #8f7a6b;
+            box-shadow: none;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(0.96);
+        }
+
+        .page-indicator {
+            text-align: center;
+            font-size: 0.85rem;
+            margin: 16px 0 8px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #7c6e60;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+
+        @media (max-width: 700px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .main-title {
+                font-size: 1.7rem;
+            }
+            .card-title {
+                font-size: 1.35rem;
+            }
+            .card {
+                padding: 20px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- 全局头部 -->
+    <div class="global-header">
+        <div class="version-badge">
+            🧬 方向性富集 · 三部曲指南
+        </div>
+        <h1 class="main-title">
+            上下调基因分离ORA<br>
+            <span style="font-size: 1.2rem;">避免信号抵消 · 精准捕获激活/抑制机制</span>
+        </h1>
+        <div class="subhead">
+            📌 核心三部曲 | 理论本质 → 统计流程与瘦身 → 实战案例与误区警示
+        </div>
+    </div>
+
+    <!-- 页面 1：为什么必须分开富集？核心必要性 + 混合陷阱 -->
+    <div id="page1" class="page active-page">
+        <div class="card">
+            <div class="card-title">🔬 为什么必须将上下调基因分开富集？</div>
+            <div class="desc-text">
+                <strong>统计与生物学双重必然性：</strong> 混合上调与下调基因进行 Over-Representation Analysis (ORA) 会导致正负调控相互抵消，
+                使真正关键的过程被淹没。例如某个通路中同时包含大量上调和下调基因，混合后总基因数仍可能显著，但<strong>方向性信息完全丢失</strong> —
+                无法判断该通路是被激活还是抑制，甚至得出错误生物学结论。
+            </div>
+            <div class="grid-2col">
+                <div class="info-card">
+                    <strong>⚠️ 混合富集的三大陷阱</strong>
+                    <ul style="margin-top: 12px; padding-left: 20px;">
+                        <li>• 上调/下调基因互相“稀释”，p值失真</li>
+                        <li>• 丢失功能方向性 (活化 vs. 抑制无法区分)</li>
+                        <li>• 真实机制被掩盖，显著通路偏离事实</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <strong>✅ 分离富集的生物学优势</strong>
+                    <ul style="margin-top: 12px; padding-left: 20px;">
+                        <li>• 上调富集 → 揭示激活的炎症/增殖/信号转导</li>
+                        <li>• 下调富集 → 代表代谢衰退/凋亡/分化抑制</li>
+                        <li>• 直接匹配表型：促进或抵抗疾病进展</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="callout-box">
+                💡 <strong>经典案例：</strong> 促炎模型中，上调基因富集<strong>“TNF-α/NF-κB信号” + “细胞因子应答”</strong>； 
+                下调基因富集<strong>“氧化磷酸化” + “脂肪酸代谢”</strong> — 混合后仅剩下“免疫应答”，丢失代谢重编程线索。
+                分开富集同时捕获“炎症激活”与“代谢抑制”两大特征。
+            </div>
+            <div class="desc-text">
+                📌 <strong>记住核心原则：</strong> 基于差异表达方向 (log₂FC正负) 将基因分割为上调集与下调集，分别进行超几何检验，
+                确保每一项富集结论都带有方向标签。这是高分组学文章的标准规范。
+            </div>
+        </div>
+<!--         <div class="card">
+            <div class="card-title">📊 混合 vs 分离：富集结果失真示意</div>
+            <div class="comparison-table">
+                <thead>
+                    <tr><th>分析策略</th><th>潜在表现</th><th>结果可信度</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>❌ 混合上下调</td><td>通路显著性高但方向模糊，无法解释激活/抑制</td><td>低，误导后续验证</td></tr>
+                    <tr><td>✅ 上调独立ORA</td><td>明确特定通路活化 (如细胞周期、炎症因子)</td><td>高，直接指引机制</td></tr>
+                    <tr><td>✅ 下调独立ORA</td><td>精准指示被抑制过程 (如代谢、凋亡抵抗)</td><td>高，解释表型倒退</td></tr>
+                </tbody>
+            </div>
+            <div class="pill-group">
+                <div class="pill">🎯 推荐: 上调列表+下调列表分别分析</div>
+                <div class="pill">🎯 避免生物学信号混淆</div>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- 页面 2：方向性富集工作流 + 通路瘦身筛选标准（统计分析流程） -->
+    <div id="page2" class="page">
+        <div class="card">
+            <div class="card-title">🧠 方向性ORA标准工作流 & 通路瘦身策略</div>
+            <div class="desc-text">
+                <strong>⚙️ 核心步骤：</strong> 针对上调基因列表 (log₂FC > 阈值, p<0.05) 与下调基因列表 (log₂FC < -阈值) 
+                分别运行超几何检验 (常用工具: clusterProfiler, DAVID, Metascape)。设定相同的背景基因集，独立计算富集分数与 FDR。
+                随后执行多层次过滤，构建精选通路池。
+            </div>
+            <ul class="step-list">
+                <li><strong>筛选1 — 基因数过滤：</strong> 剔除富集基因数 &lt; 10 的过窄通路（偶然性高）及 &gt; 200 的过泛通路（功能不专一），保留 10~100 个富集基因。</li>
+                <li><strong>筛选2 — 多重假设校正：</strong> 采用 BH 法计算 FDR (q-value) &lt; 0.05，严格控制假阳性率。</li>
+                <li><strong>筛选3 — 富集倍数排序：</strong> 按 GeneRatio / Fold Enrichment 降序，保留每个方向最具代表性的前15条通路。</li>
+                <li><strong>筛选4 — 生物学审查 + 人工精选：</strong> 结合文献与表型相关性，去除冗余通路，每个方向最终保留 <strong>3~8 条核心通路</strong> (上调3~5 + 下调3~5)。</li>
+            </ul>
+            <div class="pill-group">
+                <div class="pill">📈 上调独立ORA</div>
+                <div class="pill">📉 下调独立ORA</div>
+                <div class="pill">🔬 FDR<0.05</div>
+                <div class="pill">🎯 精选3~8条/方向</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">📐 瘦身前 vs 瘦身后：构建核心通路池</div>
+            <div class="desc-text">
+                初始ORA可能产出50~100条通路，经过基因数过滤、FDR校正及人工精选后，保留最强且最具生物学意义的信号，避免冗余通路干扰主要结论。
+                以下展示典型过滤效果：
+            </div>
+            <div class="grid-2col">
+                <div class="info-card">
+                    <strong>🔻 瘦身前（过泛）</strong>
+                    <p style="margin-top: 8px;">通路数量: 86条<br>包含“代谢通路”“癌症通路”(基因数>200) 以及基因数≤5的罕见通路 → 噪音多，难以聚焦。</p>
+                </div>
+                <div class="info-card">
+                    <strong>✅ 瘦身后（核心池）</strong>
+                    <p style="margin-top: 8px;">上调: 4条 (细胞因子应答、MAPK、凋亡调节)<br>下调: 4条 (氧化磷酸化、脂肪酸降解、DNA修复) → 清晰指导机制验证。</p>
+                </div>
+            </div>
+            <div class="callout-box" style="background: #edf3f0;">
+                📈 <strong>专家建议：</strong> 在论文中分别呈现上调和下调富集表，并标注基因计数、富集倍数及FDR；同时可绘制双向气泡图展示核心通路的方向性显著性。
+            </div>
+        </div>
+    </div>
+
+    <!-- 页面 3：实战案例解析 (番茄激素处理) + 常见误区纠正 + 精选通路构建 -->
+    <div id="page3" class="page">
+        <!-- <div class="card">
+            <div class="card-title">📌 实战案例：植物激素处理番茄 · 方向性富集如何颠覆结论</div>
+            <div class="desc-text">
+                🌱 <strong>实验背景：</strong> 外源茉莉酸处理番茄叶片，转录组获得 DEGs (|log₂FC|>1, p<0.05)。上调基因547个，下调基因412个。
+                分别进行 KEGG 富集。下方对比“混合富集”与“上下调分离”的结果差异，凸显方向性分离的必要性。
+            </div>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>分析策略</th><th>Top通路示例</th><th>p.adjust</th><th>方向性解释</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>❌ 混合富集</td><td>植物激素信号转导<br/>MAPK signaling<br/>碳代谢</td><td>1.2e-05<br/>3.1e-04<br/>0.008</td><td>⚠️ 无法区分激活/抑制，激素信号虚高</td></tr>
+                    <tr style="background:#f2f7f2;"><td>📈 上调独立ORA</td><td>植物激素信号转导 (38)<br/>MAPK signaling (29)<br/>次生代谢合成 (21)</td><td>2.1e-05<br/>0.0003<br/>0.002</td><td>✅ 防御/激素通路强激活</td></tr>
+                    <tr style="background:#fef2ec;"><td>📉 下调独立ORA</td><td>光合作用-天线蛋白 (21)<br/>淀粉蔗糖代谢 (17)<br/>卟啉代谢 (12)</td><td>1.2e-04<br/>0.0015<br/>0.008</td><td>✅ 光合/能量代谢被抑制，生长-防御权衡</td></tr>
+                </tbody>
+            </table>
+            <div class="desc-text">
+                📌 <strong>结论：</strong> 混合富集仅看到「激素信号」上调，丢失关键表型「光合作用抑制」；上下调分离完整揭示了防御激活与代谢抑制的拮抗关系，
+                完美诠释植物防御反应的能量再分配机制，类似原理同样适用于肿瘤、免疫、神经科学等领域。
+            </div>
+        </div> -->
+
+        <div class="card">
+            <div class="card-title">⚠️ 常见误区纠正 & 核心通路池构建清单</div>
+            <div class="desc-text">
+                <strong>❌ 误区一：</strong> “将上下调显著基因合并，用跑ORA” → 丢失方向，结果不可解释。<br>
+                <strong>✅ 正确做法：</strong> 始终分开上调下调基因列表，独立富集，最后综合解读。<br>
+                <strong>❌ 误区二：</strong> “仅凭p值取top10通路” → 可能包含基因数极少、无生物学支持的假阳性。<br>
+                <strong>✅ 正确做法：</strong> 优先基因数过滤+FDR+富集倍数排序+人工审查确定3~8条核心通路。<br>
+                <strong>❌ 误区三：</strong> “忽略上下调内部协同网络” → 上调可能暗示转录复合物活化，下调指向降解途径，分层阐释才能挖掘完整机制。<br>
+                <strong>✅ 推荐策略：</strong> 绘制上下调通路网络图，分别构建富集圈，并在补充材料中同时展示完整富集表。
+            </div>
+            <div class="pill-group">
+                <div class="pill">🧪 上调富集气泡图</div>
+                <div class="pill">🧬 下调富集网络图</div>
+                <div class="pill">📋 人工精选核对表</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🗂️ 精选核心通路池 · 构建工作流速查</div>
+            <div class="grid-2col">
+                <div class="info-card">
+                    <strong>🔹 上调方向精简策略</strong>
+                    <p style="font-size:0.85rem; margin-top: 12px;">① FDR<0.05且Gene count≥10<br>② 富集倍数排序，保留前12<br>③ 剔除冗余 (合并类似通路)<br>④ 最终保留3~5个核心激活通路</p>
+                </div>
+                <div class="info-card">
+                    <strong>🔻 下调方向精简策略</strong>
+                    <p style="font-size:0.85rem; margin-top: 12px;">① 相同过滤标准<br>② 聚焦代谢/凋亡/分化相关<br>③ 评估与表型损害的关联度<br>④ 最终保留3~4个抑制过程</p>
+                </div>
+            </div>
+            <!-- <div class="callout-box" style="margin-top: 8px;">
+                📚 <strong>出版级规范：</strong> 主流期刊 (Nature Communications, Cell Reports) 要求上下调基因分开富集并提供方向特异性通路表。
+                方向性ORA已成为高影响力组学文章的必备环节。
+            </div> -->
+        </div>
+    </div>
+
+    <!-- 页面指示器 + 导航按钮 -->
+    <div class="page-indicator" id="pageIndicator">第 1 / 3 页 · 为何分离富集</div>
+    <div class="nav-buttons">
+        <button id="prevBtn" class="nav-btn secondary" disabled>◀ 上一页</button>
+        <button id="nextBtn" class="nav-btn">下一页 ▶</button>
+    </div>
+<!--     <div class="footer-note">
+        🧬 上下调分离ORA策略完整三部曲 | 避免信号抵消，精准捕捉激活/抑制通路。<br>
+        推荐工具: clusterProfiler (R) / Metascape / DAVID 分别上传上下调基因列表。独立分析后再合并解读，图表可使用双向富集气泡图。
+    </div> -->
+</div>
+
+<script>
+    (function() {
+        // 三页切换逻辑
+        let currentPage = 1;
+        const totalPages = 3;
+        const page1 = document.getElementById('page1');
+        const page2 = document.getElementById('page2');
+        const page3 = document.getElementById('page3');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const indicator = document.getElementById('pageIndicator');
+
+        function updatePages() {
+            // 隐藏所有页面
+            page1.classList.remove('active-page');
+            page2.classList.remove('active-page');
+            page3.classList.remove('active-page');
+            if (currentPage === 1) page1.classList.add('active-page');
+            if (currentPage === 2) page2.classList.add('active-page');
+            if (currentPage === 3) page3.classList.add('active-page');
+            
+            // 更新按钮状态 + 指示文字
+            prevBtn.disabled = (currentPage === 1);
+            if (currentPage === 1) indicator.innerText = '📘 第 1 / 3 页 · 理论必要性：为何分开富集？';
+            else if (currentPage === 2) indicator.innerText = '📊 第 2 / 3 页 · 统计流程 & 通路瘦身标准';
+            else indicator.innerText = '🎯 第 3 / 3 页 · 实战案例 + 误区纠正 + 核心池构建';
+            
+            // 下一页按钮文字改变
+            if (currentPage === totalPages) nextBtn.innerText = '完成 ✓';
+            else nextBtn.innerText = '下一页 ▶';
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updatePages();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                // 完成时的提示：展示完整总结
+                alert('✅ 三部曲学习完成！\n核心要点：上下调基因必须分开富集，通过基因数过滤+FDR<0.05+人工精选浓缩3~8条核心通路/方向。\n可继续向上调/下调ORA实践，避免生物学信号丢失。');
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePages();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        prevBtn.addEventListener('click', prevPage);
+        nextBtn.addEventListener('click', nextPage);
+        
+        // 为卡片增加触摸反馈 (移动友好)
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(c => {
+            c.addEventListener('touchstart', () => {
+                c.style.transform = 'translateY(-2px)';
+                setTimeout(() => { c.style.transform = ''; }, 150);
+            });
+        });
+        
+        console.log('富集分析方向性三部曲已启动 | 上/下调分离ORA完整指南 + 通路瘦身策略');
+    })();
+</script>
+
+<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
+<div class="sciviz-promo-no" aria-hidden="true">No.013 · 2026-04-25</div>
+<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
+padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
+border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
+letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+</body>
+</html>

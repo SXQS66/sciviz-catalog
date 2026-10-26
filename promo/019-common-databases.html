@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="sciviz-promo" content="no=19;date=2026-07-04;id=019-common-databases">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>No.019 · 生信常用数据库全景</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #05020c;
+            --glow-purple: #7c3aed;
+            --purple-light: #a78bfa;
+            --hot-pink: #ec4899;
+            --cyan-accent: #22d3ee;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --slate-dark: #1e293b;
+            --glass: rgba(15, 25, 45, 0.45);
+            --glass-border: rgba(168, 139, 255, 0.25);
+        }
+
+        body {
+            background: radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.3), transparent 60%),
+                radial-gradient(circle at 85% 90%, rgba(34, 211, 238, 0.2), transparent 55%),
+                #05020c;
+            font-family: 'Inter', system-ui, -apple-system, 'PingFang SC', 'Segoe UI', BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            color: #f0f2fe;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: 2rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.96) translateY(18px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.7s ease;
+            pointer-events: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .slide::-webkit-scrollbar {
+            width: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .slide::-webkit-scrollbar-thumb {
+            background: #a78bfa;
+            border-radius: 10px;
+        }
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .title-lg {
+            font-size: 3.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #c4b5fd, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.2rem;
+            line-height: 1.2;
+        }
+        .title-md {
+            font-size: 2.6rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(120deg, #e0d6ff, #fbcfe8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.4rem;
+            line-height: 1.2;
+        }
+        .sub {
+            font-size: 1.3rem;
+            color: #bac8e0;
+            text-align: center;
+            max-width: 85%;
+            margin-top: 0.2rem;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+        .sub-sm {
+            font-size: 1.0rem;
+            color: #9aabca;
+            text-align: center;
+            max-width: 90%;
+            margin-top: 0.3rem;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 1.2rem 1.8rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(124, 58, 237, 0.2);
+            width: 100%;
+            max-width: 1100px;
+        }
+        .glow-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(236, 72, 153, 0.1));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(168, 85, 247, 0.65);
+            box-shadow: 0 0 32px rgba(124, 58, 237, 0.4);
+        }
+        .glass-card-inner {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 18px;
+            padding: 0.6rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+            width: 100%;
+            margin: 0.6rem auto 0;
+        }
+
+        .formula-frame {
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 40px;
+            padding: 0.6rem 1.4rem;
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            border-left: 6px solid var(--cyan-accent);
+            color: #cffafe;
+            margin: 0.4rem 0;
+        }
+        .small-formula {
+            font-size: 0.95rem;
+        }
+
+        .two-col-compare {
+            display: flex;
+            gap: 1.2rem;
+            width: 100%;
+            margin-top: 0.4rem;
+        }
+        .three-col {
+            display: block;
+            width: 100%;
+            margin: 0.4rem 0;
+        }
+
+        .three-col .col-card {
+            width: 90%;
+            margin: 0 auto 0.6rem;
+            flex: none;
+        }
+
+        .three-col .col-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .col-card {
+            background: rgba(10, 12, 35, 0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .col-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            margin-left: 0.6rem;
+            letter-spacing: -0.01em;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-left: 1rem;
+            font-size: 0.92rem;
+            line-height: 1.3;
+        }
+        .feature-list li {
+            margin: 0.3rem 0;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .feature-list li::before {
+            content: "▹";
+            color: #22d3ee;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .feature-list-sm li {
+            font-size: 0.85rem;
+            margin: 0.2rem 0;
+        }
+
+        .highlight-pink { color: #f472b6; font-weight: 600; }
+        .highlight-cyan { color: #22d3ee; font-weight: 600; }
+        .highlight-purple { color: #c084fc; font-weight: 600; }
+        .highlight-gold { color: #fbbf24; font-weight: 600; }
+        .highlight-emerald { color: #34d399; font-weight: 600; }
+        .highlight-rose { color: #fb7185; font-weight: 600; }
+
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: #a78bfa;
+            padding: 0 0.1rem;
+        }
+
+        .figure-placeholder {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 1.2rem 0.8rem;
+            margin: 0.3rem auto;
+            text-align: center;
+            border: 2px dashed rgba(168, 139, 255, 0.35);
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .figure-placeholder .icon {
+            font-size: 2.8rem;
+            opacity: 0.6;
+            margin-bottom: 0.2rem;
+        }
+        .figure-placeholder .label {
+            font-size: 0.85rem;
+            color: #9aabca;
+            letter-spacing: 0.5px;
+        }
+        .figure-placeholder .sub-label {
+            font-size: 0.7rem;
+            color: #6a7b9a;
+            margin-top: 2px;
+        }
+
+        .carousel-images {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        .figure-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border: 1px solid rgba(168, 139, 255, 0.3);
+            display: block;
+        }
+        .figure-caption {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #9aabca;
+            text-align: center;
+        }
+        .figure-caption strong {
+            color: #c4b5fd;
+        }
+
+        .quad-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+            margin: 0.4rem 0;
+        }
+        .unit-badge {
+            background: rgba(20, 30, 55, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 0.4rem 1.0rem;
+            text-align: center;
+            border-top: 3px solid;
+            min-width: 80px;
+        }
+        .unit-badge span:first-child {
+            font-size: 0.95rem;
+            font-weight: 800;
+            display: block;
+        }
+        .unit-badge span:last-child {
+            font-size: 0.85rem;
+            color: #b9c7e0;
+        }
+        .badge-coord { border-top-color: #22d3ee; }
+        .badge-read { border-top-color: #f472b6; }
+        .badge-purple { border-top-color: #a78bfa; }
+        .badge-emerald { border-top-color: #10b981; }
+        .badge-amber { border-top-color: #f59e0b; }
+        .badge-rose { border-top-color: #fb7185; }
+
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.5s ease;
+        }
+        .reveal-item.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .progress-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: transparent;
+        }
+        .timeline-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #22d3ee, #ec4899);
+            width: 0%;
+            transition: width 0.05s linear;
+        }
+        .slide-counter {
+            position: fixed;
+            bottom: 16px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(12px);
+            padding: 4px 14px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #c4b5fd;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 55;
+            font-family: monospace;
+        }
+        .control-hint {
+            position: fixed;
+            bottom: 16px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            padding: 4px 12px;
+            border-radius: 32px;
+            font-size: 0.7rem;
+            color: #b9c7e0;
+            z-index: 55;
+            display: none;
+        }
+
+        @keyframes softFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-icon {
+            animation: softFloat 2.5s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @media (max-width: 850px) {
+            .title-lg { font-size: 2.2rem; }
+            .title-md { font-size: 1.8rem; }
+            .sub { font-size: 1.1rem; }
+            .glass-card { padding: 1rem; }
+            .two-col-compare { flex-direction: column; gap: 0.6rem; }
+            .formula-frame { font-size: 0.9rem; padding: 0.4rem; }
+            .feature-list { font-size: 0.85rem; }
+            .col-card { padding: 0.6rem; }
+            .flow-arrow { font-size: 1.0rem; padding: 0.1rem 0; }
+            .figure-placeholder { min-height: 100px; padding: 0.8rem; }
+            .figure-placeholder .icon { font-size: 2.0rem; }
+            .quad-grid { gap: 0.4rem; }
+            .unit-badge { padding: 0.3rem 0.6rem; min-width: 60px; }
+            .unit-badge span:first-child { font-size: 0.95rem; }
+            .unit-badge span:last-child { font-size: 0.85rem; }
+        }
+        @media (max-width: 480px) {
+            .title-lg { font-size: 1.8rem; }
+            .title-md { font-size: 1.3rem; }
+            .sub { font-size: 0.95rem; }
+            .slide { padding: 1rem 0.6rem; }
+            .glass-card { padding: 0.6rem; border-radius: 18px; }
+            .feature-list { font-size: 0.78rem; }
+            .formula-frame { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
+            .figure-placeholder { min-height: 80px; }
+            .figure-placeholder .icon { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== 幻灯片 0：首页 ==================== -->
+    <div class="slide active">
+        <div class="title-lg reveal-item" data-duration="100">🧬 生信常用数据库 · 全景指南</div>
+        <div class="sub reveal-item" data-duration="1200" style="margin-bottom: 0.4rem;">从通用基础到疾病特异 · 逻辑清晰</div>
+        <div class="glass-card glow-card reveal-item" data-duration="1000" style="margin-top: 0.2rem; max-width: 1100px;">
+            <div style="font-size: 1.2rem; font-weight: 600; text-align: center; margin-bottom: 1.2rem;">
+                <span class="highlight-cyan">General</span> <span style="color: #c084fc;"> → </span> <span  style="color: #f472b6;">Specific</span>
+            </div>
+            <div class="three-col" style="margin-top: 0.4rem;">
+                <div class="col-card reveal-item" data-duration="2500" style="border-top: 4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">📚 通用基础</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-cyan">基因/转录组</span> · NCBI, Ensembl, HGNC, MGI</li>
+                        <li><span class="highlight-cyan">功能富集</span> · KEGG, GO, DAVID, Reactome, GSEA</li>
+                        <li><span class="highlight-cyan">蛋白互作</span> · STRING, BioGRID, IntAct</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #c084fc;">
+                    <h3 style="color:#c084fc;">🔗 调控网络</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-purple">非编码RNA</span> · miRBase, TargetScan, StarBase, CircBase</li>
+                        <li><span class="highlight-purple">突变/驱动</span> · COSMIC, MutSigDB, ClinVar, OncoKB</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #f472b6;">
+                    <h3 style="color:#f472b6;">🎯 疾病特异</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-pink">肿瘤/表达</span> · TCGA, GEO, GTEx, cBioPortal</li>
+                        <li><span class="highlight-pink">预后/生存</span> · GEPIA2, KMPlotter</li>
+                        <li><span class="highlight-pink">免疫浸润</span> · TIMER2.0, CIBERSORT</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="formula-frame small-formula reveal-item" data-duration="3000" style="margin-top: 0.8rem; font-size: 0.95rem;">
+                📌 从基础注释到临床转化 · 层层递进
+            </div>
+        </div>
+        <div class="sub-sm reveal-item" data-duration="1500" style="margin-top: 1rem;">选对工具 · 理清逻辑 · 讲好故事</div>
+    </div>
+
+    <!-- ==================== 幻灯片 1：基因/转录组基础 ==================== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1500">基因 & 转录组基础</div>
+        <div class="sub reveal-item" data-duration="1200">基因注释 · 参考序列 · 命名规范 (人 & 小鼠)</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">NCBI Gene</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-cyan">用途</span>：基因基本信息、别名、定位、功能、参考序列</li>
+                        <li><span class="highlight-cyan">网址</span>：https://www.ncbi.nlm.nih.gov/gene</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #c084fc;">
+                    <h3 style="color:#c084fc;">Ensembl</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-purple">用途</span>：基因组注释、转录本亚型、SNP/Indel、可变剪接</li>
+                        <li><span class="highlight-purple">网址</span>：https://www.ensembl.org</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #f59e0b;">
+                    <h3 style="color:#fbbf24;">HGNC</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-gold">用途</span>：人类基因官方命名规范，统一基因符号</li>
+                        <li><span class="highlight-gold">网址</span>：https://www.genenames.org</li>
+                    </ul>
+                </div>
+
+                <div class="col-card reveal-item" data-duration="4500" style="border-top: 4px solid #34d399;">
+                    <h3 style="color:#34d399;">RefSeq (NCBI)</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-emerald">用途</span>：经过验证的mRNA/蛋白参考序列，测序注释首选</li>
+                        <li><span class="highlight-emerald">网址</span>：https://www.ncbi.nlm.nih.gov/refseq</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="5000" style="border-top: 4px solid #f472b6;">
+                    <h3 style="color:#f472b6;">MGI (小鼠)</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-pink">用途</span>：小鼠基因官方命名、基因符号、基因型-表型关联</li>
+                        <li><span class="highlight-pink">网址</span>：https://www.informatics.jax.org</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="3000" style="margin-top: 0.6rem;">
+                🔑 基因注释核心 · 人类 (HGNC) + 小鼠 (MGI) 命名权威
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 幻灯片 2：功能富集/通路 ==================== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1500"> 功能富集/通路</div>
+        <div class="sub reveal-item" data-duration="1200">信号通路 · 基因功能 · 分子网络</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #34d399;">
+                    <h3 style="color:#34d399;">KEGG</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-emerald">用途</span>：信号通路、代谢通路、疾病机制、药物靶点</li>
+                        <li><span class="highlight-emerald">网址</span>：https://www.genome.jp/kegg</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #f472b6;">
+                    <h3 style="color:#f472b6;">GO</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-pink">用途</span>：基因功能三分类 (BP/CC/MF)</li>
+                        <li><span class="highlight-pink">网址</span>：http://geneontology.org</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #f59e0b;">
+                    <h3 style="color:#fbbf24;">DAVID</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-gold">用途</span>：批量基因ID转换 + GO/KEGG富集 (适合新手)</li>
+                        <li><span class="highlight-gold">网址</span>：https://david.ncifcrf.gov</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4500" style="border-top: 4px solid #22d3ee; margin-top: 0.4rem;">
+                    <h3 style="color:#22d3ee;">Reactome</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-cyan">用途</span>：精细信号通路、分子反应网络</li>
+                        <li><span class="highlight-cyan">网址</span>：https://reactome.org</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="5000" style="border-top: 4px solid #c084fc;">
+                        <h3 style="color:#c084fc;">GSEA (MSigDB)</h3>
+                        <ul class="feature-list feature-list-sm">
+                            <li><span class="highlight-purple">用途</span>：基因集富集分析，预定义基因集 (H, C1-C7)</li>
+                            <li><span class="highlight-purple">网址</span>：https://www.gsea-msigdb.org/gsea/msigdb</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card-inner reveal-item" data-duration="3000">
+                🔑 从基因列表到通路富集 (ORA) + 基因集富集 (GSEA) 双核心
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 幻灯片 3：蛋白互作 ==================== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1500">蛋白互作网络</div>
+        <div class="sub reveal-item" data-duration="1200">PPI · 实验验证 · 网络构建</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #c084fc;">
+                    <h3 style="color:#c084fc;">STRING</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-purple">用途</span>：蛋白-蛋白互作 (PPI) 网络构建、hub基因筛选</li>
+                        <li><span class="highlight-purple">网址</span>：https://string-db.org</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">BioGRID</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-cyan">用途</span>：实验验证的互作数据，覆盖更广</li>
+                        <li><span class="highlight-cyan">网址</span>：https://thebiogrid.org</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #f59e0b;">
+                    <h3 style="color:#fbbf24;">IntAct</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-gold">用途</span>：EBI 提供的分子互作数据库，包含实验验证的PPI</li>
+                        <li><span class="highlight-gold">网址</span>：https://www.ebi.ac.uk/intact</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="3000">
+                🔑 互作网络 · 从分子机制到关键基因
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 幻灯片 4：非编码RNA ==================== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1500">非编码RNA (lnc/miR/circ)</div>
+        <div class="sub reveal-item" data-duration="1200">miRNA · 靶基因 · ceRNA · circRNA</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">miRBase</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-cyan">用途</span>：miRNA序列、注释、家族</li>
+                        <li><span class="highlight-cyan">网址</span>：http://www.mirbase.org</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #c084fc;">
+                    <h3 style="color:#c084fc;">TargetScan</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-purple">用途</span>：miRNA靶基因预测 (保守性好)</li>
+                        <li><span class="highlight-purple">网址</span>：http://www.targetscan.org/vert_80</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #f472b6;">
+                    <h3 style="color:#f472b6;">StarBase</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-pink">用途</span>：lncRNA-miRNA-mRNA ceRNA网络、互作验证</li>
+                        <li><span class="highlight-pink">网址</span>：https://starbase.sysu.edu.cn</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4500" style="border-top: 4px solid #f59e0b; margin-top: 0.4rem;">
+                    <h3 style="color:#fbbf24;">CircBase</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-gold">用途</span>：circRNA注释、序列、剪切位点</li>
+                        <li><span class="highlight-gold">网址</span>：http://www.circbase.org</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="3000">
+                🔑 非编码RNA调控网络 · 从序列到功能
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 幻灯片 5：突变/驱动基因 ==================== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1500">突变/驱动基因</div>
+        <div class="sub reveal-item" data-duration="1200">肿瘤驱动突变 · 突变频谱 · 临床注释</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #f472b6;">
+                    <h3 style="color:#f472b6;">COSMIC</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-pink">用途</span>：肿瘤驱动突变、突变频谱、热点基因</li>
+                        <li><span class="highlight-pink">网址</span>：https://cancer.sanger.ac.uk/cosmic</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #f59e0b;">
+                    <h3 style="color:#fbbf24;">MutSigDB</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-gold">用途</span>：肿瘤驱动基因集、显著性突变筛选</li>
+                        <li><span class="highlight-gold">网址</span>：https://www.mutsigdb.org</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #34d399;">
+                    <h3 style="color:#34d399;">ClinVar</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-emerald">用途</span>：人类变异与临床表型关联，疾病相关突变注释</li>
+                        <li><span class="highlight-emerald">网址</span>：https://www.ncbi.nlm.nih.gov/clinvar</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4500" style="border-top: 4px solid #c084fc; margin-top: 0.4rem;">
+                    <h3 style="color:#c084fc;">OncoKB</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-purple">用途</span>：精准肿瘤学知识库，突变功能注释与药物响应</li>
+                        <li><span class="highlight-purple">网址</span>：https://www.oncokb.org</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="3000">
+                🔑 突变驱动 · 从驱动突变到临床注释
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 幻灯片 6：肿瘤/表达数据 (特异) ==================== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1500">肿瘤 & 表达数据</div>
+        <div class="sub reveal-item" data-duration="1200">多组学 · 公共表达 · 正常对照</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
+            <div class="two-col-compare">
+                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #f472b6;">
+                    <h3 style="color:#f472b6;">TCGA (GDC)</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-pink">用途</span>：肿瘤多组学 (RNA-seq, 甲基化, 突变, CNV, 临床预后)</li>
+                        <li><span class="highlight-pink">网址</span>：https://portal.gdc.cancer.gov</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">GEO</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-cyan">用途</span>：公共芯片/测序表达数据，验证数据集</li>
+                        <li><span class="highlight-cyan">网址</span>：https://www.ncbi.nlm.nih.gov/geo</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="two-col-compare" style="margin-top: 0.4rem;">
+                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #c084fc;">
+                    <h3 style="color:#c084fc;">GTEx</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-purple">用途</span>：正常人体多组织表达，肿瘤vs正常对照</li>
+                        <li><span class="highlight-purple">网址</span>：https://gtexportal.org</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4500" style="border-top: 4px solid #f59e0b;">
+                    <h3 style="color:#fbbf24;">cBioPortal</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-gold">用途</span>：TCGA整合浏览 (突变, CNV, 表达, 生存, 共突变)</li>
+                        <li><span class="highlight-gold">网址</span>：https://www.cbioportal.org</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="3000">
+                🔑 肿瘤研究标配 · 从数据下载到可视化一站式
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 幻灯片 7：预后/生存 + 免疫浸润 (特异) ==================== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1500">预后 & 免疫浸润</div>
+        <div class="sub reveal-item" data-duration="1200">生存曲线 · 免疫细胞 · 肿瘤微环境</div>
+        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
+            <div class="two-col-compare">
+                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #34d399;">
+                    <h3 style="color:#34d399;">GEPIA2</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-emerald">用途</span>：TCGA+GTEx一站式 (差异、生存、相关性、亚型)</li>
+                        <li><span class="highlight-emerald">网址</span>：http://gepia2.cancer-pku.cn</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #f472b6;">
+                    <h3 style="color:#f472b6;">KMPlotter</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-pink">用途</span>：输入基因直接出生存曲线，多癌种预后验证</li>
+                        <li><span class="highlight-pink">网址</span>：https://kmplot.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="two-col-compare" style="margin-top: 0.4rem;">
+                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">TIMER2.0</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-cyan">用途</span>：肿瘤免疫细胞浸润、基因-免疫相关性、免疫检查点</li>
+                        <li><span class="highlight-cyan">网址</span>：https://timer.cistrome.org</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4500" style="border-top: 4px solid #c084fc;">
+                    <h3 style="color:#c084fc;">CIBERSORT</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li><span class="highlight-purple">用途</span>：免疫细胞反卷积，估算22种免疫细胞比例</li>
+                        <li><span class="highlight-purple">网址</span>：https://cibersortx.stanford.edu</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-card-inner reveal-item" data-duration="3000">
+                🔑 预后评估 + 免疫微环境 · 临床转化的重要桥梁
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 幻灯片 8：总结 ==================== -->
+    <div class="slide">
+        <div class="title-md reveal-item" data-duration="1500">总结 · 生信数据库使用要诀</div>
+        <div class="sub reveal-item" data-duration="1200">选对工具 · 理清逻辑 · 讲好故事</div>
+        <div class="glass-card glow-card reveal-item" data-duration="500" style="max-width: 1100px;">
+            <div class="three-col">
+                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #22d3ee;">
+                    <h3 style="color:#22d3ee;">✅ 核心原则</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>从<span class="highlight-cyan">基因注释</span>出发，夯实基础</li>
+                        <li>用<span class="highlight-cyan">公共表达数据</span>验证假设</li>
+                        <li><span class="highlight-cyan">功能富集</span>将基因列表转化为生物学意义</li>
+                        <li><span class="highlight-cyan">互作网络</span>揭示分子调控关系</li>
+                    </ul>
+                </div>
+                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #f59e0b;">
+                    <h3 style="color:#fbbf24;">🧠 进阶思维</h3>
+                    <ul class="feature-list feature-list-sm">
+                        <li>交叉验证：<span class="highlight-gold">多数据库相互佐证</span></li>
+                        <li>整合分析：<span class="highlight-gold">表达+突变+甲基化+临床</span></li>
+                        <li>关注<span class="highlight-gold">非编码RNA</span>调控网络</li>
+                        <li>结合<span class="highlight-gold">免疫浸润</span>与预后</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="quad-grid reveal-item" data-duration="2500" style="margin-top: 0.6rem; gap: 1.6rem;">
+                <div class="unit-badge badge-coord"><span>🧬 基础</span><span>NCBI·Ensembl</span></div>
+                <div class="unit-badge badge-read"><span>⚙️ 功能</span><span>KEGG·GO</span></div>
+                <div class="unit-badge badge-purple"><span>🔗 互作</span><span>STRING·BioGRID</span></div>
+                <div class="unit-badge badge-emerald"><span>📊 肿瘤</span><span>TCGA·GEO</span></div>
+            </div>
+            <div class="formula-frame small-formula reveal-item" data-duration="2000" style="margin-top: 0.5rem; font-size: 0.9rem;">
+                🔬 生信分析 = 数据 + 工具 + 生物学问题 · 缺一不可
+            </div>
+        </div>
+        <div class="sub-sm reveal-item" data-duration="1200" style="margin-top: 0.8rem;">从数据库到机制 · 让公共数据为你所用</div>
+    </div>
+
+    <!-- ==================== 底部控件 ==================== -->
+    <div class="progress-footer">
+        <div class="timeline-bar" id="timelineBar" style="display: none;"></div>
+    </div>
+    <div class="slide-counter" id="slideCounter">1 / 9</div>
+    <div class="control-hint" style="display: none;">␣ 暂停/播放 &nbsp;|&nbsp; ◀ ▶ 切换</div>
+
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.slide');
+            const timeline = document.getElementById('timelineBar');
+            const counterSpan = document.getElementById('slideCounter');
+            let currentIdx = 0;
+            const totalSlides = slides.length;
+            let autoPlay = true;
+
+            let currentSlideItems = [];
+            let currentDurations = [];
+            let currentItemIndex = 0;
+            let currentTotalDuration = 0;
+            let currentElapsed = 0;
+
+            let progressTimer = null;
+            let itemTimer = null;
+
+            function getRevealItems(slide) {
+                return Array.from(slide.querySelectorAll('.reveal-item'));
+            }
+
+            function computeSlideDurations(slide) {
+                const items = getRevealItems(slide);
+                const durations = [];
+                let total = 0;
+                for (let i = 0; i < items.length; i++) {
+                    let dur = items[i].getAttribute('data-duration');
+                    let durNum = dur ? parseInt(dur) : 2000;
+                    if (isNaN(durNum)) durNum = 2000;
+                    durations.push(durNum);
+                    total += durNum;
+                }
+                return { items, durations, total };
+            }
+
+            function resetRevealItems(slide) {
+                const items = getRevealItems(slide);
+                items.forEach(item => {
+                    item.classList.remove('revealed');
+                });
+            }
+
+            function stopAllTimers() {
+                if (progressTimer) {
+                    clearInterval(progressTimer);
+                    progressTimer = null;
+                }
+                if (itemTimer) {
+                    clearTimeout(itemTimer);
+                    itemTimer = null;
+                }
+            }
+
+            function showNextItem() {
+                if (!autoPlay) return;
+                if (currentItemIndex >= currentSlideItems.length) {
+                    if (itemTimer) clearTimeout(itemTimer);
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) {
+                            goToSlide((currentIdx + 1) % totalSlides);
+                        }
+                    }, 500);
+                    return;
+                }
+
+                const item = currentSlideItems[currentItemIndex];
+                if (item && !item.classList.contains('revealed')) {
+                    item.classList.add('revealed');
+                }
+
+                const duration = currentDurations[currentItemIndex];
+                if (itemTimer) clearTimeout(itemTimer);
+                itemTimer = setTimeout(() => {
+                    if (autoPlay) {
+                        currentItemIndex++;
+                        showNextItem();
+                    }
+                }, duration);
+            }
+
+            function startCurrentSlide() {
+                stopAllTimers();
+
+                resetRevealItems(slides[currentIdx]);
+
+                const { items, durations, total } = computeSlideDurations(slides[currentIdx]);
+                currentSlideItems = items;
+                currentDurations = durations;
+                currentTotalDuration = total;
+                currentItemIndex = 0;
+                currentElapsed = 0;
+
+                if (currentTotalDuration === 0 || items.length === 0) {
+                    itemTimer = setTimeout(() => {
+                        if (autoPlay) goToSlide((currentIdx + 1) % totalSlides);
+                    }, 2000);
+                    return;
+                }
+
+                let startTime = performance.now();
+                progressTimer = setInterval(() => {
+                    if (!autoPlay) return;
+                    const now = performance.now();
+                    let elapsed = now - startTime;
+                    if (elapsed > currentTotalDuration) elapsed = currentTotalDuration;
+                    const percent = (elapsed / currentTotalDuration) * 100;
+                    timeline.style.width = `${percent}%`;
+                }, 50);
+
+                showNextItem();
+            }
+
+            function stopCurrentSlide() {
+                stopAllTimers();
+            }
+
+            function goToSlide(index) {
+                if (index === currentIdx) return;
+                if (index < 0) index = 0;
+                if (index >= totalSlides) index = 0;
+
+                stopCurrentSlide();
+
+                slides[currentIdx].classList.remove('active');
+                slides[index].classList.add('active');
+                currentIdx = index;
+                updateCounter();
+
+                timeline.style.width = '0%';
+
+                if (autoPlay) {
+                    startCurrentSlide();
+                } else {
+                    resetRevealItems(slides[currentIdx]);
+                    const firstItem = slides[currentIdx].querySelector('.reveal-item');
+                    if (firstItem) firstItem.classList.add('revealed');
+                    stopAllTimers();
+                }
+            }
+
+            function nextSlide() {
+                if (autoPlay) {
+                    goToSlide((currentIdx + 1) % totalSlides);
+                } else {
+                    goToSlide((currentIdx + 1) % totalSlides);
+                }
+            }
+
+            function prevSlide() {
+                goToSlide((currentIdx - 1 + totalSlides) % totalSlides);
+            }
+
+            function toggleAutoPlay() {
+                autoPlay = !autoPlay;
+                if (autoPlay) {
+                    stopCurrentSlide();
+                    startCurrentSlide();
+                } else {
+                    stopAllTimers();
+                }
+            }
+
+            function updateCounter() {
+                counterSpan.innerText = `${currentIdx+1} / ${totalSlides}`;
+            }
+
+            function onKeyDown(e) {
+                const key = e.key;
+                if (key === ' ' || key === 'Space' || key === 'Spacebar') {
+                    e.preventDefault();
+                    toggleAutoPlay();
+                } else if (key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                } else if (key === 'ArrowRight') {
+                    e.preventDefault();
+                    nextSlide();
+                }
+            }
+
+            function init() {
+                slides.forEach((s, idx) => {
+                    if (idx === 0) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+                currentIdx = 0;
+                updateCounter();
+                autoPlay = true;
+                startCurrentSlide();
+                window.addEventListener('keydown', onKeyDown);
+            }
+
+            init();
+        })();
+    </script>
+
+<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
+<div class="sciviz-promo-no" aria-hidden="true">No.019 · 2026-07-04</div>
+<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
+padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
+border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
+letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+</body>
+</html>
