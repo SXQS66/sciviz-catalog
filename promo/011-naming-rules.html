@@ -1,574 +1,286 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="sciviz-promo" content="no=11;date=2026-04-06;id=011-naming-rules">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>No.011 · 基因 · 蛋白命名权威指南</title>
-    <style>
-        /* ===== 继承九象限图风格，扩展五页布局 ===== */
-        :root {
-            --bg-light: #eef2f7;
-            --bg-dark: #d9e1ec;
-            --text-primary: #1e2b3c;
-            --text-secondary: #3f5569;
-            --mantel-teal: #2e8b8b;
-            --mantel-blue: #4a80aa;
-            --mantel-gold: #b8864b;
-            --mantel-purple: #8a6d9c;
-            --gsea-coral: #e67e5a;
-            --hyper-teal: #2c9c8c;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="sciviz-promo" content="no=11;date=2026-04-06;id=011-naming-rules">
+<title>No.011 · 基因 · 蛋白命名权威指南</title>
+<style>
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
 
-        body {
-            width: 1300px;
-            height: auto;
-            min-height: 1750px;
-            font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(145deg, var(--bg-light) 0%, var(--bg-dark) 100%);
-            overflow-x: hidden;
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transform: scale(0.45);
-            transform-origin: top left;
-            position: relative;
-        }
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
 
-        .video-container {
-            width: 1300px;
-            min-height: 1750px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-        }
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
 
-        .scene-container {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; 
-            min-height: 1750px;
-            padding: 40px 48px;
-            display: none;
-            opacity: 0;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            transition: opacity 0.35s ease;
-        }
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
 
-        .scene-container::-webkit-scrollbar {
-            width: 6px;
-        }
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
 
-        .scene-active { display: flex; opacity: 1; }
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
 
-        .text-center { text-align: center; }
-        
-        .section-badge {
-            display: inline-block;
-            background: var(--mantel-gold);
-            color: white;
-            padding: 8px 28px;
-            border-radius: 40px;
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 18px;
-            box-shadow: 0 6px 16px rgba(128, 98, 58, 0.25);
-        }
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
 
-        .badge-hybrid {
-            background: linear-gradient(95deg, var(--hyper-teal), var(--mantel-purple));
-        }
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
 
-        .main-title {
-            font-size: 42px;
-            font-weight: 800;
-            line-height: 1.2;
-            background: linear-gradient(135deg, #2c3e50 0%, var(--mantel-purple) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 16px;
-            text-align: center;
-        }
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
 
-        .feature-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px 16px;
-            margin: 18px 0 22px;
-            justify-content: center;
-            max-width: 1100px;
-        }
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
+}
 
-        .feature-item {
-            background: #eef3f9;
-            border-radius: 50px;
-            padding: 8px 22px;
-            font-size: 26px;
-            font-weight: 500;
-            color: #1e3b5c;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-left: 5px solid var(--mantel-blue);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
 
-        .feature-item::before {
-            content: '●';
-            color: var(--mantel-gold);
-            font-size: 28px;
-        }
-
-        .content-card {
-            background: white;
-            border-radius: 32px;
-            padding: 24px 28px;
-            margin: 18px 0;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
-            width: 100%;
-            max-width: 1150px;
-            border: 1px solid rgba(46,139,139,0.3);
-        }
-
-        .card-title {
-            font-size: 34px;
-            font-weight: 700;
-            color: var(--mantel-purple);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-left: 5px solid var(--mantel-gold);
-            padding-left: 20px;
-        }
-
-        .desc-text {
-            font-size: 28px;
-            line-height: 1.45;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-        }
-
-        .grid-2col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 16px 0;
-        }
-
-        .info-block {
-            background: #fef9e6;
-            border-left: 5px solid var(--mantel-gold);
-            padding: 18px;
-            border-radius: 24px;
-        }
-        .info-block strong {
-            font-size: 26px;
-            color: var(--mantel-teal);
-            display: block;
-            margin-bottom: 8px;
-        }
-        .info-block li {
-            margin-left: 16px;
-            font-size: 24px;
-        }
-        .info-block p, .info-block ul { font-size: 24px; }
-
-        .badge-light {
-            background: #eef2fa;
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 28px;
-            font-size: 22px;
-            font-weight: 500;
-            color: var(--mantel-teal);
-            margin-bottom: 12px;
-        }
-
-        .step-list {
-            list-style: none;
-            padding-left: 0;
-        }
-        .step-list li {
-            font-size: 26px;
-            padding: 10px 0 10px 32px;
-            border-bottom: 1px solid #e9edf2;
-            position: relative;
-        }
-        .step-list li::before {
-            content: "▹";
-            color: var(--mantel-gold);
-            font-weight: bold;
-            font-size: 28px;
-            position: absolute;
-            left: 0;
-            top: 8px;
-        }
-
-        .pill-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 12px 0;
-        }
-        .pill {
-            background: #eef3f9;
-            border-radius: 50px;
-            padding: 5px 16px;
-            font-size: 24px;
-            font-weight: 500;
-            color: var(--mantel-blue);
-            border: 1px solid var(--mantel-blue);
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 28px;
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 12px 0;
-        }
-        .comparison-table th, .comparison-table td {
-            border: 1px solid #e2e8f0;
-            padding: 12px 10px;
-            text-align: left;
-            vertical-align: top;
-        }
-        .comparison-table th {
-            background: #eef2fa;
-            font-weight: 700;
-            color: var(--mantel-teal);
-        }
-
-        .back-btn {
-            background: var(--mantel-blue);
-            color: white;
-            border: none;
-            padding: 8px 24px;
-            font-size: 22px;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 16px;
-            box-shadow: 0 4px 10px rgba(74,128,170,0.25);
-            transition: 0.2s;
-        }
-
-        .back-btn:hover {
-            background: var(--mantel-purple);
-            transform: scale(1.02);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 16px;
-            margin: 18px 0;
-            justify-content: center;
-        }
-
-        .progress-indicator {
-            position: fixed;
-            bottom: 22px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 12px;
-            z-index: 1000;
-            background: rgba(255,255,240,0.8);
-            padding: 6px 16px;
-            border-radius: 40px;
-            backdrop-filter: blur(4px);
-        }
-
-        .progress-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(57,73,96,0.4);
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .progress-dot-active {
-            background: var(--mantel-gold);
-            transform: scale(1.4);
-        }
-
-        hr { margin: 16px 0; border-color: #d0dbea; }
-        .footer-note {
-            margin: 24px 0 12px;
-            font-size: 18px;
-            color: var(--mantel-purple);
-            text-align: center;
-        }
-        .highlight-text {
-            background: linear-gradient(120deg, #f9f2e0 0%, #f9f2e0 40%, transparent);
-            font-weight: 600;
-            padding: 0 4px;
-        }
-        .quote-note {
-            font-size: 24px;
-            font-style: italic;
-            color: #5d6e7e;
-            background: #f4f8fe;
-            padding: 14px 20px;
-            border-radius: 28px;
-            margin: 12px 0;
-        }
-        .ref-link {
-            color: var(--mantel-teal);
-            text-decoration: none;
-            border-bottom: 1px dashed var(--mantel-gold);
-        }
-        .ref-link:hover { color: var(--mantel-purple); }
-    </style>
+/* ---- 外链 ---- */
+.body a{color:var(--brand);text-decoration:none;border-bottom:1px solid var(--line);word-break:break-all}
+.body a:hover{color:var(--brand2);border-bottom-color:var(--brand2)}
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
+</style>
 </head>
 <body>
-<div class="video-container">
-    <!-- 页面1：概述 —— 为何命名规则是科研基石 -->
-    <div class="scene-container scene-active" id="scene-step1">
-        <div style="text-align: center;">
-            <div class="section-badge badge-hybrid">📐 学术规范基石</div>
-            <h1 class="main-title">基因与蛋白质命名规则：全球共识与可重复性</h1>
-            <div class="feature-grid">
-                <div class="feature-item">🧬 斜体 vs 正体：物种专属密码</div>
-            </div>
-            <div class="feature-grid">
-                <div class="feature-item">📡 HUGO / MGNC / FlyBase 官方委员会</div>
-            </div>
-            <div class="feature-grid">
-                <div class="feature-item">⚡ 错误命名 = 数据失效/论文退回</div>
-            </div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">🌐 为什么必须遵循国际命名规则？</div>
-            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;基因/蛋白质符号是生物医学研究的“数字身份证”。<strong>统一命名</strong>确保数据库检索、文献比较、审稿流程无歧义。顶级期刊明确要求遵循各物种命名委员会标准，错误的命名可直接导致数据无法被索引或论文退回。</div>
-            <div class="grid-2col">
-                <div class="info-block"><strong>✅ 正确命名的价值</strong><ul><li>跨数据库精准映射 (NCBI, Ensembl)</li><li>避免同源基因混淆 (人TP53 vs 小鼠Trp53)</li><li>提升研究可复现性与引证效率</li></ul></div>
-                <div class="info-block"><strong>⚠️ 常见代价</strong><ul><li>审稿阶段直接拒稿或强制修正</li><li>生物信息学分析结果错配</li><li>结论被同行质疑或无法复现</li></ul></div>
-            </div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">📖 核心速查表 · 三大黄金法则</div>
-            <table class="comparison-table">
-                <thead><tr><th>物种</th><th>基因符号 (斜体)</th><th>蛋白质 (正体)</th><th>命名委员会/资源</th></tr></thead>
-                <tbody>
-                    <tr><td>人类</td><td><i>BRCA1</i>, <i>TP53</i></td><td>BRCA1, TP53</td><td>HUGO (HGNC)</td></tr>
-                    <tr><td>小鼠</td><td><i>Brca1</i>, <i>Trp53</i></td><td>BRCA1, TRP53</td><td>MGNC (MGI)</td></tr>
-                    <tr><td>果蝇</td><td><i>Dlg1</i>, <i>shakB</i></td><td>Dlg1, ShakB</td><td>FlyBase</td></tr>
-                    <tr><td>拟南芥</td><td><i>AGL8</i>, <i>CBF2</i></td><td>AGL8, CBF2</td><td>TAIR</td></tr>
-                </tbody>
-            </table>
-            <div class="quote-note">💡 斜体/正体、大小写、数字格式均具强制约束力，投稿前务必用官方数据库核实最新符号。</div>
-        </div>
-        <div class="btn-group"><button class="back-btn" onclick="switchToScene('step2')">→ 人类基因命名细则 (HUGO) →</button></div>
+<article class="post">
+
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.011</span>
+      <span>2026-04-06</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
     </div>
+    <h1>基因 · 蛋白命名权威指南</h1>
+    <p class="lede">人 / 小鼠 / 模式生物五页规范：大小写、斜体、别名与旧名，投稿前逐条对。</p>
+    <div class="chips"><span class="chip">命名规范</span><span class="chip">基因</span><span class="chip">蛋白</span><span class="chip">投稿</span></div>
+  </header>
 
-    <!-- 页面2：人类 —— HUGO 命名规则（HGNC）-->
-    <div class="scene-container" id="scene-step2">
-        <div style="text-align: center;">
-            <div class="section-badge">🧬 人类基因命名 (HGNC)</div>
-            <h1 class="main-title">HUGO 规则：全大写斜体基因，正体蛋白</h1>
-            <div class="feature-grid"><div class="feature-item">🔠 基因符号全大写拉丁字母+数字</div><div class="feature-item">📖 蛋白质全大写正体</div><div class="feature-item">✅ 唯一且具有描述性</div></div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">📌 人类基因/蛋白核心规范</div>
-            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>基因：</strong><i>全大写斜体</i> (如 <i>TP53</i>, <i>BRCA1</i>, <i>EGFR</i>)。避免希腊字母(写为alpha)，可用阿拉伯数字 (如 <i>GNAI1</i>)。<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>蛋白质：</strong>正体全大写，与基因符号字母相同 (TP53, BRCA1)。</div>
-            <div class="grid-2col">
-                <div class="info-block"><strong>✅ 正确示例</strong><ul><li>基因: <i>KRAS</i>, <i>MYC</i>, <i>CDKN2A</i></li><li>蛋白: KRAS, MYC, CDKN2A</li><li>全称: cyclin dependent kinase inhibitor 2A</li></ul></div>
-                <div class="info-block"><strong>❌ 常见错误</strong><ul><li>将人类基因写为小写 <i>tp53</i> → 被误认为小鼠基因</li><li>蛋白写为斜体 <i>TP53</i> → 蛋白必须正体</li></ul></div>
-            </div>
-            <div class="badge-light">🔗 官方核实：<a href="#" class="ref-link">www.genenames.org</a> (HGNC数据库)</div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">⚖️ 人类 vs 小鼠：同源基因对比陷阱</div>
-            <table class="comparison-table"><thead><tr><th>同源基因</th><th>人类基因</th><th>人类蛋白</th><th>小鼠基因</th><th>小鼠蛋白</th></tr></thead>
-                <tbody>
-                    <tr><td>TP53/p53</td><td><i>TP53</i></td><td>TP53</td><td><i>Trp53</i></td><td>TRP53</td></tr>
-                    <tr><td>BRCA1</td><td><i>BRCA1</i></td><td>BRCA1</td><td><i>Brca1</i></td><td>Brca1</td></tr>
-                    <tr><td>GFAP</td><td><i>GFAP</i></td><td>GFAP</td><td><i>Gfap</i></td><td>Gfap</td></tr>
-                </tbody>
-            </table>
-            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⚠️ 特别提醒：小鼠基因首字母大写其余小写，蛋白大写首字母后小写（传统Trp53蛋白形式）或部分数据库采用全大写，但标准MGI推荐蛋白符号与基因符号大小写一致（首字母大写）。跨物种写作时务必区分！</div>
-        </div>
-        <div class="btn-group"><button class="back-btn" style="background:#6c757d;" onclick="switchToScene('step1')">← 返回概述</button><button class="back-btn" onclick="switchToScene('step3')">→ 小鼠命名规则 →</button></div>
+  <div class="body">
+  <section>
+    <h2>为什么必须遵循国际命名规则？</h2>
+    <p>基因/蛋白质符号是生物医学研究的「数字身份证」。统一命名确保数据库检索、文献比较、审稿流程无歧义：顶级期刊明确要求遵循各物种命名委员会标准，错误命名可直接导致数据无法被索引，甚至论文退回。</p>
+    <ul>
+      <li><strong>正确命名的价值</strong>——跨数据库精准映射（NCBI、Ensembl），避免同源基因混淆（人 <i>TP53</i> vs 小鼠 <i>Trp53</i>），提升可复现性与引证效率；</li>
+      <li><strong>错误命名的代价</strong>——审稿阶段被拒或强制修正，生信分析结果错配，结论被同行质疑或无法复现。</li>
+    </ul>
+    <h3>核心速查表 · 三大黄金法则</h3>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>物种</th><th>基因符号（斜体）</th><th>蛋白质（正体）</th><th>命名委员会 / 资源</th></tr></thead>
+      <tbody>
+        <tr><td>人类</td><td><i>BRCA1</i>、<i>TP53</i>（全大写）</td><td>BRCA1、TP53</td><td>HGNC<sup>1</sup>（HUGO）</td></tr>
+        <tr><td>小鼠</td><td><i>Brca1</i>、<i>Trp53</i>（首字母大写）</td><td>BRCA1、TRP53</td><td>MGI<sup>2</sup>（MGNC）</td></tr>
+        <tr><td>果蝇</td><td><i>Dlg1</i>、<i>shakB</i>（依表型命名）</td><td>Dlg1、ShakB</td><td>FlyBase<sup>3</sup></td></tr>
+        <tr><td>拟南芥</td><td><i>AGL8</i>、<i>CBF2</i>（全大写）</td><td>AGL8、CBF2</td><td>TAIR<sup>4</sup></td></tr>
+      </tbody>
+    </table>
     </div>
+    <div class="note note-tip"><p>斜体/正体、大小写、数字格式均具强制约束力，投稿前务必到官方数据库核实最新符号。</p></div>
+  </section>
 
-    <!-- 页面3：小鼠及哺乳动物（MGNC）-->
-    <div class="scene-container" id="scene-step3">
-        <div style="text-align: center;">
-            <div class="section-badge">🐭 小鼠命名 (MGNC)</div>
-            <h1 class="main-title">小鼠：首字母大写斜体基因 · 蛋白正体</h1>
-            <div class="feature-grid"><div class="feature-item">🧬 基因: <i>Gfap</i> , <i>Trp53</i> (斜体, 首字母大写)</div><div class="feature-item">🧪 蛋白: Gfap, Trp53 (正体, 首字母大写)</div><div class="feature-item">📌 大鼠规则相似但独立查询</div></div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">📘 小鼠基因命名细则 (MGNC)</div>
-            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>基因符号：</strong><i>斜体，首字母大写，其余小写</i>。例如：<i>Brca1</i>, <i>Gfap</i>, <i>Trp53</i>。基因全称首字母大写不斜体：“Transformation related protein 53”。<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>蛋白质：</strong>正体，首字母大写 (Brca1, Gfap, Trp53)。官方MGI数据库显示蛋白符号与基因符号相同但正体。<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>同源人类基因：</strong>故意采用大小写区分，避免混淆。<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注意：线粒体基因、tRNA等遵循特定命名格式，可在MGI查询。</div>
-            <div class="grid-2col">
-                <div class="info-block"><strong>✅ 正确小鼠格式</strong><ul><li>基因 <i>Cd44</i>, <i>Egf</i>, <i>Mmp9</i></li><li>蛋白 Cd44, Egf, Mmp9 (正体首字母大写)</li><li>权威示例：MGI官方显示<i>Trp53</i>蛋白为TRP53或Trp53？最新规范蛋白为正体且首字母大写Trp53。</li></ul></div>
-                <div class="info-block"><strong>⚠️ 高危错误区</strong><ul><li>将小鼠基因全大写 <i>TRP53</i> → 人类基因风格</li><li>将小鼠蛋白写成小写 trp53 → 蛋白必须正体且首字母大写</li><li>在同一图表中混用人类小鼠大小写符号而未加标注</li></ul></div>
-            </div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">🐀 附：大鼠命名要点 (RGNC)</div>
-            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;大鼠基因命名与小鼠类似：基因斜体首字母大写（如 <i>Brca1</i>, <i>Tp53</i>），蛋白正体首字母大写。但大鼠有独立命名委员会，强烈建议使用 <strong>Rat Genome Database (RGD)</strong> 核实特定基因符号。</div>
-            <div class="pill-group"><div class="pill">🔍 MGI: www.informatics.jax.org</div><div class="pill">🔍 RGD: rgd.mcw.edu</div></div>
-        </div>
-        <div class="btn-group"><button class="back-btn" style="background:#6c757d;" onclick="switchToScene('step2')">← 返回人类命名</button><button class="back-btn" onclick="switchToScene('step4')">→ 其他模式生物 (果蝇/拟南芥) →</button></div>
+  <section>
+    <h2>人类基因命名（HGNC）：全大写斜体基因，正体蛋白</h2>
+    <ul>
+      <li><strong>基因</strong>——全大写、斜体，如 <i>TP53</i>、<i>BRCA1</i>、<i>EGFR</i>；避免希腊字母（写作 <code>alpha</code>），可用阿拉伯数字（如 <i>GNAI1</i>）；</li>
+      <li><strong>蛋白质</strong>——正体、全大写，与基因符号字母相同（TP53、BRCA1）；</li>
+      <li><strong>正确示例</strong>——基因 <i>KRAS</i>、<i>MYC</i>、<i>CDKN2A</i>；蛋白 KRAS、MYC、CDKN2A；全称 cyclin dependent kinase inhibitor 2A。</li>
+    </ul>
+    <div class="note note-warn"><p><strong>常见错误</strong>：把人类基因写成小写 <code>tp53</code>（会被误认为小鼠基因）；把蛋白写成斜体（蛋白必须正体）。官方核实入口：<code><a href="https://www.genenames.org" target="_blank" rel="noopener">www.genenames.org</a></code>。</p></div>
+    <h3>人类 vs 小鼠：同源基因对比陷阱</h3>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>同源基因</th><th>人类基因</th><th>人类蛋白</th><th>小鼠基因</th><th>小鼠蛋白</th></tr></thead>
+      <tbody>
+        <tr><td>p53</td><td><i>TP53</i></td><td>TP53</td><td><i>Trp53</i></td><td>TRP53</td></tr>
+        <tr><td>BRCA1</td><td><i>BRCA1</i></td><td>BRCA1</td><td><i>Brca1</i></td><td>BRCA1</td></tr>
+        <tr><td>GFAP</td><td><i>GFAP</i></td><td>GFAP</td><td><i>Gfap</i></td><td>GFAP</td></tr>
+      </tbody>
+    </table>
     </div>
+  </section>
 
-    <!-- 页面4：其他主要模式生物（果蝇/拟南芥）-->
-    <div class="scene-container" id="scene-step4">
-        <div style="text-align: center;">
-            <div class="section-badge">🌿 模式生物多样性命名</div>
-            <h1 class="main-title">果蝇 · 拟南芥 专属规则</h1>
-            <div class="feature-grid"><div class="feature-item">🪰 果蝇: 斜体小写/特定模式</div><div class="feature-item">🌱 拟南芥: 全大写斜体</div></div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">🪰 果蝇 (<i>Drosophila melanogaster</i>) — FlyBase</div>
-            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>基因：</strong><i>斜体</i>，通常小写，基于突变表型命名，如 <i>Dlg1</i> (discs large 1)，<i>shakB</i> (shaker B)。<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>蛋白：</strong>正体，首字母大写 (Dlg1, ShakB)。<br></div>
-            <div class="badge-light">🔗 FlyBase: flybase.org</div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">🌿 拟南芥 (<i>Arabidopsis</i>) — TAIR</div>
-            <div class="desc-text"><strong>基因符号：</strong><i>斜体，全大写</i> (如 <i>AGL8</i>, <i>CBF2</i>, <i>FT</i>)。<br>
-            <strong>蛋白质：</strong>正体，全大写 (AGL8, CBF2)。<br>
-            <strong>等位基因：</strong> <i>agl8-1</i> 小写斜体。遵循TAIR命名委员会。</div>
-            <div class="pill-group"><div class="pill">TAIR: www.arabidopsis.org</div></div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">📚 延伸：其他常见生物命名资源</div>
-            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;虽然本指南未新增物种详情，但遵循相同严谨原则：线虫 (WormBase)、酵母 (SGD)、细菌 (Demerec规则) 等均需在投稿前查询对应官方数据库，确保基因符号斜体与大小写正确。</div>
-        </div>
-        <div class="btn-group"><button class="back-btn" style="background:#6c757d;" onclick="switchToScene('step3')">← 返回小鼠规则</button><button class="back-btn" onclick="switchToScene('step5')">→ 总结 →</button></div>
-    </div>
+  <section>
+    <h2>小鼠（MGNC）与大鼠（RGD）</h2>
+    <p>小鼠基因符号<strong>斜体、首字母大写、其余小写</strong>（<i>Brca1</i>、<i>Gfap</i>、<i>Trp53</i>）；蛋白<strong>正体、首字母大写</strong>（Brca1、Gfap、Trp53）。MGI 数据库中蛋白符号与基因符号大小写一致但正体。同源的人类基因故意采用全大写以示区分。线粒体基因、tRNA 等遵循特定格式，可在 MGI 查询。</p>
+    <div class="note note-warn"><p><strong>高危错误区</strong>：把小鼠基因写成全大写 <code>TRP53</code>（那是人类风格）；把小鼠蛋白写成小写 <code>trp53</code>（蛋白必须正体且首字母大写）；在同一图表中混用人鼠大小写符号而未加标注。</p></div>
+    <p><strong>大鼠</strong>规则与小鼠类似：基因斜体首字母大写（<i>Brca1</i>、<i>Tp53</i>），蛋白正体首字母大写。但大鼠有独立命名委员会，强烈建议用 Rat Genome Database 核实（<code><a href="https://rgd.mcw.edu" target="_blank" rel="noopener">rgd.mcw.edu</a></code>；MGI：<code><a href="https://www.informatics.jax.org" target="_blank" rel="noopener">www.informatics.jax.org</a></code>）。</p>
+  </section>
 
-    <!-- 页面5：总结 —— 发表前必做检查与评分矩阵 -->
-    <div class="scene-container" id="scene-step5">
-        <div style="text-align: center;">
-            <div class="section-badge">📋 发表前最终审核</div>
-            <h1 class="main-title">从实验室记录到顶级期刊：命名合规三要素</h1>
-            <div class="feature-grid"><div class="feature-item">✅ 官方数据库核实符号</div><div class="feature-item">🎯 斜体/正体全文统一</div><div class="feature-item">📑 新基因预注册</div></div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">🔍 投稿前强制核对清单</div>
-            <div class="step-list">
-                <li><strong>第一查：</strong>登录对应物种委员会 (HGNC, MGI, FlyBase, TAIR, SGD, WormBase) 确认基因符号为最新官方格式。</li>
-                <li><strong>第二查：</strong>通篇扫描基因符号是否为<strong>斜体</strong>，蛋白质符号是否为<strong>正体</strong>（含摘要、方法、图表、补充材料）。</li>
-                <li><strong>第三查：</strong>人鼠同源基因是否错误混用大小写（例如将小鼠Trp53误写为TP53）。</li>
-                <li><strong>第四查：</strong>新基因是否已获得命名委员会注册号并致谢。</li>
-                <li><strong>第五查：</strong>引用公共数据库时提供 accession number，如 NCBI Gene ID 或 UniProt ID。</li>
-            </div>
-        </div>
-        <div class="content-card">
-            <div class="card-title">📌 最终提醒</div>
-            <div class="desc-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;基因命名绝非细枝末节，而是科学交流的通用语言。正确使用斜体/正体、大小写，不仅体现研究者的严谨素养，更是确保研究成果能被全球同行精确发现、引用和验证的基础。投稿前多花十分钟核对命名，可避免后期返修之苦。</div>
-        </div>
-        <div class="btn-group"><button class="back-btn" style="background:#6c757d;" onclick="switchToScene('step4')">← 返回其他物种</button><button class="back-btn" onclick="switchToScene('step1')">🏠 回到首页总览</button></div>
-    </div>
-</div>
+  <section>
+    <h2>果蝇与拟南芥的专属规则</h2>
+    <h3>果蝇（FlyBase）</h3>
+    <p>基因<strong>斜体</strong>，通常小写，基于突变表型命名，如 <i>Dlg1</i>（discs large 1）、<i>shakB</i>（shaker B）；蛋白<strong>正体、首字母大写</strong>（Dlg1、ShakB）。核实：<code><a href="https://flybase.org" target="_blank" rel="noopener">flybase.org</a></code>。</p>
+    <h3>拟南芥（TAIR）</h3>
+    <p>基因符号<strong>斜体、全大写</strong>（<i>AGL8</i>、<i>CBF2</i>、<i>FT</i>）；蛋白质<strong>正体、全大写</strong>；等位基因小写斜体（<i>agl8-1</i>）。核实：<code><a href="https://www.arabidopsis.org" target="_blank" rel="noopener">www.arabidopsis.org</a></code>。</p>
+    <p>其他常见生物同理：线虫（WormBase）、酵母（SGD）、细菌（Demerec 规则）等，投稿前一律查对应官方数据库，确保斜体与大小写正确。</p>
+  </section>
 
-<div class="progress-indicator" style="display: none;">
-    <div class="progress-dot progress-dot-active" data-scene="step1"></div>
-    <div class="progress-dot" data-scene="step2"></div>
-    <div class="progress-dot" data-scene="step3"></div>
-    <div class="progress-dot" data-scene="step4"></div>
-    <div class="progress-dot" data-scene="step5"></div>
-</div>
+  <section>
+    <h2>发表前审核清单</h2>
+    <ol>
+      <li>登录对应物种委员会（HGNC、MGI、FlyBase、TAIR、SGD、WormBase）确认符号为最新官方格式；</li>
+      <li>通篇扫描基因符号是否斜体、蛋白符号是否正体（含摘要、方法、图表、补充材料）；</li>
+      <li>检查人鼠同源基因是否混用大小写（如把小鼠 <i>Trp53</i> 误写成 <code>TP53</code>）；</li>
+      <li>新基因是否已获命名委员会注册号并在文中致谢；</li>
+      <li>引用公共数据库时提供 accession number（NCBI Gene ID、UniProt ID）。</li>
+    </ol>
+    <blockquote>
+      <p>基因命名是科学交流的通用语言。正确使用斜体/正体与大小写，是研究成果被全球同行精确发现、引用和验证的基础——投稿前多花十分钟核对，可省去一轮返修。</p>
+    </blockquote>
+    <h3 class="refs-title">延伸阅读与参考文献</h3>
+    <ol class="refs">
+      <li>Bruford EA, Braschi B, Denny P, et al. Guidelines for human gene nomenclature. <em>Nature Genetics</em>. 2020;52(8):754–758. doi:10.1038/s41588-020-0669-3</li>
+      <li>Mouse Genome Informatics (MGI). Guidelines for nomenclature of mouse and rat strains and genes. <a href="https://www.informatics.jax.org/mgihome/nomen/" target="_blank" rel="noopener">https://www.informatics.jax.org/mgihome/nomen/</a></li>
+      <li>The FlyBase Consortium. FlyBase: a database for Drosophila genetics and biology. <em>Nucleic Acids Research</em>. 2023;51(D1):D587–D591.</li>
+      <li>Berardini TZ, et al. Curated genome annotation for Arabidopsis and guidelines for gene nomenclature (TAIR). <a href="https://www.arabidopsis.org/" target="_blank" rel="noopener">https://www.arabidopsis.org/</a></li>
+    </ol>
+  </section>
+  </div>
 
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.011</span>
+    <span>2026-04-06</span>
+  </div>
+
+</article>
+
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
 <script>
-    (function() {
-        const scenes = ['step1', 'step2', 'step3', 'step4', 'step5'];
-        let currentScene = 'step1';
-        
-        const sceneElements = {
-            step1: document.getElementById('scene-step1'),
-            step2: document.getElementById('scene-step2'),
-            step3: document.getElementById('scene-step3'),
-            step4: document.getElementById('scene-step4'),
-            step5: document.getElementById('scene-step5')
-        };
-        
-        const progressDots = document.querySelectorAll('.progress-dot');
-
-        window.switchToScene = function(sceneId) {
-            Object.values(sceneElements).forEach(scene => {
-                if (scene) {
-                    scene.classList.remove('scene-active');
-                    scene.style.opacity = 0;
-                }
-            });
-            
-            const targetScene = sceneElements[sceneId];
-            if (targetScene) {
-                targetScene.classList.add('scene-active');
-                targetScene.style.opacity = 1;
-                targetScene.scrollTop = 0;
-            }
-            
-            progressDots.forEach((dot, idx) => {
-                dot.classList.remove('progress-dot-active');
-                if (idx < scenes.length && scenes[idx] === sceneId) {
-                    dot.classList.add('progress-dot-active');
-                }
-            });
-            currentScene = sceneId;
-        };
-
-        progressDots.forEach((dot, idx) => {
-            dot.addEventListener('click', function() {
-                if (idx < scenes.length) {
-                    switchToScene(scenes[idx]);
-                }
-            });
-        });
-
-        document.addEventListener('keydown', (e) => {
-            const currentIndex = scenes.indexOf(currentScene);
-            if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                const nextIndex = (currentIndex + 1) % scenes.length;
-                switchToScene(scenes[nextIndex]);
-            } else if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                const prevIndex = (currentIndex - 1 + scenes.length) % scenes.length;
-                switchToScene(scenes[prevIndex]);
-            }
-        });
-
-        window.addEventListener('load', function() {
-            document.querySelectorAll('.scene-container').forEach(scene => {
-                scene.style.opacity = 0;
-            });
-            const step1Scene = sceneElements.step1;
-            if (step1Scene) {
-                step1Scene.classList.add('scene-active');
-                step1Scene.style.opacity = 1;
-            }
-        });
-    })();
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
+    });
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
 </script>
-
-<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
-<div class="sciviz-promo-no" aria-hidden="true">No.011 · 2026-04-06</div>
-<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
-padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
-border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
-letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
 </body>
 </html>

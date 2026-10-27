@@ -1,1064 +1,296 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="sciviz-promo" content="no=24;date=2026-08-01;id=024-sequence-display">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>No.024 · 序列展示可视化工具全景</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #ede8ff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
-        }
-        .app-wrapper {
-            width: 1440px;
-            height: 2400px;
-            background: linear-gradient(180deg, #f3f0ff 0%, #ede8ff 40%, #f0f5ff 100%);
-            box-shadow: 0 0 0 1px rgba(132, 94, 194, 0.06);
-            overflow: hidden;
-            position: relative;
-            margin: 0 auto;
-        }
-        .slider-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-        .page {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            will-change: transform;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.45s ease, visibility 0.45s ease;
-            pointer-events: none;
-            overflow-y: auto;
-            overflow-x: hidden;
-            background: transparent;
-            padding: 20px 0;
-        }
-        .page.active {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-            z-index: 10;
-        }
-        /* 工具页专用背景色（第2~9页，索引1~8） */
-        .page.tool-page {
-            background: #f9f7ff;
-        }
-        .page::-webkit-scrollbar {
-            width: 4px;
-        }
-        .page::-webkit-scrollbar-track {
-            background: #ede8ff;
-        }
-        .page::-webkit-scrollbar-thumb {
-            background: #c4b5fd;
-            border-radius: 10px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="sciviz-promo" content="no=24;date=2026-08-01;id=024-sequence-display">
+<title>No.024 · 序列展示可视化工具全景</title>
+<style>
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
 
-        /* ===== 卡片风格 ===== */
-        .update-card {
-            width: 100%;
-            max-width: 1440px;
-            background: #ffffff;
-            overflow: hidden;
-            transition: 0.2s;
-            height: auto;
-            max-height: 100%;
-            display: flex;
-            flex-direction: column;
-            border-radius: 0;
-        }
-        .hero {
-            background: linear-gradient(135deg, #845ec2 0%, #9b6fd4 35%, #6c5ce7 70%, #a29bfe 100%);
-            padding: 32px 60px 28px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            right: -100px;
-            width: 360px;
-            height: 360px;
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 50%;
-        }
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: -70px;
-            left: -70px;
-            width: 260px;
-            height: 260px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 50%;
-        }
-        .page-counter {
-            position: absolute;
-            top: 18px;
-            right: 50px;
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(4px);
-            border-radius: 50px;
-            padding: 8px 26px;
-            font-size: 1.6rem;
-            font-weight: 650;
-            z-index: 2;
-        }
-        .hero h1 {
-            font-size: 5.2rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            line-height: 1.12;
-            position: relative;
-            z-index: 1;
-            margin-top: 60px;
-        }
-        .version-badge {
-            background: rgba(255, 255, 255, 0.28);
-            backdrop-filter: blur(4px);
-            border-radius: 80px;
-            padding: 10px 34px;
-            font-size: 2.4rem;
-            font-weight: 650;
-            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
-        }
-        .sub {
-            font-size: 3.6rem;
-            opacity: 0.98;
-            margin: 60px 0;
-            display: flex;
-            gap: 24px;
-            flex-wrap: wrap;
-            align-items: baseline;
-            position: relative;
-            z-index: 1;
-        }
-        .content {
-            padding: 36px 56px 28px;
-            flex: 1;
-        }
-        .section-title {
-            font-size: 4.6rem;
-            font-weight: 760;
-            color: #1b1b2d;
-            margin-bottom: 44px;
-            display: flex;
-            align-items: baseline;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .section-title span {
-            background: #ede8ff;
-            padding: 8px 24px;
-            border-radius: 45px;
-            font-size: 1.8rem;
-            font-weight: 660;
-            color: #845ec2;
-        }
-        .updates-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 50px;
-            margin: 50px 0 80px 0;
-        }
-        .update-item {
-            background: #fbfbff;
-            border-radius: 24px;
-            padding: 24px 46px;
-            border: 1px solid #e0dcff;
-            transition: 0.22s ease;
-            box-shadow: 0 8px 24px rgba(132, 94, 194, 0.06);
-            position: relative;
-            overflow: hidden;
-        }
-        .update-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 10px;
-            background: linear-gradient(180deg, #845ec2 0%, #a29bfe 100%);
-        }
-        .update-item:hover {
-            border-color: #c4b5fd;
-            background: #ffffff;
-            box-shadow: 0 20px 40px rgba(132, 94, 194, 0.12);
-            transform: translateY(-4px);
-        }
-        .update-title {
-            font-size: 4.8rem;
-            font-weight: 740;
-            color: #1b1b2d;
-            letter-spacing: -0.4px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            flex-wrap: wrap;
-        }
-        .update-desc {
-            color: #3b3b4a;
-            font-size: 3.6rem;
-            line-height: 1.8;
-            margin-top: 4px;
-        }
-        .update-desc strong {
-            color: #6c5ce7;
-            font-weight: 650;
-        }
-        .footer-copyright {
-            font-size: 2.4rem;
-            text-align: center;
-            color: #8a8ab0;
-            padding: 24px 36px 28px;
-            border-top: 1px solid #ede8ff;
-            background: #ffffff;
-            flex-shrink: 0;
-        }
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
 
-        /* 工具页面特有：截图块 */
-        .img-box {
-            background: #f8f7ff;
-            border-radius: 16px;
-            border: 2px dashed #d5ccf0;
-            padding: 18px 12px 14px;
-            text-align: center;
-            transition: 0.2s;
-            margin-top: 12px;
-        }
-        .img-box:hover {
-            border-color: #a29bfe;
-            background: #f5f2ff;
-        }
-        .img-box .img-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .img-box .img-placeholder img {
-            max-width: 100%;
-            height: auto;
-            max-height: 400px;
-            border-radius: 12px;
-            border: 1px solid #d5ccf0;
-            box-shadow: 0 4px 16px rgba(132, 94, 194, 0.10);
-            transition: 0.2s;
-            display: block;
-            object-fit: contain;
-            background: #ffffff;
-        }
-        .img-box .img-placeholder img:hover {
-            box-shadow: 0 8px 28px rgba(132, 94, 194, 0.18);
-            border-color: #a29bfe;
-            transform: scale(1.01);
-        }
-        .img-box .img-placeholder small {
-            font-size: 2.0rem;
-            color: #9a92b8;
-            display: block;
-            margin-top: 4px;
-        }
-        .tool-url {
-            font-size: 2.8rem;
-            color: #6c5ce7;
-            margin-top: 6px;
-            padding-left: 14px;
-        }
-        .tool-url a {
-            color: #6c5ce7;
-            text-decoration: none;
-            border-bottom: 1px dotted #c4b5fd;
-        }
-        .tool-url a:hover {
-            border-bottom: 2px solid #845ec2;
-        }
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
 
-        /* 首页分类卡片 */
-        .category-list {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            margin: 30px 0 40px;
-        }
-        .cat-card {
-            background: #fbfbff;
-            border-radius: 24px;
-            padding: 20px 40px 24px;
-            border: 1px solid #e0dcff;
-            box-shadow: 0 8px 24px rgba(132, 94, 194, 0.06);
-            transition: 0.2s;
-        }
-        .cat-card:hover {
-            border-color: #c4b5fd;
-            box-shadow: 0 20px 40px rgba(132, 94, 194, 0.12);
-            transform: translateY(-4px);
-        }
-        .cat-card .cat-name {
-            font-size: 4.0rem;
-            font-weight: 700;
-            color: #1b1b2d;
-            display: inline-block;
-        }
-        .cat-card .tool-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px 30px;
-            margin-top: 12px;
-        }
-        .cat-card .tool-item {
-            font-size: 3.2rem;
-            color: #3b3b4a;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .cat-card .tool-item .badge-simple {
-            background: #d4edda;
-            color: #155724;
-            font-size: 1.8rem;
-            padding: 0 16px;
-            border-radius: 30px;
-            font-weight: 600;
-        }
-        .cat-card .tool-item .badge-medium {
-            background: #fff3cd;
-            color: #856404;
-            font-size: 1.8rem;
-            padding: 0 16px;
-            border-radius: 30px;
-            font-weight: 600;
-        }
-        .cat-card .tool-item .badge-easy {
-            background: #d1ecf1;
-            color: #0c5460;
-            font-size: 1.8rem;
-            padding: 0 16px;
-            border-radius: 30px;
-            font-weight: 600;
-        }
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
 
-        /* 总结页 */
-        .summary-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            margin: 30px 0 40px;
-        }
-        .summary-card {
-            background: #fbfbff;
-            border-radius: 24px;
-            padding: 20px 40px 24px;
-            border: 1px solid #e0dcff;
-            box-shadow: 0 8px 24px rgba(132, 94, 194, 0.06);
-            transition: 0.2s;
-        }
-        .summary-card:hover {
-            border-color: #c4b5fd;
-            box-shadow: 0 20px 40px rgba(132, 94, 194, 0.12);
-            transform: translateY(-4px);
-        }
-        .summary-card .s-icon {
-            font-size: 4.0rem;
-            display: inline-block;
-            margin-right: 16px;
-        }
-        .summary-card .s-title {
-            font-size: 4.0rem;
-            font-weight: 700;
-            color: #1b1b2d;
-            display: inline-block;
-        }
-        .summary-card .s-desc {
-            font-size: 3.2rem;
-            color: #3b3b4a;
-            line-height: 1.6;
-            margin-top: 8px;
-        }
-        .summary-card .s-desc strong {
-            color: #6c5ce7;
-        }
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
 
-        /* 导航控件（隐藏） */
-        .nav-controls {
-            display: none;
-        }
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
 
-        @media (max-width: 1080px) {
-            .app-wrapper {
-                width: 100%;
-                min-width: 1080px;
-            }
-            body {
-                overflow-x: auto;
-                background: #f3f0ff;
-            }
-        }
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
 
-        .hint-text {
-            display: none;
-        }
-        .hero-tool-title {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px 24px;
-            margin-top: 60px;
-        }
-        .hero-tool-title .tool-name-main {
-            font-size: 5.2rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-        }
-        .hero-tool-title .tool-name-main small {
-            font-size: 3.0rem;
-            font-weight: 500;
-            opacity: 0.85;
-            margin-left: 6px;
-        }
-        .tag-cat {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(4px);
-            border-radius: 60px;
-            padding: 6px 28px;
-            font-size: 2.2rem;
-            font-weight: 600;
-            color: #fff;
-        }
-        .tag-diff {
-            font-size: 2.2rem;
-            font-weight: 600;
-            color: #fff;
-            background: rgba(255, 255, 255, 0.18);
-            padding: 6px 28px;
-            border-radius: 60px;
-            backdrop-filter: blur(4px);
-        }
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
 
-        /* 水平双栏布局 */
-        .screenshot-row {
-            display: flex;
-            gap: 50px;
-            flex-wrap: wrap;
-        }
-        .screenshot-row .update-item {
-            flex: 1;
-            min-width: 300px;
-        }
-    </style>
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
+}
+
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
+</style>
 </head>
 <body>
+<article class="post">
 
-    <div class="app-wrapper">
-        <div class="slider-container" id="slider">
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.024</span>
+      <span>2026-08-01</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
+    </div>
+    <h1>序列展示可视化工具全景</h1>
+    <p class="lede">十六张实拍对比：蛋白结构域、基因结构、多序列比对各该用哪个工具。</p>
+    <div class="chips"><span class="chip">序列展示</span><span class="chip">结构域</span><span class="chip">多序列比对</span><span class="chip">工具</span></div>
+  </header>
 
-            <!-- 第1页：总体概况 -->
-            <div class="page active" data-index="0">
-                <div class="update-card">
-                    <div class="hero">
-                        <div class="page-counter">1 / 10</div>
-                        <h1>
-                            <span>🧬 序列展示可视化</span>
-                            <span class="version-badge">工具全景</span>
-                        </h1>
-                        <div class="sub">8 款精选工具 · 4 大类别 · 覆盖核酸 &amp; 蛋白质</div>
-                    </div>
-                    <div class="content">
-                        <div class="section-title">
-                            📋 分类总览 <span>按场景划分</span>
-                        </div>
-                        <div class="category-list">
-                            <div class="cat-card">
-                                <div><span class="cat-name">在线序列浏览器</span></div>
-                                <div class="tool-list">
-                                    <div class="tool-item">NCBI Sequence Viewer <span class="badge-simple">⭐ 简单</span></div>
-                                    <div class="tool-item">GSDS <span class="badge-simple">⭐ 简单</span></div>
-                                </div>
-                            </div>
-                            <div class="cat-card">
-                                <div><span class="cat-name">基因组浏览器</span></div>
-                                <div class="tool-list">
-                                    <div class="tool-item">UCSC Genome Browser <span class="badge-medium">⭐⭐⭐ 中等</span></div>
-                                    <div class="tool-item">IGV <span class="badge-medium">⭐⭐⭐ 中等</span></div>
-                                </div>
-                            </div>
-                            <div class="cat-card">
-                                <div><span class="cat-name">多序列比对 &amp; 结构域</span></div>
-                                <div class="tool-list">
-                                    <div class="tool-item">Jalview <span class="badge-medium">⭐⭐⭐ 中等</span></div>
-                                    <div class="tool-item">ESPript <span class="badge-medium">⭐⭐⭐ 中等</span></div>
-                                    <div class="tool-item">InterProScan <span class="badge-easy">⭐⭐ 较简单</span></div>
-                                </div>
-                            </div>
-                            <div class="cat-card">
-                                <div><span class="cat-name">序列绘图</span></div>
-                                <div class="tool-list">
-                                    <div class="tool-item">IBS <span class="badge-easy">⭐⭐ 较简单</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-copyright">
-                        <strong>序列可视化工具集</strong> · 助力科研绘图 &nbsp;|&nbsp; © 2026
-                    </div>
-                </div>
-            </div>
+  <div class="body">
+  <section>
+    <h2>工具全景：8 款工具覆盖 4 大场景</h2>
+    <p>序列展示是论文里最常见也最容易画丑的一类图。本文按使用场景把 8 款工具分成四类，每款给出界面截图与示例输出，并标注上手难度：</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>场景</th><th>工具</th><th>上手难度</th></tr></thead>
+      <tbody>
+        <tr><td>在线序列浏览器</td><td>NCBI Sequence Viewer · GSDS 2.0</td><td>⭐ 简单</td></tr>
+        <tr><td>基因组浏览器</td><td>UCSC Genome Browser · IGV</td><td>⭐⭐⭐ 中等</td></tr>
+        <tr><td>多序列比对与结构域</td><td>Jalview · ESPript · InterProScan</td><td>⭐⭐–⭐⭐⭐</td></tr>
+        <tr><td>序列绘图</td><td>IBS 2.0</td><td>⭐⭐ 较简单</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>选择逻辑很简单：查 NCBI 记录顺手看序列用 Sequence Viewer；画基因结构示意用 GSDS / IBS；探索注释与组学 track 用 UCSC / IGV；比对排版出图用 Jalview / ESPript；批量注释结构域用 InterProScan。</p>
+  </section>
 
-            <!-- ============================================================ -->
-            <!-- 第2页：NCBI Sequence Viewer -->
-            <!-- ============================================================ -->
-            <div class="page tool-page" data-index="1">
-                <div class="update-card">
-                    <div class="hero">
-                        <div class="page-counter">2 / 10</div>
-                        <div class="hero-tool-title">
-                            <span class="tool-name-main">NCBI Sequence Viewer <small>🌐 在线</small></span>
-                            <span class="tag-cat">在线序列浏览器</span>
-                            <span class="tag-diff">⭐ 简单</span>
-                        </div>
-                        <div class="sub" style="font-size:3.2rem; margin-top:10px;">NCBI 官方图形化序列展示 · 支持缩放与标记</div>
-                    </div>
-                    <div class="content">
-                        <div class="updates-grid" style="margin-top:20px;">
-                            <!-- 简介与链接 -->
-                            <div class="update-item">
-                                <div class="update-title">简介与链接</div>
-                                <div class="update-desc">
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>NCBI Sequence Viewer</strong> 是 NCBI 官方推出的图形化序列展示工具，可展示核酸和蛋白质序列的编码区、外显子、变异位点等注释信息，支持缩放、标记和自定义显示。<strong>上手极快</strong>，适合快速查看基因注释和变异。
-                                </div>
-                                <div class="tool-url">🔗 官网：<a href="https://www.ncbi.nlm.nih.gov/projects/sviewer/" target="_blank">https://www.ncbi.nlm.nih.gov/projects/sviewer/</a></div>
-                            </div>
-                            <!-- 两个截图水平排列 -->
-                            <div class="screenshot-row">
-                                <div class="update-item">
-                                    <div class="update-title">工具界面</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/tool_1.jpg" alt="工具界面截图">
-                                            <small>NCBI Sequence Viewer 主界面</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">示例输出</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/example_1.jpg" alt="示例输出截图">
-                                            <small>编码区 / 外显子 / 变异位点标注</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-copyright">
-                        <strong>序列可视化工具集</strong> · 助力科研绘图 &nbsp;|&nbsp; © 2026
-                    </div>
-                </div>
-            </div>
+  <section>
+    <h3>① NCBI Sequence Viewer · 在线序列浏览器</h3>
+    <p>嵌入在 NCBI 各数据库记录页里的序列浏览器：输入 accession 即可查看基因、转录本、变异与公开 RNA-seq track，无需安装，适合快速核查与引用记录页截图。</p>
+    <figure><img src="assets/024-sequence-display/tool_1.jpg" alt="NCBI Sequence Viewer 3.51.3 首页" loading="lazy"><figcaption>图 1a · NCBI Sequence Viewer 首页：输入 accession 或 gi 即可开始</figcaption></figure>
+    <figure><img src="assets/024-sequence-display/example_1.jpg" alt="NCBI Sequence Viewer 展示人类 1 号染色体与公开 RNA-seq track" loading="lazy"><figcaption>图 1b · 示例：人类 1 号染色体（GRCh38.p14），叠加 RefSeq 注释、dbSNP 变异与公开 RNA-seq 信号 track</figcaption></figure>
+  </section>
 
-            <!-- ============================================================ -->
-            <!-- 第3页：GSDS -->
-            <!-- ============================================================ -->
-            <div class="page tool-page" data-index="2">
-                <div class="update-card">
-                    <div class="hero">
-                        <div class="page-counter">3 / 10</div>
-                        <div class="hero-tool-title">
-                            <span class="tool-name-main">GSDS <small>🌐 在线</small></span>
-                            <span class="tag-cat">在线序列浏览器</span>
-                            <span class="tag-diff">⭐ 简单</span>
-                        </div>
-                        <div class="sub" style="font-size:3.2rem; margin-top:10px;">基因结构显示 · 输入序列一键出图</div>
-                    </div>
-                    <div class="content">
-                        <div class="updates-grid" style="margin-top:20px;">
-                            <div class="update-item">
-                                <div class="update-title">简介与链接</div>
-                                <div class="update-desc">
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>GSDS</strong> 是一个实用的显示基因结构的在线工具，只需要输入基因序列（FASTA 格式）就可以绘制基因结构图，<strong>操作简单</strong>，适合快速查看基因的外显子-内含子组织以及上下游调控区域。该工具支持多序列输入，可同时展示多个基因的结构对比。
-                                </div>
-                                <div class="tool-url">🔗 官网：<a href="https://gsds.gao-lab.org/" target="_blank">https://gsds.gao-lab.org/</a></div>
-                            </div>
-                            <div class="screenshot-row">
-                                <div class="update-item">
-                                    <div class="update-title">工具界面</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/tool_2.jpg" alt="工具界面截图">
-                                            <small>GSDS 在线工具截图</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">示例输出</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/example_2.jpg" alt="示例输出截图">
-                                            <small>基因结构图 · 外显子 / 内含子分布</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-copyright">
-                        <strong>序列可视化工具集</strong> · 助力科研绘图 &nbsp;|&nbsp; © 2026
-                    </div>
-                </div>
-            </div>
+  <section>
+    <h3>② GSDS 2.0 · 基因结构在线绘图</h3>
+    <p>北大 CBI 的 Gene Structure Display Server<sup>6</sup>：提交 GFF3 / BED 等格式的基因特征，一键生成外显子–内含子–UTR 结构图，支持按进化树排序输出，适合多基因家族结构比较。</p>
+    <figure><img src="assets/024-sequence-display/tool_2.jpg" alt="GSDS 2.0 提交界面" loading="lazy"><figcaption>图 2a · GSDS 2.0 提交界面：支持 BED/GFF3 输入与 SVG 输出</figcaption></figure>
+    <figure><img src="assets/024-sequence-display/example_2.jpg" alt="GSDS 2.0 输出的多条转录本基因结构图" loading="lazy"><figcaption>图 2b · 示例输出：多条转录本的外显子（黄）、UTR（蓝）与内含子（线）结构</figcaption></figure>
+  </section>
 
-            <!-- ============================================================ -->
-            <!-- 第4页：UCSC Genome Browser -->
-            <!-- ============================================================ -->
-            <div class="page tool-page" data-index="3">
-                <div class="update-card">
-                    <div class="hero">
-                        <div class="page-counter">4 / 10</div>
-                        <div class="hero-tool-title">
-                            <span class="tool-name-main">UCSC Genome Browser <small>🔬 桌面/在线</small></span>
-                            <span class="tag-cat">基因组浏览器</span>
-                            <span class="tag-diff">⭐⭐⭐ 中等</span>
-                        </div>
-                        <div class="sub" style="font-size:3.2rem; margin-top:10px;">50+ 物种 · 基因注释 · 调控元件</div>
-                    </div>
-                    <div class="content">
-                        <div class="updates-grid" style="margin-top:20px;">
-                            <div class="update-item">
-                                <div class="update-title">简介与链接</div>
-                                <div class="update-desc">
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>UCSC Genome Browser</strong> 是基因组可视化的老牌工具，支持约 50 个物种的基因组线性可视化，可查看 DNA 序列、基因注释、调控元件、保守性等海量数据。提供丰富的 track 选项，<strong>功能强大</strong>，适合深入探索基因组区域和比较基因组学分析。
-                                </div>
-                                <div class="tool-url">🔗 官网：<a href="https://genome.ucsc.edu/" target="_blank">https://genome.ucsc.edu/</a></div>
-                            </div>
-                            <div class="screenshot-row">
-                                <div class="update-item">
-                                    <div class="update-title">工具界面</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/tool_3.jpg" alt="工具界面截图">
-                                            <small>UCSC Genome Browser 截图</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">示例输出</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/example_3.jpg" alt="示例输出截图">
-                                            <small>基因组线性视图 · 基因与调控元件</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-copyright">
-                        <strong>序列可视化工具集</strong> · 助力科研绘图 &nbsp;|&nbsp; © 2026
-                    </div>
-                </div>
-            </div>
+  <section>
+    <h3>③ UCSC Genome Browser · 基因组浏览器</h3>
+    <p>注释资源最丰富的公共基因组浏览器之一<sup>2</sup>：RefSeq/GENCODE 转录本、OMIM 表型、dbSNP 变异、GTEx 表达、ENCODE 调控元件与多物种保守性一页看尽，适合定位区域的功能背景调研。</p>
+    <figure><img src="assets/024-sequence-display/tool_3.jpg" alt="UCSC Genome Browser 首页" loading="lazy"><figcaption>图 3a · UCSC Genome Browser 首页：按物种与组装版本进入</figcaption></figure>
+    <figure><img src="assets/024-sequence-display/example_3.jpg" alt="UCSC Genome Browser 展示 SHH 基因座的多层注释" loading="lazy"><figcaption>图 3b · 示例：人 SHH 基因座——转录本、OMIM、GTEx 表达、H3K27ac 与 100 物种保守性 track</figcaption></figure>
+  </section>
 
-            <!-- ============================================================ -->
-            <!-- 第5页：IGV -->
-            <!-- ============================================================ -->
-            <div class="page tool-page" data-index="4">
-                <div class="update-card">
-                    <div class="hero">
-                        <div class="page-counter">5 / 10</div>
-                        <div class="hero-tool-title">
-                            <span class="tool-name-main">IGV <small>桌面/在线</small></span>
-                            <span class="tag-cat">基因组浏览器</span>
-                            <span class="tag-diff">⭐⭐⭐ 中等</span>
-                        </div>
-                        <div class="sub" style="font-size:3.2rem; margin-top:10px;">Broad Institute · NGS 数据可视化</div>
-                    </div>
-                    <div class="content">
-                        <div class="updates-grid" style="margin-top:20px;">
-                            <div class="update-item">
-                                <div class="update-title">简介与链接</div>
-                                <div class="update-desc">
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>IGV</strong> 由 Broad Institute 开发，是交互式基因组可视化工具，支持 NGS 测序数据的可视化展示，可查看 BAM、VCF、BED 等多种格式。它能够直观展示 RNA-seq 覆盖度、变异位点、染色质互作等，<strong>是生物信息学分析的标准工具之一</strong>。
-                                </div>
-                                <div class="tool-url">🔗 官网：<a href="https://igv.org/doc/desktop/" target="_blank">https://igv.org/doc/desktop/</a></div>
-                            </div>
-                            <div class="screenshot-row">
-                                <div class="update-item">
-                                    <div class="update-title">工具界面</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/tool_4.jpg" alt="工具界面截图">
-                                            <small>IGV 桌面软件截图</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">示例输出</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/example_4.jpg" alt="示例输出截图">
-                                            <small>BAM / VCF / BED 覆盖与变异展示</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-copyright">
-                        <strong>序列可视化工具集</strong> · 助力科研绘图 &nbsp;|&nbsp; © 2026
-                    </div>
-                </div>
-            </div>
+  <section>
+    <h3>④ IGV · 本地基因组浏览器</h3>
+    <p>Integrative Genomics Viewer<sup>1</sup>：桌面版 / Web / igv.js 三种形态，本地加载 BAM 与 VCF 查看比对、覆盖度与变异，是测序数据质检和变异核查的标准工具。</p>
+    <figure><img src="assets/024-sequence-display/tool_4.jpg" alt="IGV 桌面版官网" loading="lazy"><figcaption>图 4a · IGV 官网：桌面版、IGV-Web 与 igv.js 三种形态</figcaption></figure>
+    <figure><img src="assets/024-sequence-display/example_4.jpg" alt="IGV 查看测序比对与变异示例" loading="lazy"><figcaption>图 4b · 示例输出：IGV 中查看比对与变异</figcaption></figure>
+  </section>
 
-            <!-- ============================================================ -->
-            <!-- 第6页：Jalview -->
-            <!-- ============================================================ -->
-            <div class="page tool-page" data-index="5">
-                <div class="update-card">
-                    <div class="hero">
-                        <div class="page-counter">6 / 10</div>
-                        <div class="hero-tool-title">
-                            <span class="tool-name-main">Jalview <small>💻 桌面</small></span>
-                            <span class="tag-cat">多序列比对 &amp; 结构域</span>
-                            <span class="tag-diff">⭐⭐⭐ 中等</span>
-                        </div>
-                        <div class="sub" style="font-size:3.2rem; margin-top:10px;">多序列比对编辑 · 系统发育树 · PCA</div>
-                    </div>
-                    <div class="content">
-                        <div class="updates-grid" style="margin-top:20px;">
-                            <div class="update-item">
-                                <div class="update-title">简介与链接</div>
-                                <div class="update-desc">
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Jalview</strong> 是一款免费跨平台软件，用于多序列比对的编辑、可视化与分析。它支持多种比对格式，可结合系统发育树、主成分分析 (PCA) 图表开展比对结果分析，并能直接浏览 PDB 结构信息，<strong>功能全面</strong>，适合深度序列分析和教学演示。
-                                </div>
-                                <div class="tool-url">🔗 官网：<a href="https://www.jalview.org/" target="_blank">https://www.jalview.org/</a></div>
-                            </div>
-                            <div class="screenshot-row">
-                                <div class="update-item">
-                                    <div class="update-title">工具界面</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/tool_5.jpg" alt="工具界面截图">
-                                            <small>Jalview 桌面软件截图</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">示例输出</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/example_5.jpg" alt="示例输出截图">
-                                            <small>多序列比对 · 保守区与系统发育树</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-copyright">
-                        <strong>序列可视化工具集</strong> · 助力科研绘图 &nbsp;|&nbsp; © 2026
-                    </div>
-                </div>
-            </div>
+  <section>
+    <h3>⑤ Jalview · 多序列比对编辑与分析</h3>
+    <p>免费跨平台的多序列比对编辑、可视化与分析工作台<sup>3</sup>：内置多种比对算法（经 JABAWS 调用）、支持系统树与 PCA 分析，可对接 UniProt、PDB、ENA 等外部资源，还能直接产出发表级图片。</p>
+    <figure><img src="assets/024-sequence-display/tool_5.jpg" alt="Jalview 官网功能地图" loading="lazy"><figcaption>图 5a · Jalview 官网：比对、编辑、分析、可视化的功能地图</figcaption></figure>
+    <figure><img src="assets/024-sequence-display/example_5.jpg" alt="Jalview 多序列比对编辑示例" loading="lazy"><figcaption>图 5b · 示例输出：Jalview 中的多序列比对与着色</figcaption></figure>
+  </section>
 
-            <!-- ============================================================ -->
-            <!-- 第7页：InterProScan -->
-            <!-- ============================================================ -->
-            <div class="page tool-page" data-index="6">
-                <div class="update-card">
-                    <div class="hero">
-                        <div class="page-counter">7 / 10</div>
-                        <div class="hero-tool-title">
-                            <span class="tool-name-main">InterProScan <small>🌐 在线</small></span>
-                            <span class="tag-cat">多序列比对 &amp; 结构域</span>
-                            <span class="tag-diff">⭐⭐ 较简单</span>
-                        </div>
-                        <div class="sub" style="font-size:3.2rem; margin-top:10px;">蛋白质功能与结构域预测</div>
-                    </div>
-                    <div class="content">
-                        <div class="updates-grid" style="margin-top:20px;">
-                            <div class="update-item">
-                                <div class="update-title">简介与链接</div>
-                                <div class="update-desc">
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>InterProScan</strong>是EBI提供的蛋白质序列功能分析工具，可预测蛋白质序列中的结构域、功能位点和家族归属。它整合了Pfam、PRINTS、PROSITE等多个数据库，输入序列即可获得注释结果，<strong>操作简便</strong>，是蛋白功能研究的利器。
-                                </div>
-                                <div class="tool-url">🔗 官网：<a href="https://www.ebi.ac.uk/interpro/search/sequence/" target="_blank">https://www.ebi.ac.uk/interpro/search/sequence/</a></div>
-                            </div>
-                            <div class="screenshot-row">
-                                <div class="update-item">
-                                    <div class="update-title">工具界面</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/tool_6.jpg" alt="工具界面截图">
-                                            <small>InterProScan 在线截图</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">示例输出</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/example_6.jpg" alt="示例输出截图">
-                                            <small>蛋白结构域与功能位点注释</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-copyright">
-                        <strong>序列可视化工具集</strong> · 助力科研绘图 &nbsp;|&nbsp; © 2026
-                    </div>
-                </div>
-            </div>
+  <section>
+    <h3>⑥ InterProScan · 结构域批量注释</h3>
+    <p>EMBL-EBI 的蛋白家族与结构域扫描工具<sup>5</sup>：网页版单次可提交 100 条序列，批量任务用命令行版本地运行；结果按 Pfam、SMART 等成员库归并，是功能注释流水线的常客。</p>
+    <figure><img src="assets/024-sequence-display/tool_6.jpg" alt="InterPro 序列扫描界面" loading="lazy"><figcaption>图 6a · InterPro 在线扫描界面：粘贴序列或上传文件，也可下载本地版</figcaption></figure>
+    <figure><img src="assets/024-sequence-display/example_6.jpg" alt="InterProScan 结构域注释结果示例" loading="lazy"><figcaption>图 6b · 示例输出：InterProScan 的结构域注释结果</figcaption></figure>
+  </section>
 
-            <!-- ============================================================ -->
-            <!-- 第8页：ESPript -->
-            <!-- ============================================================ -->
-            <div class="page tool-page" data-index="7">
-                <div class="update-card">
-                    <div class="hero">
-                        <div class="page-counter">8 / 10</div>
-                        <div class="hero-tool-title">
-                            <span class="tool-name-main">ESPript <small>🌐 在线</small></span>
-                            <span class="tag-cat">多序列比对 &amp; 结构域</span>
-                            <span class="tag-diff">⭐⭐⭐ 中等</span>
-                        </div>
-                        <div class="sub" style="font-size:3.2rem; margin-top:10px;">蛋白多序列比对美化 · 保守残基与二级结构</div>
-                    </div>
-                    <div class="content">
-                        <div class="updates-grid" style="margin-top:20px;">
-                            <div class="update-item">
-                                <div class="update-title">简介与链接</div>
-                                <div class="update-desc">
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>ESPript</strong> 是蛋白多序列比对美化绘图工具，用于可视化保守残基与二级结构。上传比对文件（如 Clustal 格式）及 PDB 结构信息，可生成<strong>标注保守位点、结构元件</strong>的精美比对图，输出高分辨率矢量图，常用于分子进化与蛋白结构研究论文发表。
-                                </div>
-                                <div class="tool-url">🔗 官网：<a href="https://espript.ibcp.fr/ESPript/ESPript/" target="_blank">https://espript.ibcp.fr/ESPript/ESPript/</a></div>
-                            </div>
-                            <div class="screenshot-row">
-                                <div class="update-item">
-                                    <div class="update-title">工具界面</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/tool_7.jpg" alt="工具界面截图">
-                                            <small>ESPript 在线截图</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">示例输出</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/example_7.jpg" alt="示例输出截图">
-                                            <small>标注保守位点与结构元件的比对图</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-copyright">
-                        <strong>序列可视化工具集</strong> · 助力科研绘图 &nbsp;|&nbsp; © 2026
-                    </div>
-                </div>
-            </div>
+  <section>
+    <h3>⑦ ESPript 3 · 比对结果排版出图</h3>
+    <p>Easy Sequencing in PostScript<sup>4</sup>：把已有的多序列比对渲染成发表级图——相似度着色、二级结构标注、一致性序列一应俱全；核酸比对的排版交给姊妹版 N-ESPript。</p>
+    <figure><img src="assets/024-sequence-display/tool_7.jpg" alt="ESPript 3.2 首页与示例图" loading="lazy"><figcaption>图 7a · ESPript 3.2 首页：渲染蛋白序列相似度与二级结构信息</figcaption></figure>
+    <figure><img src="assets/024-sequence-display/example_7.jpg" alt="ESPript 生成的发表级比对图示例" loading="lazy"><figcaption>图 7b · 示例输出：ESPript 排版的比对图（PDF 输出可直接投稿）</figcaption></figure>
+  </section>
 
-            <!-- ============================================================ -->
-            <!-- 第9页：IBS -->
-            <!-- ============================================================ -->
-            <div class="page tool-page" data-index="8">
-                <div class="update-card">
-                    <div class="hero">
-                        <div class="page-counter">9 / 10</div>
-                        <div class="hero-tool-title">
-                            <span class="tool-name-main">IBS <small>🌐 在线</small></span>
-                            <span class="tag-cat">序列绘图</span>
-                            <span class="tag-diff">⭐⭐ 较简单</span>
-                        </div>
-                        <div class="sub" style="font-size:3.2rem; margin-top:10px;">生物序列分析可视化 · 丰富图形元素</div>
-                    </div>
-                    <div class="content">
-                        <div class="updates-grid" style="margin-top:20px;">
-                            <div class="update-item">
-                                <div class="update-title">简介与链接</div>
-                                <div class="update-desc">
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>IBS</strong> 提供了丰富的图形元素（如多边形、括号、曲线和折线）用于表示功能元件或调控分子，可轻松绘制各种基因、分子结构示意图。支持导出为 SVG/PNG 等格式，<strong>操作直观</strong>，适合科研绘图和教学课件制作。
-                                </div>
-                                <div class="tool-url">🔗 官网：<a href="https://ibs.renlab.org/" target="_blank">https://ibs.renlab.org/</a></div>
-                            </div>
-                            <div class="screenshot-row">
-                                <div class="update-item">
-                                    <div class="update-title">工具界面</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/tool_8.jpg" alt="工具界面截图">
-                                            <small>IBS 在线工具截图</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">示例输出</div>
-                                    <div class="img-box">
-                                        <div class="img-placeholder">
-                                            <img src="assets/024-sequence-display/example_8.jpg" alt="示例输出截图">
-                                            <small>基因 / 分子结构示意图</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-copyright">
-                        <strong>序列可视化工具集</strong> · 助力科研绘图 &nbsp;|&nbsp; © 2026
-                    </div>
-                </div>
-            </div>
+  <section>
+    <h3>⑧ IBS 2.0 · 序列示意图绘制</h3>
+    <p>Illustrator for Biological Sequences<sup>7</sup>：双模式（网页 + 桌面）绘制蛋白/核酸的示意图，多边形、括号、曲线等图形元素自由组合，是画基因结构、载体构建、蛋白结构域示意图的利器。</p>
+    <figure><img src="assets/024-sequence-display/tool_8.jpg" alt="IBS 2.0 首页" loading="lazy"><figcaption>图 8a · IBS 2.0 首页：网页版直接 Get Started</figcaption></figure>
+    <figure><img src="assets/024-sequence-display/example_8.jpg" alt="IBS 2.0 绘制的 SHANK3 基因打靶示意图" loading="lazy"><figcaption>图 8b · 示例输出：SHANK3 条件性打靶策略示意图（Yi F et al., Science 2016）</figcaption></figure>
+  </section>
 
-            <!-- ============================================================ -->
-            <!-- 第10页：总结 -->
-            <!-- ============================================================ -->
-            <div class="page" data-index="9">
-                <div class="update-card">
-                    <div class="hero">
-                        <div class="page-counter">10 / 10</div>
-                        <h1 style="font-size:5.2rem;">
-                            <span>🎯 总结与推荐</span>
-                            <span class="version-badge">选对工具</span>
-                        </h1>
-                        <div class="sub" style="font-size:3.6rem;">按需选择 · 效率倍增</div>
-                    </div>
-                    <div class="content">
-                        <div class="section-title" style="font-size:4.0rem; margin-bottom:30px;">
-                            📌 场景化使用建议
-                        </div>
-                        <div class="summary-vertical">
-                            <div class="summary-card">
-                                <div><span class="s-title">快速浏览</span></div>
-                                <div class="s-desc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>NCBI Sequence Viewer</strong> · <strong>GSDS</strong> — 无需安装，输入序列即可查看基因结构或注释，<strong>1 分钟出图</strong>，适合初步了解基因特征。</div>
-                            </div>
-                            <div class="summary-card">
-                                <div><span class="s-title">基因组深度探索</span></div>
-                                <div class="s-desc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>UCSC Genome Browser</strong> · <strong>IGV</strong> — 适合查看 NGS 数据、调控元件、多物种比对，<strong>功能强大</strong>，是基因组学研究的主力工具。</div>
-                            </div>
-                            <div class="summary-card">
-                                <div><span class="s-title">比对与结构分析</span></div>
-                                <div class="s-desc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Jalview</strong> · <strong>ESPript</strong> · <strong>InterProScan</strong> — 多序列比对、保守位点、结构域预测，<strong>研究蛋白功能</strong>必备组合。</div>
-                            </div>
-                            <div class="summary-card">
-                                <div><span class="s-title">序列绘图</span></div>
-                                <div class="s-desc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>IBS</strong> — 绘制基因结构示意图，<strong>可视化表达</strong>直观，适合论文插图。</div>
-                            </div>
-                            <!-- <div class="summary-card" style="background:#f5f0ff;border-color:#c4b5fd;">
-                                <div><span class="s-icon">💡</span><span class="s-title">一句话选型</span></div>
-                                <div class="s-desc" style="font-size:3.6rem;">
-                                    🔹 <strong>要快</strong> → NCBI / GSDS &nbsp;|&nbsp; 🔹 <strong>要全</strong> → UCSC / IGV &nbsp;|&nbsp; 🔹 <strong>要美</strong> → ESPript / IBS &nbsp;|&nbsp; 🔹 <strong>要深</strong> → Jalview / InterProScan
-                                </div>
-                            </div> -->
-                        </div>
-                    </div>
-                    <div class="footer-copyright">
-                        <strong>序列可视化工具集</strong> · 助力科研绘图 &nbsp;|&nbsp; © 2026
-                    </div>
-                </div>
-            </div>
+  <section>
+    <h2>选型建议</h2>
+    <ul>
+      <li><strong>只是看一眼序列</strong>——NCBI Sequence Viewer，零安装；</li>
+      <li><strong>画基因结构 / 构建示意图</strong>——GSDS 2.0（批量、带进化树排序）或 IBS 2.0（自由排版）；</li>
+      <li><strong>区域功能调研</strong>——UCSC；<strong>看自己的比对与变异</strong>——IGV；</li>
+      <li><strong>比对出图</strong>——Jalview（可编辑分析）或 ESPript（排版更精致）；</li>
+      <li><strong>结构域批量注释</strong>——InterProScan（&gt; 100 条务必用本地版）。</li>
+    </ul>
+    <h3 class="refs-title">延伸阅读与参考文献</h3>
+    <ol class="refs">
+      <li>Robinson JT, Thorvaldsdóttir H, Winckler W, et al. Integrative genomics viewer. <em>Nature Biotechnology</em>. 2011;29(1):24–26. doi:10.1038/nbt.1754</li>
+      <li>Nassar LR, Barber GP, Benet-Pagès A, et al. The UCSC Genome Browser database: 2023 update. <em>Nucleic Acids Research</em>. 2023;51(D1):D1188–D1195. doi:10.1093/nar/gkac1072</li>
+      <li>Waterhouse AM, Procter JB, Martin DMA, Clamp M, Barton GJ. Jalview Version 2—a multiple sequence alignment editor and analysis workbench. <em>Bioinformatics</em>. 2009;25(9):1189–1191. doi:10.1093/bioinformatics/btp033</li>
+      <li>Robert X, Gouet P. Deciphering key features in protein structures with the new ENDscript server. <em>Nucleic Acids Research</em>. 2014;42(W1):W320–W324. doi:10.1093/nar/gku316</li>
+      <li>Jones P, Binns D, Chang HY, et al. InterProScan 5: genome-scale protein function classification. <em>Bioinformatics</em>. 2014;30(9):1236–1240. doi:10.1093/bioinformatics/btu031</li>
+      <li>Hu B, Jin J, Guo AY, Zhang H, Luo J, Gao G. GSDS 2.0: an upgraded gene feature visualization server. <em>Bioinformatics</em>. 2015;31(8):1296–1297. doi:10.1093/bioinformatics/btu817</li>
+      <li>Liu W, Xie Y, Ma J, et al. IBS: an illustrator for the presentation and visualization of biological sequences. <em>Bioinformatics</em>. 2015;31(20):3359–3361. doi:10.1093/bioinformatics/btv362</li>
+    </ol>
+  </section>
+  </div>
 
-        </div><!-- /slider-container -->
-    </div><!-- /app-wrapper -->
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.024</span>
+    <span>2026-08-01</span>
+  </div>
 
-    <script>
-        (function() {
-            const pages = document.querySelectorAll('.page');
-            const total = pages.length;
-            let current = 0;
-            // 简单键盘切换，无导航点
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    let next = current + 1;
-                    if (next >= total) next = 0;
-                    goTo(next);
-                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    let prev = current - 1;
-                    if (prev < 0) prev = total - 1;
-                    goTo(prev);
-                }
-            });
+</article>
 
-            // 触摸滑动
-            let startX = 0,
-                startY = 0;
-            const slider = document.getElementById('slider');
-            slider.addEventListener('touchstart', function(e) {
-                startX = e.changedTouches[0].screenX;
-                startY = e.changedTouches[0].screenY;
-            }, { passive: true });
-            slider.addEventListener('touchend', function(e) {
-                const deltaX = e.changedTouches[0].screenX - startX;
-                const deltaY = e.changedTouches[0].screenY - startY;
-                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
-                    if (deltaX < 0) {
-                        let next = current + 1;
-                        if (next >= total) next = 0;
-                        goTo(next);
-                    } else {
-                        let prev = current - 1;
-                        if (prev < 0) prev = total - 1;
-                        goTo(prev);
-                    }
-                }
-            }, { passive: true });
-
-            function goTo(index) {
-                if (index < 0) index = 0;
-                if (index >= total) index = total - 1;
-                if (index === current) return;
-                pages.forEach((p, i) => {
-                    p.classList.toggle('active', i === index);
-                });
-                current = index;
-            }
-
-            // 初始显示第一页
-            goTo(0);
-        })();
-    </script>
-
-
-<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
-<div class="sciviz-promo-no" aria-hidden="true">No.024 · 2026-08-01</div>
-<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
-padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
-border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
-letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
+<script>
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
+    });
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
+</script>
 </body>
 </html>

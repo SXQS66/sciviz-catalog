@@ -1,727 +1,296 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="sciviz-promo" content="no=27;date=2026-08-30;id=027-grafify">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>No.027 · grafify online：绘图 + 统计一体</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        :root {
-            --bg-deep: #05020c;
-            --glow-purple: #7c3aed;
-            --purple-light: #a78bfa;
-            --hot-pink: #ec4899;
-            --cyan-accent: #22d3ee;
-            --emerald: #10b981;
-            --amber: #f59e0b;
-            --slate-dark: #1e293b;
-            --glass: rgba(15, 25, 45, 0.45);
-            --glass-border: rgba(168, 139, 255, 0.25);
-        }
-        body {
-            background: radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.3), transparent 60%),
-                radial-gradient(circle at 85% 90%, rgba(14, 165, 233, 0.2), transparent 55%),
-                #05020c;
-            font-family: 'Inter', system-ui, -apple-system, 'PingFang SC', 'Segoe UI', BlinkMacSystemFont, sans-serif;
-            overflow: hidden;
-            color: #f0f2fe;
-            height: 100vh;
-            width: 100vw;
-        }
-        .slide {
-            position: absolute;
-            inset: 0;
-            padding: 2rem 1.2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transform: scale(0.96) translateY(18px);
-            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.7s ease;
-            pointer-events: none;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: thin;
-        }
-        .slide::-webkit-scrollbar { width: 4px; background: rgba(255,255,255,0.1); }
-        .slide::-webkit-scrollbar-thumb { background: #a78bfa; border-radius: 10px; }
-        .slide.active {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            pointer-events: auto;
-            z-index: 10;
-        }
-        .title-lg {
-            font-size: 3.2rem;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 0.2rem;
-            line-height: 1.2;
-        }
-        .title-md {
-            font-size: 2.4rem;
-            font-weight: 700;
-            text-align: center;
-            background: linear-gradient(120deg, #e0d6ff, #fbcfe8);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            margin-bottom: 0.4rem;
-            line-height: 1.2;
-        }
-        .sub {
-            font-size: 1.2rem;
-            color: #bac8e0;
-            text-align: center;
-            max-width: 85%;
-            margin-top: 0.2rem;
-            margin-bottom: 0.8rem;
-            line-height: 1.4;
-        }
-        .sub-sm {
-            font-size: 0.95rem;
-            color: #9aabca;
-            text-align: center;
-            max-width: 90%;
-            margin-top: 0.3rem;
-        }
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(18px);
-            border: 1px solid var(--glass-border);
-            border-radius: 28px;
-            padding: 1.2rem 1.8rem;
-            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,58,237,0.2);
-            width: 100%;
-            max-width: 1100px;
-        }
-        .glow-card {
-            background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(14,165,233,0.1));
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(168,85,247,0.65);
-            box-shadow: 0 0 32px rgba(124,58,237,0.4);
-        }
-        .glass-card-inner {
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(8px);
-            border-radius: 18px;
-            padding: 0.6rem 1rem;
-            border: 1px solid rgba(255,255,255,0.08);
-            text-align: center;
-            width: 100%;
-            margin: 0.6rem auto 0;
-        }
-        .formula-frame {
-            background: rgba(0,0,0,0.55);
-            border-radius: 40px;
-            padding: 0.6rem 1.4rem;
-            font-family: 'Courier New', 'Fira Code', monospace;
-            font-size: 1.0rem;
-            font-weight: 600;
-            text-align: center;
-            border-left: 6px solid var(--cyan-accent);
-            color: #cffafe;
-            margin: 0.4rem 0;
-        }
-        .small-formula { font-size: 0.9rem; }
-        .two-col-compare {
-            display: block;
-            width: 100%;
-            margin-top: 0.4rem 0;
-        }
-        .three-col {
-            display: block;
-            width: 100%;
-            margin: 0.4rem 0;
-        }
-        .three-col .col-card {
-            width: 90%;
-            margin: 0 auto 0.6rem;
-            flex: none;
-        }
-        .three-col .col-card:last-child { margin-bottom: 0; }
-        .col-card {
-            background: rgba(10,12,35,0.6);
-            backdrop-filter: blur(12px);
-            border-radius: 28px;
-            padding: 0.8rem 1.2rem;
-            border: 1px solid rgba(255,255,255,0.08);
-            flex: 1;
-        }
-        .col-card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 0.4rem;
-            margin-left: 0.6rem;
-            letter-spacing: -0.01em;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.4rem 0.6rem;
-        }
-        .col-card h3 .capsule {
-            display: inline-block;
-            border-radius: 20px;
-            padding: 0.1rem 0.7rem;
-            font-size: 1.1rem;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: #c4b5fd;
-            vertical-align: middle;
-            line-height: 1.4;
-        }
-        .col-card h3 .capsule.ora { background: rgba(34,211,238,0.15); border-color: rgba(34,211,238,0.3); color: #22d3ee; }
-        .col-card h3 .capsule.fcs { background: rgba(249,115,22,0.15); border-color: rgba(249,115,22,0.3); color: #fb923c; }
-        .col-card h3 .capsule.pt  { background: rgba(192,132,252,0.15); border-color: rgba(192,132,252,0.3); color: #c084fc; }
-        .feature-list {
-            list-style: none;
-            margin-left: 1rem;
-            font-size: 1.2rem;
-            line-height: 1.4;
-        }
-        .feature-list li {
-            margin: 0.3rem 0;
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-        }
-        .feature-list li::before {
-            content: "▹";
-            color: #22d3ee;
-            font-size: 0.8rem;
-            flex-shrink: 0;
-        }
-        .feature-list-sm li { font-size: 1.1rem; margin: 0.2rem 0; }
-        .feature-list-gold li::before { color: #fbbf24; }
-        .feature-list-pink li::before { color: #f472b6; }
-        .feature-list-teal li::before { color: #22d3ee; }
-        .highlight-pink { color: #f472b6; font-weight: 600; }
-        .highlight-cyan { color: #22d3ee; font-weight: 600; }
-        .highlight-purple { color: #c084fc; font-weight: 600; }
-        .highlight-gold { color: #fbbf24; font-weight: 600; }
-        .highlight-emerald { color: #34d399; font-weight: 600; }
-        .highlight-rose { color: #fb7185; font-weight: 600; }
-        .highlight-white { color: #f0f2fe; font-weight: 600; }
-        .highlight-orange { color: #fb923c; font-weight: 600; }
-        .flow-arrow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            color: #a78bfa;
-            padding: 0 0.1rem;
-        }
-        .quad-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            justify-content: center;
-            margin: 0.4rem 0;
-        }
-        .unit-badge {
-            background: rgba(20,30,55,0.7);
-            backdrop-filter: blur(12px);
-            border-radius: 32px;
-            padding: 0.4rem 1.0rem;
-            text-align: center;
-            border-top: 3px solid;
-            min-width: 80px;
-        }
-        .unit-badge span:first-child {
-            font-size: 1.25rem;
-            font-weight: 800;
-            display: block;
-        }
-        .unit-badge span:last-child {
-            font-size: 1.15rem;
-            color: #b9c7e0;
-        }
-        .badge-de { border-top-color: #22d3ee; }
-        .badge-en { border-top-color: #f97316; }
-        .badge-wg { border-top-color: #c084fc; }
-        .reveal-item {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s cubic-bezier(0.2,0.9,0.3,1.1), transform 0.5s ease;
-        }
-        .reveal-item.revealed {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .progress-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            background: transparent;
-        }
-        .timeline-bar {
-            height: 3px;
-            background: linear-gradient(90deg, #7c3aed, #0ea5e9, #f97316);
-            width: 0%;
-            transition: width 0.05s linear;
-        }
-        .slide-counter {
-            position: fixed;
-            bottom: 16px;
-            right: 20px;
-            background: rgba(0,0,0,0.65);
-            backdrop-filter: blur(12px);
-            padding: 4px 14px;
-            border-radius: 60px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #c4b5fd;
-            border: 1px solid rgba(255,255,255,0.2);
-            z-index: 55;
-            font-family: monospace;
-        }
-        .warning-box {
-            background: rgba(251,191,36,0.08);
-            border-left: 4px solid #fbbf24;
-            padding: 0.4rem 0.8rem;
-            border-radius: 8px;
-            margin-top: 0.4rem;
-            font-size: 0.9rem;
-            color: #d4d4e8;
-        }
-        .warning-box .label {
-            color: #fbbf24;
-            font-weight: 600;
-            margin-right: 0.4rem;
-        }
-        .tip-box {
-            background: rgba(34,211,238,0.08);
-            border-left: 4px solid #22d3ee;
-            padding: 0.4rem 0.8rem;
-            border-radius: 8px;
-            margin-top: 0.4rem;
-            font-size: 0.9rem;
-            color: #d4d4e8;
-        }
-        .tip-box .label {
-            color: #22d3ee;
-            font-weight: 600;
-            margin-right: 0.4rem;
-        }
-        .story-flow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-            margin: 0.6rem 0;
-        }
-        .story-flow .step {
-            background: rgba(20,30,55,0.6);
-            padding: 0.4rem 1.0rem;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 1.4rem;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        .story-flow .step.de { border-color: #22d3ee; color: #22d3ee; }
-        .story-flow .step.en { border-color: #f97316; color: #f97316; }
-        .story-flow .step.wg { border-color: #c084fc; color: #c084fc; }
-        .story-flow .arrow {
-            color: #6b7a9a;
-            font-size: 1.2rem;
-        }
-        .screenshot-container {
-            width: 100%;
-            max-width: 750px;
-            margin: 0.3rem auto;
-            border-radius: 18px;
-            overflow: hidden;
-            border: 1px solid rgba(168, 139, 255, 0.3);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-            transition: transform 0.3s ease;
-            background: #0a0c1a;
-        }
-        .screenshot-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-            vertical-align: middle;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="sciviz-promo" content="no=27;date=2026-08-30;id=027-grafify">
+<title>No.027 · grafify online：绘图 + 统计一体</title>
+<style>
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
 
-        @media (max-width: 350px) {
-            .title-lg { font-size: 2.2rem; }
-            .title-md { font-size: 1.8rem; }
-            .sub { font-size: 1.2rem; }
-            .glass-card { padding: 1rem; }
-            .two-col-compare { flex-direction: column; gap: 0.6rem; }
-            .formula-frame { font-size: 1.25rem; padding: 0.4rem; }
-            .feature-list { font-size: 0.85rem; }
-            .col-card { padding: 0.6rem; }
-            .flow-arrow { font-size: 1.0rem; padding: 0.1rem 0; }
-            .quad-grid { gap: 0.4rem; }
-            .unit-badge { padding: 0.3rem 0.6rem; min-width: 60px; }
-            .story-flow { gap: 0.4rem; }
-            .story-flow .step { font-size: 0.8rem; padding: 0.3rem 0.7rem; }
-            .screenshot-container { max-width: 100%; border-radius: 12px; }
-        }
-    </style>
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
+
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
+
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
+
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
+
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
+
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
+
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
+
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
+}
+
+
+/* ---- 外链 ---- */
+.body a{color:var(--brand);text-decoration:none;border-bottom:1px solid var(--line);word-break:break-all}
+.body a:hover{color:var(--brand2);border-bottom-color:var(--brand2)}
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
+</style>
 </head>
 <body>
+<article class="post">
 
-    <!-- ===== 幻灯片 0：封面（嵌入截图） ===== -->
-    <div class="slide active">
-        <div class="title-lg reveal-item" style="background:linear-gradient(135deg,#e0d6ff,#fbcfe8,#a78bfa);background-clip:text;-webkit-background-clip:text;color:transparent;">
-            📊 grafify online
-        </div>
-        <div class="sub reveal-item" style="margin:0.2rem 0 0.5rem;">
-            没学过R语言？也能一键出图+统计！
-        </div>
-        <div class="glass-card glow-card reveal-item" style="max-width: 950px; padding: 1rem 1.2rem;">
-            <div style="font-size:1rem; text-align:center; margin-bottom:0.3rem; color:#bac8e0; letter-spacing: 1px;">
-                📸 主页长这样 · 打开即用
-            </div>
-            <!-- 嵌入 main_page.png 截图 -->
-            <div class="screenshot-container">
-                <img src="assets/027-grafify/grafify_main_page.jpg" alt="grafify online 主页界面截图">
-            </div>
-            <div class="glass-card-inner" style="margin-top:0.6rem; border-color:rgba(168,139,255,0.2); font-size: 1.1rem;">
-                ⭐ 科研小白、医学生、生物老师的福音
-            </div>
-        </div>
-        <div class="sub-sm reveal-item" style="margin-top:0.3rem; display: none;">
-            ← → 翻页 · 空格 暂停/播放
-        </div>
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.027</span>
+      <span>2026-08-30</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
     </div>
+    <h1>grafify online：绘图 + 统计一体</h1>
+    <p class="lede">选图、跑统计检验、标显著性一次做完，适合不想写 R 的人。</p>
+    <div class="chips"><span class="chip">grafify</span><span class="chip">统计检验</span><span class="chip">绘图</span></div>
+  </header>
 
-    <!-- ===== 幻灯片 1：谁适合用？ ===== -->
-    <div class="slide">
-        <div class="title-md reveal-item" style="background:linear-gradient(120deg,#22d3ee,#67e8f9);background-clip:text;-webkit-background-clip:text;color:transparent;">
-            🙋 谁适合用？
-        </div>
-        <div class="sub reveal-item">没有编程经验，但需要完成数据分析与作图</div>
-        <div class="glass-card reveal-item" style="max-width:1100px;">
-            <div class="two-col-compare">
-                <div class="col-card reveal-item" style="border-top:4px solid #22d3ee; flex:1.2;">
-                    <h3 style="color:#22d3ee; font-size:1.4rem;">🎯 完美适配</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>🧪 <span class="highlight-cyan">生物学/医学研究生</span> – 快速出图写论文</li>
-                        <li>👩‍🏫 <span class="highlight-cyan">高校教师</span> – 教学演示，无需学生装软件</li>
-                        <li>🔬 <span class="highlight-cyan">实验室技术员</span> – 日常数据探索与汇报</li>
-                        <li>📊 <span class="highlight-cyan">科研助理</span> – 帮老板整理数据，省时省力</li>
-                        <li>🧑‍💻 <span class="highlight-cyan">转行数据分析的新手</span> – 从图形化界面理解统计逻辑</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" style="border-top:4px solid #f472b6; flex:1;">
-                    <h3 style="color:#f472b6; font-size:1.4rem;">💡 为什么适合你？</h3>
-                    <ul class="feature-list feature-list-sm feature-list-pink">
-                        <li>✅ 无需安装任何软件，浏览器打开即用</li>
-                        <li>✅ 不用记代码，点选变量就能出图</li>
-                        <li>✅ 统计结果自动生成，含<span class="highlight-pink">效应量、置信区间、多重校正</span></li>
-                        <li>✅ 图表配色<span class="highlight-pink">色盲友好</span>，可直接用于发表</li>
-                        <li>✅ 数据不上传服务器（Shinylive本地版）或会话结束后自动清除</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="glass-card-inner reveal-item" style="margin-top:0.6rem; font-size: 1.2rem;">
-                🌐 访问地址：<span class="highlight-cyan">grafifyonline.shinyapps.io/grafify/</span>
-            </div>
-        </div>
-    </div>
+  <div class="body">
+  <section>
+    <h2>grafify online：一键出图 + 统计</h2>
+    <p>grafify online 把常见的统计图（散点 + 均值线、箱线图、配对图等）和背后的统计检验打包成「选图 → 填数据 → 出图 + 统计」三步：左侧选图型，右侧填参数，不用写一行 R 代码。特别适合没有编程经验、但需要完成数据分析与作图的科研新手、医学生与生物老师。</p>
+    <figure><img src="assets/027-grafify/grafify_main_page.jpg" alt="grafify 主界面：左侧选图，右侧出参数" loading="lazy"><figcaption>grafify 主界面：左侧选图，右侧出参数</figcaption></figure>
+    <h3>谁适合用？</h3>
+    <ul><li>没有编程经验，但需要完成数据分析与作图</li></ul>
+  </section>
+  <section>
+    <h3>适用人群</h3>
+    <ul>
+      <li>生物学/医学研究生 – 快速出图写论文</li>
+      <li>高校教师 – 教学演示，无需学生装软件</li>
+      <li>实验室技术员 – 日常数据探索与汇报</li>
+      <li>科研助理 – 帮老板整理数据，省时省力</li>
+      <li>转行数据分析的新手 – 从图形化界面理解统计逻辑</li>
+    </ul>
+  </section>
+  <section>
+    <h3>为什么适合你？</h3>
+    <ul>
+      <li>无需安装任何软件，浏览器打开即用</li>
+      <li>不用记代码，点选变量就能出图</li>
+      <li>统计结果自动生成，含效应量、置信区间、多重校正</li>
+      <li>图表配色色盲友好，可直接用于发表</li>
+      <li>数据不上传服务器（Shinylive本地版）或会话结束后自动清除</li>
+    </ul>
+    <p>访问地址：<code><a href="https://grafifyonline.shinyapps.io/grafify/" target="_blank" rel="noopener">grafifyonline.shinyapps.io/grafify/</a></code></p>
+  </section>
+  <section>
+    <h3>多种图表</h3>
+    <ul>
+      <li>箱线图、小提琴图、柱状图</li>
+      <li>Before–After 连线图（配对数据）</li>
+      <li>散点图 + 趋势线</li>
+      <li>对数轴变换（log10 / log₂）</li>
+    </ul>
+  </section>
+  <section>
+    <h3>统计分析</h3>
+    <ul>
+      <li>线性模型（OLS）替代传统ANOVA</li>
+      <li>混合效应模型（随机截距）</li>
+      <li>事后两两比较 + 效应量 (Cohen's d)</li>
+      <li>FDR多重检验校正（Benjamini-Hochberg）</li>
+      <li>残差QQ图 + 密度图诊断</li>
+      <li>图表与统计联动：变换坐标轴后统计结果自动更新</li>
+    </ul>
+  </section>
+  <section>
+    <h3>隐私与部署</h3>
+    <ul>
+      <li>在线版数据仅存于当前会话</li>
+      <li>Shinylive本地版完全在浏览器运行</li>
+    </ul>
+  </section>
+  <section>
+    <h3>Step 1：准备数据</h3>
+    <ul>
+      <li>Excel 或 CSV 格式，tidy 数据（每列一个变量）</li>
+      <li>示例数据可直接加载，先体验再上传自己的</li>
+      <li>支持 .xlsx, .xls, .csv, .tsv</li>
+    </ul>
+    <p>不会整理？官网有示例数据格式可参考</p>
+  </section>
+  <section>
+    <h3>Step 2：选择变量 + 绘图</h3>
+    <ul>
+      <li>在“Graphs”标签页选择 X轴、Y轴、分组</li>
+      <li>点击“Variables chosen” → “graffy my data”</li>
+      <li>自动生成图表，可切换不同图表类型</li>
+    </ul>
+  </section>
+  <section>
+    <h3>Step 3：分析 + 导出</h3>
+    <ul>
+      <li>切换到“ANOVAs”标签，选择模型类型（简单/混合）</li>
+      <li>点击“Analyse my data” → 获得统计结果表 + 残差诊断图</li>
+      <li>图表可直接下载为 PNG/SVG/PDF，统计结果可复制</li>
+    </ul>
+  </section>
 
-    <!-- ===== 幻灯片 2：能做什么？ ===== -->
-    <div class="slide">
-        <div class="title-md reveal-item" style="background:linear-gradient(120deg,#f97316,#fb923c);background-clip:text;-webkit-background-clip:text;color:transparent;">
-            ✨ 能做什么？核心功能一览
-        </div>
-        <div class="sub reveal-item">绘图 + 统计 + 诊断，一应俱全</div>
-        <div class="glass-card reveal-item" style="max-width:1100px;">
-            <div class="three-col">
-                <div class="col-card reveal-item" style="border-top:4px solid #22d3ee;">
-                    <h3 style="color:#22d3ee; font-size:1.3rem;">📊 多种图表</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>箱线图、小提琴图、柱状图</li>
-                        <li><span class="highlight-cyan">Before–After 连线图</span>（配对数据）</li>
-                        <li>散点图 + 趋势线</li>
-                        <li><span class="highlight-cyan">对数轴变换</span>（log10/log2）</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" style="border-top:4px solid #f97316;">
-                    <h3 style="color:#f97316; font-size:1.3rem;">📈 统计分析</h3>
-                    <ul class="feature-list feature-list-sm feature-list-gold">
-                        <li><span class="highlight-orange">线性模型</span>（OLS）替代传统ANOVA</li>
-                        <li><span class="highlight-orange">混合效应模型</span>（随机截距）</li>
-                        <li>事后两两比较 + <span class="highlight-orange">效应量 (Cohen's d)</span></li>
-                        <li>FDR多重检验校正（Benjamini-Hochberg）</li>
-                        <li>残差<span class="highlight-orange">QQ图 + 密度图</span>诊断</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" style="border-top:4px solid #c084fc;">
-                    <h3 style="color:#c084fc; font-size:1.3rem;">🔒 隐私与部署</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>在线版数据<span class="highlight-purple">仅存于当前会话</span></li>
-                        <li>Shinylive本地版<span class="highlight-purple">完全在浏览器</span>运行</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="formula-frame small-formula reveal-item" style="margin-top:0.4rem; border-left-color:#f97316; font-size: 1.2rem;">
-                🧠 图表与统计联动 — 变换轴后统计自动更新
-            </div>
-        </div>
-    </div>
+  <section>
+    <h2>延伸阅读与参考文献</h2>
+    <ol class="refs">
+      <li>grafify: Easy graphs, ANOVAs and post-hoc comparisons. R package, CRAN. <code><a href="https://cran.r-project.org/package=grafify" target="_blank" rel="noopener">cran.r-project.org/package=grafify</a></code></li>
+      <li>Wickham H. <em>ggplot2: Elegant Graphics for Data Analysis</em>. 2nd ed. Springer, 2016.</li>
+      <li>Benjamini Y, Hochberg Y. Controlling the false discovery rate: a practical and powerful approach to multiple testing. <em>Journal of the Royal Statistical Society B</em>. 1995;57(1):289–300. doi:10.1111/j.2517-6161.1995.tb02031.x</li>
+    </ol>
+  </section>
+  </div>
 
-    <!-- ===== 幻灯片 3：三步上手 ===== -->
-    <div class="slide">
-        <div class="title-md reveal-item" style="background:linear-gradient(120deg,#c084fc,#a78bfa);background-clip:text;-webkit-background-clip:text;color:transparent;">
-            🚀 三步上手 · 今天就能用
-        </div>
-        <div class="sub reveal-item">真的只要三步，没有代码，没有安装</div>
-        <div class="glass-card reveal-item" style="max-width:1100px;">
-            <div class="two-col-compare">
-                <div class="col-card reveal-item" style="border-top:4px solid #34d399; flex:1.2;">
-                    <h3 style="color:#34d399; font-size:1.4rem;">📌 Step 1：准备数据</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>Excel 或 CSV 格式，<span class="highlight-emerald">tidy 数据</span>（每列一个变量）</li>
-                        <li>示例数据可直接加载，先体验再上传自己的</li>
-                        <li>支持 <span class="highlight-emerald">.xlsx, .xls, .csv, .tsv</span></li>
-                    </ul>
-                    <div style="margin-top:0.6rem; background:rgba(52,211,153,0.06); border-radius:12px; padding:0.3rem 0.8rem; border-left:3px solid #34d399;">
-                        <span style="color:#9aabca; font-size:1.05rem;">💡 不会整理？官网有示例数据格式可参考</span>
-                    </div>
-                </div>
-                <div class="col-card reveal-item" style="border-top:4px solid #fbbf24; flex:1;">
-                    <h3 style="color:#fbbf24; font-size:1.4rem;">🎯 Step 2：选择变量 + 绘图</h3>
-                    <ul class="feature-list feature-list-sm feature-list-gold">
-                        <li>在“Graphs”标签页选择 <span class="highlight-gold">X轴、Y轴、分组</span></li>
-                        <li>点击“Variables chosen” → “graffy my data”</li>
-                        <li>自动生成图表，可切换不同图表类型</li>
-                    </ul>
-                    <div style="margin-top:0.6rem; background:rgba(251,191,36,0.06); border-radius:12px; padding:0.3rem 0.8rem; border-left:3px solid #fbbf24;">
-                        <span style="color:#9aabca; font-size:1.05rem;">💡 支持 log 变换，一键切换</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-card reveal-item" style="border-top:4px solid #f472b6; width:100%; margin-top:0.6rem;">
-                <h3 style="color:#f472b6; font-size:1.4rem;">📊 Step 3：分析 + 导出</h3>
-                <ul class="feature-list feature-list-sm feature-list-pink">
-                    <li>切换到“ANOVAs”标签，选择模型类型（简单/混合）</li>
-                    <li>点击“Analyse my data” → 获得统计结果表 + 残差诊断图</li>
-                    <li>图表可<span class="highlight-pink">直接下载为 PNG/SVG/PDF</span>，统计结果可复制</li>
-                </ul>
-            </div>
-            <div class="glass-card-inner reveal-item" style="margin-top:0.6rem; font-size:1.2rem; border-color:rgba(251,191,36,0.2);">
-                🌟 就是这么简单！马上打开浏览器试试吧 
-            </div>
-        </div>
-    </div>
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.027</span>
+    <span>2026-08-30</span>
+  </div>
 
-    <!-- ===== 底部控件 ===== -->
-    <div class="progress-footer" style="display: none;">
-        <div class="timeline-bar" id="timelineBar"></div>
-    </div>
-    <div class="slide-counter" id="slideCounter">1 / 4</div>
+</article>
 
-    <script>
-        (function() {
-            const slides = document.querySelectorAll('.slide');
-            const timeline = document.getElementById('timelineBar');
-            const counterSpan = document.getElementById('slideCounter');
-            let currentIdx = 0;
-            const totalSlides = slides.length;
-            let autoPlay = true;
-
-            let currentSlideItems = [];
-            let currentDurations = [];
-            let currentItemIndex = 0;
-            let currentTotalDuration = 0;
-
-            let progressTimer = null;
-            let itemTimer = null;
-
-            function getRevealItems(slide) {
-                return Array.from(slide.querySelectorAll('.reveal-item'));
-            }
-
-            function computeSlideDurations(slide) {
-                const items = getRevealItems(slide);
-                const durations = [];
-                let total = 0;
-                for (let i = 0; i < items.length; i++) {
-                    let dur = items[i].getAttribute('data-duration');
-                    let durNum = dur ? parseInt(dur) : 2000;
-                    if (isNaN(durNum)) durNum = 2000;
-                    durations.push(durNum);
-                    total += durNum;
-                }
-                return { items, durations, total };
-            }
-
-            function resetRevealItems(slide) {
-                const items = getRevealItems(slide);
-                items.forEach(item => {
-                    item.classList.remove('revealed');
-                });
-            }
-
-            function stopAllTimers() {
-                if (progressTimer) {
-                    clearInterval(progressTimer);
-                    progressTimer = null;
-                }
-                if (itemTimer) {
-                    clearTimeout(itemTimer);
-                    itemTimer = null;
-                }
-            }
-
-            function showNextItem() {
-                if (!autoPlay) return;
-                if (currentItemIndex >= currentSlideItems.length) {
-                    if (itemTimer) clearTimeout(itemTimer);
-                    itemTimer = setTimeout(() => {
-                        if (autoPlay) {
-                            goToSlide((currentIdx + 1) % totalSlides);
-                        }
-                    }, 500);
-                    return;
-                }
-
-                const item = currentSlideItems[currentItemIndex];
-                if (item && !item.classList.contains('revealed')) {
-                    item.classList.add('revealed');
-                }
-
-                const duration = currentDurations[currentItemIndex];
-                if (itemTimer) clearTimeout(itemTimer);
-                itemTimer = setTimeout(() => {
-                    if (autoPlay) {
-                        currentItemIndex++;
-                        showNextItem();
-                    }
-                }, duration);
-            }
-
-            function startCurrentSlide() {
-                stopAllTimers();
-
-                resetRevealItems(slides[currentIdx]);
-
-                const { items, durations, total } = computeSlideDurations(slides[currentIdx]);
-                currentSlideItems = items;
-                currentDurations = durations;
-                currentTotalDuration = total;
-                currentItemIndex = 0;
-
-                if (currentTotalDuration === 0 || items.length === 0) {
-                    itemTimer = setTimeout(() => {
-                        if (autoPlay) goToSlide((currentIdx + 1) % totalSlides);
-                    }, 2000);
-                    return;
-                }
-
-                let startTime = performance.now();
-                if (progressTimer) clearInterval(progressTimer);
-                progressTimer = setInterval(() => {
-                    if (!autoPlay) return;
-                    const now = performance.now();
-                    let elapsed = now - startTime;
-                    if (elapsed > currentTotalDuration) elapsed = currentTotalDuration;
-                    const percent = (elapsed / currentTotalDuration) * 100;
-                    timeline.style.width = `${percent}%`;
-                }, 50);
-
-                showNextItem();
-            }
-
-            function stopCurrentSlide() {
-                stopAllTimers();
-            }
-
-            function goToSlide(index) {
-                if (index === currentIdx) return;
-                if (index < 0) index = 0;
-                if (index >= totalSlides) index = 0;
-
-                stopCurrentSlide();
-
-                slides[currentIdx].classList.remove('active');
-                slides[index].classList.add('active');
-                currentIdx = index;
-                updateCounter();
-
-                timeline.style.width = '0%';
-
-                if (autoPlay) {
-                    startCurrentSlide();
-                } else {
-                    resetRevealItems(slides[currentIdx]);
-                    const firstItem = slides[currentIdx].querySelector('.reveal-item');
-                    if (firstItem) firstItem.classList.add('revealed');
-                    stopAllTimers();
-                }
-            }
-
-            function nextSlide() {
-                goToSlide((currentIdx + 1) % totalSlides);
-            }
-
-            function prevSlide() {
-                goToSlide((currentIdx - 1 + totalSlides) % totalSlides);
-            }
-
-            function toggleAutoPlay() {
-                autoPlay = !autoPlay;
-                if (autoPlay) {
-                    stopCurrentSlide();
-                    startCurrentSlide();
-                } else {
-                    stopAllTimers();
-                }
-            }
-
-            function updateCounter() {
-                counterSpan.innerText = `${currentIdx+1} / ${totalSlides}`;
-            }
-
-            function onKeyDown(e) {
-                const key = e.key;
-                if (key === ' ' || key === 'Space' || key === 'Spacebar') {
-                    e.preventDefault();
-                    toggleAutoPlay();
-                } else if (key === 'ArrowLeft') {
-                    e.preventDefault();
-                    prevSlide();
-                } else if (key === 'ArrowRight') {
-                    e.preventDefault();
-                    nextSlide();
-                }
-            }
-
-            function init() {
-                slides.forEach((s, idx) => {
-                    if (idx === 0) s.classList.add('active');
-                    else s.classList.remove('active');
-                });
-                currentIdx = 0;
-                updateCounter();
-                autoPlay = true;
-                startCurrentSlide();
-                window.addEventListener('keydown', onKeyDown);
-            }
-
-            init();
-        })();
-    </script>
-
-<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
-<div class="sciviz-promo-no" aria-hidden="true">No.027 · 2026-08-30</div>
-<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
-padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
-border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
-letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
+<script>
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
+    });
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
+</script>
 </body>
 </html>

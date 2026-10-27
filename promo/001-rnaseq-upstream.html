@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="sciviz-promo" content="no=1;date=2026-10-26;id=001-rnaseq-upstream">
+<title>No.001 · RNA-seq 上游分析：从 NCBI 到 Count 矩阵</title>
+<style>
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
+
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
+
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
+
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
+
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
+
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
+
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
+
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
+
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
+}
+
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
+</style>
+</head>
+<body>
+<article class="post">
+
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.001</span>
+      <span>2026-10-26</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
+    </div>
+    <h1>RNA-seq 上游分析：从 NCBI 到 Count 矩阵</h1>
+    <p class="lede">从 SRA 下载数据到基因 Count 矩阵的完整上游流程：文件格式速查、质控、STAR 比对与 featureCounts 定量，附全套可运行命令。</p>
+    <div class="chips"><span class="chip">RNA-seq</span><span class="chip">SRA</span><span class="chip">质控</span><span class="chip">STAR</span><span class="chip">上游分析</span></div>
+  </header>
+
+  <div class="body">
+  <section>
+    <h2>全流程一览</h2>
+    <p>上游分析要回答一个问题：测序仪吐出的几十 G reads，如何变成一张「基因 × 样本」的 Count 矩阵？整条链路是固定五步，每一步的输入输出都不变：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>步骤</th><th>输入</th><th>常用工具</th><th>输出</th></tr></thead>
+        <tbody>
+          <tr><td>① 获取数据</td><td>SRA 登录号</td><td>sra-tools（prefetch + fasterq-dump）</td><td>FASTQ</td></tr>
+          <tr><td>② 质控</td><td>FASTQ</td><td>FastQC · fastp<sup>4</sup> · MultiQC<sup>5</sup></td><td>质控报告 + 清洗后 FASTQ</td></tr>
+          <tr><td>③ 比对</td><td>FASTQ + 参考基因组</td><td>STAR<sup>2</sup>（或 HISAT2）</td><td>BAM</td></tr>
+          <tr><td>④ 定量</td><td>BAM + GTF 注释</td><td>featureCounts<sup>3</sup></td><td>基因 Count 矩阵</td></tr>
+          <tr><td>⑤ 交付下游</td><td>Count 矩阵 + 样本信息表</td><td>DESeq2 / edgeR（见 No.015 / 036）</td><td>差异分析结果</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>环境准备（推荐 conda 一次装齐，并记录版本号）：</p>
+    <pre><code><span class="c"># 一次创建上游分析环境（bioconda 源）</span>
+conda create -n rnaseq -c bioconda -c conda-forge \
+  sra-tools fastqc fastp star subread samtools multiqc
+conda activate rnaseq</code></pre>
+  </section>
+
+  <section>
+    <h2>先认识文件：五分钟格式速查</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>格式</th><th>内容</th><th>典型文件</th></tr></thead>
+        <tbody>
+          <tr><td><strong>FASTA</strong></td><td>序列本身：一行以 <code>&gt;</code> 开头的描述行 + 若干行序列字母</td><td>参考基因组 <code>Genome.fa</code>、转录本 <code>cDNA.fa</code></td></tr>
+          <tr><td><strong>FASTQ</strong></td><td>序列 + <em>质量</em>：每 4 行一条 read</td><td>测序数据 <code>SRR…_1.fastq.gz</code></td></tr>
+          <tr><td><strong>SAM / BAM</strong></td><td>每条 read 比对到基因组的记录（位置、错配、比对质量）；BAM 是其压缩二进制版</td><td><code>Aligned.sortedByCoord.out.bam</code></td></tr>
+          <tr><td><strong>GTF/GFF</strong></td><td>基因结构注释：基因、转录本、外显子的坐标与属性</td><td><code>genes.gtf</code>（与基因组必须同版本）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>FASTQ 的四行结构（质量行与序列行逐字符对应）：</p>
+    <pre><code>@SRR28453127.1 1 length=101
+GATCGGAAGAGCACACGTCTGAACTCCAGTCACATCACGATCTCGTATGCCGTCTTCTGCTTG
++
+<span class="c">FFFFFFFF:FFFFFF,F:FFFFFFF,F:FFFFFF,F:FFF,FFFFF,F</span></code></pre>
+    <p>第 4 行质量字符用 Phred+33 编码：字符的 ASCII 值减 33 即质量值 Q，Q = −10·log₁₀(P)，P 为该碱基测错的概率。常见对照：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>字符</th><th>质量值</th><th>含义</th></tr></thead>
+        <tbody>
+          <tr><td><code>!</code></td><td>Q0</td><td>完全不可信（通常对应 N）</td></tr>
+          <tr><td><code>5</code></td><td>Q20</td><td>错误率 1%，勉强可用</td></tr>
+          <tr><td><code>F</code></td><td>Q37</td><td>错误率约 0.02%，良好</td></tr>
+          <tr><td><code>I</code></td><td>Q40</td><td>错误率 0.01%，优秀</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note note-warn"><p><strong>两个易错点：</strong>① FASTQ 中 <code>_1</code> / <code>_2</code>（或 R1/R2）是一对 read 的两端，顺序必须一一对应；② BAM 不能直接用 <code>cat</code>/<code>head</code> 查看，需 <code>samtools view<sup>6</sup> file.bam | head</code>，或对排序后的 BAM 建 <code>.bai</code> 索引供 IGV 查看。</p></div>
+  </section>
+
+  <section>
+    <h2>第一步：从 NCBI SRA 拿到 FASTQ</h2>
+    <p>公共测序数据存于 SRA（Sequence Read Archive）<sup>1</sup>。检索入口：<code><a href="https://www.ncbi.nlm.nih.gov/sra" target="_blank" rel="noopener">SRA 数据库</a></code>——用疾病名/基因名检索，或从文献 Data availability 段落直接复制登录号。SRA 的编号是分层金字塔：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>层级</th><th>前缀示例</th><th>含义</th></tr></thead>
+        <tbody>
+          <tr><td>BioProject</td><td><code>PRJNA123456</code></td><td>整个研究项目（最顶层）</td></tr>
+          <tr><td>Study</td><td><code>SRP123456</code></td><td>一次测序研究</td></tr>
+          <tr><td>Sample</td><td><code>SRS1234567</code></td><td>一个样本（对应一组分组信息）</td></tr>
+          <tr><td>Experiment</td><td><code>SRX1234567</code></td><td>一个上机实验（文库 + 上机方案）</td></tr>
+          <tr><td><strong>Run</strong></td><td><code>SRR1234567</code></td><td><strong>一次实际下机的数据，下载的基本单位</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>在 Run Selector（页面顶部 <code>Send to → Run Selector</code>）里可以按 SRS 逐行勾选，勾选后导出 <code>SRR_Acc_List.txt</code>（每行一个 SRR 号）。下载用 <a href="https://github.com/ncbi/sra-tools" target="_blank" rel="noopener">sra-tools</a> 的两段式：先 <code>prefetch</code> 拉 SRA 原始文件，再 <code>fasterq-dump</code> 拆成 FASTQ：</p>
+    <pre><code><span class="c"># 单个 Run 下载并拆分</span>
+mkdir -p sra fastq
+prefetch SRR28453127 -O sra/
+fasterq-dump SRR28453127 -e 6 -O fastq/
+gzip fastq/SRR28453127_1.fastq fastq/SRR28453127_2.fastq
+
+<span class="c"># 批量下载：用 Run Selector 导出的 SRR 列表</span>
+cat SRR_Acc_List.txt | while read srr; do
+  prefetch "$srr" -O sra/
+  fasterq-dump "$srr" -e 6 -O fastq/
+  gzip fastq/${"srr"}_1.fastq fastq/${"srr"}_2.fastq
+done</code></pre>
+    <div class="note note-tip"><p><strong>命名即记录：</strong>双端数据拆出 <code>_1</code>/<code>_2</code> 两个文件（R1/R2）。把样本名与 SRR 号的对应关系存成一张 <code>samplesheet</code> 表（样本名、SRR、分组、批次），下游差异分析还要用。</p></div>
+  </section>
+
+  <section>
+    <h2>第二步：质控——先看清数据再动手</h2>
+    <p>质控分「看」与「洗」两步：FastQC 逐文件诊断，fastp 清洗并出报告，MultiQC 汇总所有样本。</p>
+    <pre><code><span class="c"># FastQC：对原始 FASTQ 逐文件出报告</span>
+mkdir -p qc/raw
+fastqc -t 8 -o qc/raw fastq/*.fastq.gz
+
+<span class="c"># fastp：去接头 + 掐低质量尾部 + 丢弃过短 reads</span>
+mkdir -p clean
+fastp \
+  -i fastq/SRR28453127_1.fastq.gz -I fastq/SRR28453127_2.fastq.gz \
+  -o clean/SRR28453127_1.fq.gz  -O clean/SRR28453127_2.fq.gz \
+  --detect_adapter_for_pe --qualified_quality_phred 20 \
+  --length_required 36 --thread 8 \
+  --json qc/SRR28453127.fastp.json --html qc/SRR28453127.fastp.html</code></pre>
+    <p>FastQC 报告重点看四项：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>指标</th><th>健康标准</th><th>异常时的处理</th></tr></thead>
+        <tbody>
+          <tr><td>Per base sequence quality</td><td>尾部中位 Q ≥ 30</td><td>靠 fastp 的质量修剪补救</td></tr>
+          <tr><td>Adapter Content</td><td>&lt; 5%</td><td>fastp 自动去接头</td></tr>
+          <tr><td>Duplication Levels</td><td>适度即可（RNA-seq 天然偏高）</td><td>显著偏高提示 PCR 过度扩增或起始量过低</td></tr>
+          <tr><td>Overrepresented sequences</td><td>少量</td><td>大批量单一序列提示污染（rRNA 等）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <pre><code><span class="c"># MultiQC：把 FastQC、fastp、STAR、featureCounts 的报告汇成一份总表</span>
+multiqc qc/ clean/ star/ counts/ -o qc/multiqc</code></pre>
+    <div class="note note-tip"><p><strong>清洗要克制：</strong>现代数据的接头和低质量尾部通常很少，激进修剪反而丢数据。STAR 会软切比对不上的部分，所以质控的主要目标是<em>去接头</em>，而非把数据洗得越短越好。清洗后重跑 FastQC 确认改善。</p></div>
+  </section>
+
+  <section>
+    <h2>第三步：比对——STAR 建索引与比对</h2>
+    <p>参考基因组与注释建议从 <code><a href="https://www.gencodegenes.org" target="_blank" rel="noopener">GENCODE</a></code> 或 Ensembl 下载，<strong>FASTA 与 GTF 必须取自同一注释版本</strong>（版本不一致是比对率偏低与注释错位的常见原因）。STAR<sup>2</sup>建一次索引，之后所有样本共用；人类/小鼠基因组建索引约需 30 GB 内存：</p>
+    <pre><code><span class="c"># 建索引：sjdbOverhang = read 长度 − 1（101bp 读长取 100）</span>
+STAR --runMode genomeGenerate --runThreadN 12 \
+  --genomeDir star_index \
+  --genomeFastaFiles Genome.fa \
+  --sjdbGTFfile gencode.vM36.annotation.gtf \
+  --sjdbOverhang 100
+
+<span class="c"># 逐样本比对：输出按坐标排序的 BAM，并同时按基因计数</span>
+mkdir -p star
+STAR --runThreadN 12 --genomeDir star_index \
+  --readFilesIn clean/SRR28453127_1.fq.gz clean/SRR28453127_2.fq.gz \
+  --readFilesCommand zcat \
+  --outSAMtype BAM SortedByCoordinate \
+  --quantMode GeneCounts \
+  --outFileNamePrefix star/SRR28453127.
+
+<span class="c"># 给 BAM 建索引（供 IGV 查看与下游工具使用）</span>
+samtools index star/SRR28453127.Aligned.sortedByCoord.out.bam</code></pre>
+    <p>比对完成后先看 <code>star/SRR28453127.Log.final.out</code>，三个数字决定这批数据能不能往下走：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>指标</th><th>健康参考值</th><th>偏低时先排查</th></tr></thead>
+        <tbody>
+          <tr><td>Uniquely mapped reads %</td><td>≥ 70%（细胞系/组织通常 75–90%）</td><td>参考基因组物种/版本是否用错</td></tr>
+          <tr><td>% of reads mapped to multiple loci</td><td>个位数</td><td>rRNA 污染或注释版本过旧</td></tr>
+          <tr><td>Average mapped length</td><td>接近原始读长</td><td>插入片段过短或数据被过度修剪</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note note-warn"><p><strong>同一项目内参数必须统一：</strong>所有样本用同一版本的工具、同一索引、同一参数跑完。混用比对结果会给下游引入批次假象。</p></div>
+  </section>
+
+  <section>
+    <h2>关键一步：链特异性别搞错</h2>
+    <p>建库试剂盒决定 reads 与基因方向的关系（链特异性），定量参数若与之不符，会<strong>静默丢掉约一半 reads</strong>。先确定链型，再全局统一：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>文库类型</th><th>常见试剂盒</th><th>featureCounts <code>-s</code></th><th>STAR ReadsPerGene 列</th></tr></thead>
+        <tbody>
+          <tr><td>非链特异性</td><td>普通 poly-A 建库</td><td><code>0</code></td><td>第 2 列</td></tr>
+          <tr><td>正向（forward）</td><td>部分 ligation 法</td><td><code>1</code></td><td>第 3 列</td></tr>
+          <tr><td><strong>反向（reverse）</strong></td><td><strong>dUTP / TruSeq Stranded（最常见）</strong></td><td><code>2</code></td><td>第 4 列</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note note-tip"><p><strong>拿不准怎么办：</strong>打开 <code>star/SRR28453127.ReadsPerGene.out.tab</code>——第 2 列是非链特异性计数，第 3/4 列是两种方向计数。谁的数值明显更大，就说明数据是哪种链型：第 4 列大 → 反向（<code>-s 2</code>）。也可以用 RSeQC 的 <code>infer_experiment.py</code> 自动判断。</p></div>
+  </section>
+
+  <section>
+    <h2>第四步：featureCounts 定量</h2>
+    <p>featureCounts<sup>3</sup>（<a href="https://subread.sourceforge.net" target="_blank" rel="noopener">subread</a> 套件）把 BAM 里的 reads 分配到 GTF 注释的外显子上，按 <code>gene_id</code> 汇总；一次传入所有样本的 BAM，直接得到合并矩阵：</p>
+    <pre><code><span class="c"># -p 双端模式；--countReadPairs 按 read pair 计数（subread ≥ 2.0）</span>
+mkdir -p counts
+featureCounts -T 8 -p --countReadPairs \
+  -t exon -g gene_id \
+  -a gencode.vM36.annotation.gtf \
+  -s 2 \
+  -o counts/featureCounts.txt \
+  star/*.Aligned.sortedByCoord.out.bam</code></pre>
+    <p>输出的 <code>counts/featureCounts.txt</code> 前几行是注释信息，<code>Geneid</code> 列之后每列一个样本——这就是交给差异分析（DESeq2 / edgeR）的<strong>原始 Count 矩阵</strong>。三个硬性要求：</p>
+    <ul>
+      <li>差异分析必须用<em>原始整数 Count</em>，不要喂 TPM/FPKM（参见 No.015）；</li>
+      <li>列的顺序与样本对应关系要记录在样本信息表里；</li>
+      <li>富集分析前记得把 ENSEMBL ID 转成 ENTREZID（参见 No.020 / 036）。</li>
+    </ul>
+    <div class="note note-tip"><p><strong>STAR 自带计数 vs featureCounts：</strong>加 <code>--quantMode GeneCounts</code> 后 STAR 会顺带输出 <code>ReadsPerGene.out.tab</code>，可以直接用；但 featureCounts 支持多外显子 read 的精细分配规则与并行多样本合并，是论文方法学里更常见的写法。两者二选一即可，不要混用。</p></div>
+  </section>
+
+  <section>
+    <h2>交付下游：一张清单</h2>
+    <ul>
+      <li><strong>Count 矩阵</strong>：<code>counts/featureCounts.txt</code>（基因 × 样本，整数）；</li>
+      <li><strong>样本信息表</strong>：样本名、SRR 号、分组、批次——差异分析 design 公式的依据；</li>
+      <li><strong>QC 存档</strong>：<code>qc/multiqc_report.html</code> + 各样本 <code>Log.final.out</code> 的比对率表；</li>
+      <li><strong>版本记录</strong>：sra-tools / STAR / subread 版本号，基因组与注释版本（如 Gencode vM36）——方法学部分直接照抄；</li>
+      <li><strong>下一步</strong>：ID 统一（No.020）→ 差异分析（DESeq2）→ 可视化与富集（No.034 / 036）。</li>
+    </ul>
+    <div class="note note-warn">
+      <p><strong>可复现性提醒：</strong>「能跑出矩阵」只是底线。把每一步的版本号、参数和样本表存进分析目录，下一次换电脑或换人重跑时得到同样的结果，才算合格的上游分析。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>延伸阅读与参考文献</h2>
+    <ol class="refs">
+      <li>Leinonen R, Sugawara H, Shumway M; International Nucleotide Sequence Database Collaboration. The Sequence Read Archive. <em>Nucleic Acids Research</em>. 2011;39(Database issue):D19–D21. doi:10.1093/nar/gkq1019</li>
+      <li>Dobin A, Davis CA, Schlesinger F, et al. STAR: ultrafast universal RNA-seq aligner. <em>Bioinformatics</em>. 2013;29(1):15–21. doi:10.1093/bioinformatics/bts635</li>
+      <li>Liao Y, Smyth GK, Shi W. featureCounts: an efficient general purpose program for assigning sequence reads to genomic features. <em>Bioinformatics</em>. 2014;30(7):923–930. doi:10.1093/bioinformatics/btt656</li>
+      <li>Chen S, Zhou Y, Chen Y, Gu J. fastp: an ultra-fast all-in-one FASTQ preprocessor. <em>Bioinformatics</em>. 2018;34(17):i884–i890. doi:10.1093/bioinformatics/bty560</li>
+      <li>Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in one report. <em>Bioinformatics</em>. 2016;32(19):3047–3048. doi:10.1093/bioinformatics/btw354</li>
+      <li>Li H, Handsaker B, Wysoker A, et al. The Sequence Alignment/Map format and SAMtools. <em>Bioinformatics</em>. 2009;25(16):2078–2079. doi:10.1093/bioinformatics/btp352</li>
+    </ol>
+  </section>
+  </div>
+
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.001</span>
+    <span>2026-10-26</span>
+  </div>
+
+</article>
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
+<script>
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
+    });
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
+</script>
+</body>
+</html>

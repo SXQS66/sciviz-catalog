@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="sciviz-promo" content="no=3;date=2025-12-19;id=003-deseq2-de">
+<title>No.003 · DESeq2 差异表达：从 Count 到结果表</title>
+<style>
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
+
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
+
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
+
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
+
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
+
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
+
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
+
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
+
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
+}
+
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
+</style>
+</head>
+<body>
+<article class="post">
+
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.003</span>
+      <span>2025-12-19</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
+    </div>
+    <h1>DESeq2 差异表达：从 Count 到结果表</h1>
+    <p class="lede">承接 No.001 的 Count 矩阵：design 公式、预过滤、结果列逐项解读、LFC 收缩与多组比较，全套可运行代码。</p>
+    <div class="chips"><span class="chip">DESeq2</span><span class="chip">差异分析</span><span class="chip">R</span><span class="chip">RNA-seq</span></div>
+  </header>
+
+  <div class="body">
+  <section>
+    <h2>从 Count 矩阵到差异表：全流程一览</h2>
+    <p>上游产出 Count 矩阵后，差异分析只差四步：建对象 → 建模 → 提取结果 → 校正幅度。DESeq2<sup>1</sup>基于负二项分布对原始 Count 直接建模，内置样本内离散度估计与 BH 多重校正，是 bulk RNA-seq 差异分析的事实标准。本文承接 No.001 的输出，把每一步代码与参数含义讲透。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>步骤</th><th>函数</th><th>作用</th></tr></thead>
+        <tbody>
+          <tr><td>① 建对象</td><td><code>DESeqDataSetFromMatrix()</code></td><td>绑定 Count 矩阵、样本信息表与 design 公式</td></tr>
+          <tr><td>② 建模</td><td><code>DESeq()</code></td><td>估计尺寸因子、离散度，拟合并检验</td></tr>
+          <tr><td>③ 提结果</td><td><code>results()</code></td><td>按 contrast 提取差异表</td></tr>
+          <tr><td>④ 校幅度</td><td><code>lfcShrink()</code></td><td>收缩低表达基因的夸张 log₂FC，便于排序展示</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>准备输入：Count 矩阵与样本信息表</h2>
+    <p>featureCounts 输出的矩阵前 6 列是注释信息，需要剥掉；样本信息表（coldata）的行名必须与 Count 矩阵列名<em>一一对应</em>——这是 DESeq2 最常见的报错来源：</p>
+    <pre><code><span class="k">library</span>(DESeq2)
+
+<span class="c">## ① 读入 featureCounts 矩阵：剥掉前 6 列注释，清理 BAM 文件名后缀</span>
+fc  &lt;- read.delim(<span class="s">"counts/featureCounts.txt"</span>, check.names = <span class="k">FALSE</span>)
+mat &lt;- as.matrix(fc[, 7:ncol(fc)])
+rownames(mat) &lt;- fc$Geneid
+colnames(mat) &lt;- gsub(<span class="s">"\\.Aligned.*$"</span>, <span class="s">""</span>, colnames(mat))
+
+<span class="c">## ② 样本信息表：每行一个样本，行名 = 矩阵列名</span>
+coldata &lt;- read.csv(<span class="s">"samplesheet.csv"</span>, row.names = 1)
+coldata$condition &lt;- relevel(factor(coldata$condition), ref = <span class="s">"normal"</span>)
+
+<span class="c">## ③ 建对象：所有样本必须同处理、同版本注释（No.001 的要求）</span>
+dds &lt;- DESeqDataSetFromMatrix(countData = mat,
+                              colData   = coldata,
+                              design    = ~ batch + condition)</code></pre>
+    <div class="note note-warn"><p><strong>design 公式在建模前就要定好</strong>，它决定模型检验什么。常见写法：无批次因素 <code>~ condition</code>；有批次因素 <code>~ batch + condition</code>（感兴趣的变量放最后）；配对设计 <code>~ patient + condition</code>。批次问题详见 No.006。</p></div>
+  </section>
+
+  <section>
+    <h2>预过滤：不是所有基因都值得检验</h2>
+    <p>几万个基因同时检验会稀释多重校正的预算——低表达基因贡献的几乎全是噪声。标准做法是先剔除「几乎所有样本里都数不到几个 reads」的基因：</p>
+    <pre><code><span class="c">## 至少 3 个样本中 count ≥ 10 才保留</span>
+keep &lt;- rowSums(counts(dds) &gt;= 10) &gt;= 3
+dds  &lt;- dds[keep, ]
+nrow(dds)   <span class="c"># 记录过滤前后基因数，写进方法学</span></code></pre>
+    <p>过滤标准不是铁律（有的流程用 CPM ≥ 1），但要在同一项目的所有分析中保持一致，并如实报告。</p>
+  </section>
+
+  <section>
+    <h2>三步主流程与结果列解读</h2>
+    <pre><code>dds &lt;- DESeq(dds)                          <span class="c"># 尺寸因子 → 离散度 → 拟合检验</span>
+res &lt;- results(dds, contrast = c(<span class="s">"condition"</span>, <span class="s">"tumor"</span>, <span class="s">"normal"</span>))
+res &lt;- res[order(res$padj), ]              <span class="c"># 按 FDR 从小到大排序</span>
+summary(res)                               <span class="c"># 一屏总览：上调/下调数量、过滤比例</span></code></pre>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>列</th><th>含义</th><th>注意</th></tr></thead>
+        <tbody>
+          <tr><td>baseMean</td><td>标准化后平均表达量</td><td>低 baseMean 基因的 FC 不可信</td></tr>
+          <tr><td>log2FoldChange</td><td>组间倍数变化（log₂）</td><td>低表达基因常被夸大 → 用 lfcShrink 收缩</td></tr>
+          <tr><td>stat</td><td>Wald 检验统计量</td><td>GSEA 排序就用它（No.005）</td></tr>
+          <tr><td>pvalue</td><td>原始 p 值</td><td>未做多重校正，直接用会大量假阳性</td></tr>
+          <tr><td>padj</td><td>BH 校正后 FDR</td><td><strong>筛选以此为准</strong>（参见 No.022）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>低表达基因的 log₂FC 方差天然巨大——同样 4 倍变化，baseMean=10 的基因远不如 baseMean=2000 的可信。<code>lfcShrink</code> 配合 apeglm<sup>2</sup>把这些夸张幅度拉回合理区间，让火山图与排序更稳健：</p>
+    <pre><code>resultsNames(dds)   <span class="c"># 查看 coef 名称，如 "condition_tumor_vs_normal"</span>
+resShrink &lt;- lfcShrink(dds, coef = <span class="s">"condition_tumor_vs_normal"</span>,
+                       type = <span class="s">"apeglm"</span>)</code></pre>
+    <figure><img src="assets/003-deseq2-de/ma_shrink.png" alt="MA 式对比：原始 log₂FC（灰）与 apeglm 收缩后（红）——低表达区被明显拉平（模拟数据 · DESeq2 真实流程输出）" loading="lazy"><figcaption>MA 式对比：原始 log₂FC（灰）与 apeglm 收缩后（红）——低表达区被明显拉平（模拟数据 · DESeq2 真实流程输出）</figcaption></figure>
+
+  </section>
+
+  <section>
+    <h2>多组比较与似然比检验</h2>
+    <p>三组以上（如 normal / early / late）逐对做 contrast 即可，无需重新建模；想知道「三组之间有没有任何差异」则用似然比检验（LRT），比较完整模型与删去分组项的简化模型：</p>
+    <pre><code><span class="c">## 任意两组：换 contrast 即可，dds 不用重跑</span>
+res_e_n &lt;- results(dds, contrast = c(<span class="s">"stage"</span>, <span class="s">"early"</span>, <span class="s">"normal"</span>))
+res_l_e &lt;- results(dds, contrast = c(<span class="s">"stage"</span>, <span class="s">"late"</span>,  <span class="s">"early"</span>))
+
+<span class="c">## LRT：是否有「任何」组间差异（适合后续聚类/亚型分析）</span>
+dds_lrt &lt;- DESeq(dds, test = <span class="s">"LRT"</span>, reduced = ~ batch)
+res_lrt &lt;- results(dds_lrt)</code></pre>
+    <p>最后导出结果表，交给可视化的富集分析：</p>
+    <pre><code>write.csv(as.data.frame(resShrink), <span class="s">"DE_tumor_vs_normal.csv"</span>)</code></pre>
+    <div class="note note-tip">
+      <p><strong>解读三原则：</strong>① 筛选以 <code>padj</code> 为准，<code>|log₂FC| &gt; 1</code> 只是常用的幅度参考，阈值该由研究问题定；② 不显著 ≠ 无差异，可能只是功效不够（样本量、离散度）；③ DESeq2 / edgeR<sup>3</sup> / limma-voom<sup>4</sup>结果高度一致<sup>5</sup>，但<em>不要在同一项目里混用</em>。指标含义的更多陷阱见 No.022。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>延伸阅读与参考文献</h2>
+    <ol class="refs">
+      <li>Love MI, Huber W, Anders S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. <em>Genome Biology</em>. 2014;15:550. doi:10.1186/s13059-014-0550-8</li>
+      <li>Zhu A, Ibrahim JG, Love MI. Heavy-tailed prior distributions for sequence count data: removing the noise and preserving large fold changes. <em>Bioinformatics</em>. 2019;35(12):2084–2092. doi:10.1093/bioinformatics/bty895</li>
+      <li>Robinson MD, McCarthy DJ, Smyth GK. edgeR: a Bioconductor package for differential expression analysis of digital gene expression data. <em>Genome Biology</em>. 2010;11:R25. doi:10.1186/gb-2010-11-3-r25</li>
+      <li>Law CW, Chen Y, Shi W, Smyth GK. voom: precision weights unlock linear model analysis tools for RNA-seq read counts. <em>Nucleic Acids Research</em>. 2014;42(7):e47. doi:10.1093/nar/gkv007</li>
+      <li>Soneson C, Love MI, Robinson MD. Differential analyses for RNA-seq: transcript-level estimates, gene-level counts and robust methods are equally accurate. <em>F1000Research</em>. 2015;4:1521. doi:10.12688/f1000research.7563.2</li>
+    </ol>
+  </section>
+  </div>
+
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.003</span>
+    <span>2025-12-19</span>
+  </div>
+
+</article>
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
+<script>
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
+    });
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
+</script>
+</body>
+</html>

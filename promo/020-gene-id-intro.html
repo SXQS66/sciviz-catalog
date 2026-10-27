@@ -1,1097 +1,327 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="sciviz-promo" content="no=20;date=2026-07-11;id=020-gene-id-intro">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>No.020 · 基因 ID，你真的分清了吗</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="sciviz-promo" content="no=20;date=2026-07-11;id=020-gene-id-intro">
+<title>No.020 · 基因 ID，你真的分清了吗</title>
+<style>
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
 
-        :root {
-            --bg-deep: #05020c;
-            --glow-purple: #7c3aed;
-            --purple-light: #a78bfa;
-            --hot-pink: #ec4899;
-            --cyan-accent: #22d3ee;
-            --emerald: #10b981;
-            --amber: #f59e0b;
-            --slate-dark: #1e293b;
-            --glass: rgba(15, 25, 45, 0.45);
-            --glass-border: rgba(168, 139, 255, 0.25);
-        }
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
 
-        body {
-            background: radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.3), transparent 60%),
-                radial-gradient(circle at 85% 90%, rgba(34, 211, 238, 0.2), transparent 55%),
-                #05020c;
-            font-family: 'Inter', system-ui, -apple-system, 'PingFang SC', 'Segoe UI', BlinkMacSystemFont, sans-serif;
-            overflow: hidden;
-            color: #f0f2fe;
-            height: 100vh;
-            width: 100vw;
-        }
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
 
-        .slide {
-            position: absolute;
-            inset: 0;
-            padding: 2rem 1.2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transform: scale(0.96) translateY(18px);
-            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.7s ease;
-            pointer-events: none;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: thin;
-        }
-        .slide::-webkit-scrollbar {
-            width: 4px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        .slide::-webkit-scrollbar-thumb {
-            background: #a78bfa;
-            border-radius: 10px;
-        }
-        .slide.active {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            pointer-events: auto;
-            z-index: 10;
-        }
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
 
-        .title-lg {
-            font-size: 3.6rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #FFFFFF, #c4b5fd, #a78bfa);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-align: center;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.2rem;
-            line-height: 1.2;
-        }
-        .title-md {
-            font-size: 2.6rem;
-            font-weight: 700;
-            text-align: center;
-            background: linear-gradient(120deg, #e0d6ff, #fbcfe8);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            margin-bottom: 0.4rem;
-            line-height: 1.2;
-        }
-        .sub {
-            font-size: 1.3rem;
-            color: #bac8e0;
-            text-align: center;
-            max-width: 85%;
-            margin-top: 0.2rem;
-            margin-bottom: 0.8rem;
-            line-height: 1.4;
-        }
-        .sub-sm {
-            font-size: 1.0rem;
-            color: #9aabca;
-            text-align: center;
-            max-width: 90%;
-            margin-top: 0.3rem;
-        }
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
 
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(18px);
-            border: 1px solid var(--glass-border);
-            border-radius: 28px;
-            padding: 1.2rem 1.8rem;
-            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(124, 58, 237, 0.2);
-            width: 100%;
-            max-width: 1100px;
-        }
-        .glow-card {
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(236, 72, 153, 0.1));
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(168, 85, 247, 0.65);
-            box-shadow: 0 0 32px rgba(124, 58, 237, 0.4);
-        }
-        .glass-card-inner {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(8px);
-            border-radius: 18px;
-            padding: 0.6rem 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            text-align: center;
-            width: 100%;
-            margin: 0.6rem auto 0;
-        }
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
 
-        .formula-frame {
-            background: rgba(0, 0, 0, 0.55);
-            border-radius: 40px;
-            padding: 0.6rem 1.4rem;
-            font-family: 'Courier New', 'Fira Code', monospace;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-align: center;
-            border-left: 6px solid var(--cyan-accent);
-            color: #cffafe;
-            margin: 0.4rem 0;
-        }
-        .small-formula {
-            font-size: 0.95rem;
-        }
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
 
-        .two-col-compare {
-            display: flex;
-            gap: 1.2rem;
-            width: 100%;
-            margin-top: 0.4rem;
-        }
-        .three-col {
-            display: block;
-            width: 100%;
-            margin: 0.4rem 0;
-        }
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
 
-        .three-col .col-card {
-            width: 90%;
-            margin: 0 auto 0.6rem;
-            flex: none;
-        }
-        .three-col .col-card:last-child {
-            margin-bottom: 0;
-        }
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
 
-        .col-card {
-            background: rgba(10, 12, 35, 0.6);
-            backdrop-filter: blur(12px);
-            border-radius: 28px;
-            padding: 0.8rem 1.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
 
-        .col-card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.4rem;
-            margin-left: 0.6rem;
-            letter-spacing: -0.01em;
-        }
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
+}
 
-        .feature-list {
-            list-style: none;
-            margin-left: 1rem;
-            font-size: 0.92rem;
-            line-height: 1.3;
-        }
-        .feature-list li {
-            margin: 0.3rem 0;
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-        }
-        .feature-list li::before {
-            content: "▹";
-            color: #22d3ee;
-            font-size: 0.8rem;
-            flex-shrink: 0;
-        }
-        .feature-list-sm li {
-            font-size: 0.85rem;
-            margin: 0.2rem 0;
-        }
-
-        .highlight-pink {
-            color: #f472b6;
-            font-weight: 600;
-        }
-        .highlight-cyan {
-            color: #22d3ee;
-            font-weight: 600;
-        }
-        .highlight-purple {
-            color: #c084fc;
-            font-weight: 600;
-        }
-        .highlight-gold {
-            color: #fbbf24;
-            font-weight: 600;
-        }
-        .highlight-emerald {
-            color: #34d399;
-            font-weight: 600;
-        }
-        .highlight-rose {
-            color: #fb7185;
-            font-weight: 600;
-        }
-        .highlight-white {
-            color: #f0f2fe;
-            font-weight: 600;
-        }
-
-        .flow-arrow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            color: #a78bfa;
-            padding: 0 0.1rem;
-        }
-
-        .quad-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            justify-content: center;
-            margin: 0.4rem 0;
-        }
-        .unit-badge {
-            background: rgba(20, 30, 55, 0.7);
-            backdrop-filter: blur(12px);
-            border-radius: 32px;
-            padding: 0.4rem 1.0rem;
-            text-align: center;
-            border-top: 3px solid;
-            min-width: 80px;
-        }
-        .unit-badge span:first-child {
-            font-size: 0.95rem;
-            font-weight: 800;
-            display: block;
-        }
-        .unit-badge span:last-child {
-            font-size: 0.85rem;
-            color: #b9c7e0;
-        }
-        .badge-symbol {
-            border-top-color: #22d3ee;
-        }
-        .badge-ensembl {
-            border-top-color: #c084fc;
-        }
-        .badge-entrez {
-            border-top-color: #f472b6;
-        }
-        .badge-probe {
-            border-top-color: #f59e0b;
-        }
-
-        .reveal-item {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.5s ease;
-        }
-        .reveal-item.revealed {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .progress-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            background: transparent;
-        }
-        .timeline-bar {
-            height: 3px;
-            background: linear-gradient(90deg, #7c3aed, #22d3ee, #ec4899);
-            width: 0%;
-            transition: width 0.05s linear;
-        }
-        .slide-counter {
-            position: fixed;
-            bottom: 16px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(12px);
-            padding: 4px 14px;
-            border-radius: 60px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #c4b5fd;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            z-index: 55;
-            font-family: monospace;
-        }
-        .control-hint {
-            position: fixed;
-            bottom: 16px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            padding: 4px 12px;
-            border-radius: 32px;
-            font-size: 0.7rem;
-            color: #b9c7e0;
-            z-index: 55;
-            display: none;
-        }
-
-        @keyframes softFloat {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-5px);
-            }
-            100% {
-                transform: translateY(0px);
-            }
-        }
-        .float-icon {
-            animation: softFloat 2.5s ease-in-out infinite;
-            display: inline-block;
-        }
-
-        .id-code {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 12px;
-            padding: 0.2rem 0.8rem;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            color: #cffafe;
-            display: inline-block;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .id-example-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            justify-content: center;
-            margin: 0.3rem 0;
-        }
-        .id-example-item {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 16px;
-            padding: 0.3rem 0.9rem;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .warning-box {
-            background: rgba(245, 158, 11, 0.12);
-            border-left: 4px solid #f59e0b;
-            border-radius: 12px;
-            padding: 0.4rem 0.8rem;
-            margin: 0.3rem 0;
-            font-size: 0.85rem;
-        }
-        .warning-box .label {
-            color: #fbbf24;
-            font-weight: 600;
-        }
-
-        .tip-box {
-            background: rgba(34, 211, 238, 0.08);
-            border-left: 4px solid #22d3ee;
-            border-radius: 12px;
-            padding: 0.4rem 0.8rem;
-            margin: 0.3rem 0;
-            font-size: 0.85rem;
-        }
-        .tip-box .label {
-            color: #22d3ee;
-            font-weight: 600;
-        }
-
-        .species-note {
-            background: rgba(124, 58, 237, 0.15);
-            border-radius: 10px;
-            padding: 0.2rem 0.8rem;
-            font-size: 0.8rem;
-            color: #c4b5fd;
-            display: inline-block;
-            border: 1px solid rgba(168, 139, 255, 0.2);
-        }
-
-        @media (max-width: 850px) {
-            .title-lg {
-                font-size: 2.2rem;
-            }
-            .title-md {
-                font-size: 1.8rem;
-            }
-            .sub {
-                font-size: 1.1rem;
-            }
-            .glass-card {
-                padding: 1rem;
-            }
-            .two-col-compare {
-                flex-direction: column;
-                gap: 0.6rem;
-            }
-            .formula-frame {
-                font-size: 0.9rem;
-                padding: 0.4rem;
-            }
-            .feature-list {
-                font-size: 0.85rem;
-            }
-            .col-card {
-                padding: 0.6rem;
-            }
-            .flow-arrow {
-                font-size: 1.0rem;
-                padding: 0.1rem 0;
-            }
-            .quad-grid {
-                gap: 0.4rem;
-            }
-            .unit-badge {
-                padding: 0.3rem 0.6rem;
-                min-width: 60px;
-            }
-            .unit-badge span:first-child {
-                font-size: 0.95rem;
-            }
-            .unit-badge span:last-child {
-                font-size: 0.85rem;
-            }
-            .id-example-item {
-                font-size: 0.75rem;
-                padding: 0.2rem 0.6rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .title-lg {
-                font-size: 1.8rem;
-            }
-            .title-md {
-                font-size: 1.3rem;
-            }
-            .sub {
-                font-size: 0.95rem;
-            }
-            .slide {
-                padding: 1rem 0.6rem;
-            }
-            .glass-card {
-                padding: 0.6rem;
-                border-radius: 18px;
-            }
-            .feature-list {
-                font-size: 0.78rem;
-            }
-            .formula-frame {
-                font-size: 0.75rem;
-                padding: 0.3rem 0.6rem;
-            }
-            .id-example-item {
-                font-size: 0.7rem;
-                padding: 0.15rem 0.5rem;
-            }
-        }
-    </style>
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
+</style>
 </head>
 <body>
+<article class="post">
 
-    <!-- ========== 幻灯片 0：首页 · 疑问风格 ========== -->
-    <div class="slide active">
-        <div class="title-lg reveal-item" data-duration="800">🧬 这些ID，你真的分清了吗？</div>
-        <div class="sub reveal-item" data-duration="1200" style="margin-bottom: 0.2rem;">
-            打开表达矩阵，第一列那些奇奇怪怪的 ID …… <br>你确定都认识？
-        </div>
-        <div class="glass-card glow-card reveal-item" data-duration="1400" style="margin-top: 0.2rem; max-width: 1100px;">
-            <div style="font-size: 1.2rem; font-weight: 600; text-align: center; margin-bottom: 1.0rem; line-height: 1.6;">
-                <span style="color: #f0f2fe;">❓</span>
-                <span style="color: #fbbf24;">TP53</span>
-                <span style="color: #9aabca;"> · </span>
-                <span style="color: #22d3ee;">ENSG00000141510</span>
-                <span style="color: #9aabca;"> · </span>
-                <span style="color: #f472b6;">7157</span>
-                <span style="color: #9aabca;"> · </span>
-                <span style="color: #c084fc;">204016_at</span>
-                <br>
-                <span style="font-size: 0.95rem; color: #9aabca;">
-                    都是基因吗？为什么有的像名字，有的像编号？
-                </span>
-            </div>
-            <div class="three-col" style="margin-top: 0.2rem;">
-                <div class="col-card reveal-item" data-duration="2500" style="border-top: 4px solid #f59e0b;">
-                    <h3 style="color:#f59e0b;">🔬 问题1</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>差异分析能跑，一到富集分析就报错？</li>
-                        <li>同一个基因出现好几行，该信哪个？</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #22d3ee;">
-                    <h3 style="color:#22d3ee;">🧩 问题2</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>ENSEMBL 转 SYMBOL 后，基因数突然少了一大截？</li>
-                        <li>代码没报错，但结果就是不对劲？</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #f472b6;">
-                    <h3 style="color:#f472b6;">🎯 问题3</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>跨队列验证时，关键基因怎么也找不到？</li>
-                        <li>多组学整合，ID 对不上怎么办？</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="formula-frame small-formula reveal-item" data-duration="3000" style="margin-top: 0.6rem; font-size: 0.95rem;">
-                📌 很多分析出问题，不一定是方法选错了，而是<span style="color:#fbbf24;">第一步的基因 ID 没弄清楚</span>
-            </div>
-        </div>
-        <div class="sub-sm reveal-item" data-duration="2500" style="margin-top: 0.8rem;">
-            SYMBOL · ENSEMBL · ENTREZID · Probe —— 一次讲清楚
-        </div>
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.020</span>
+      <span>2026-07-11</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
     </div>
+    <h1>基因 ID，你真的分清了吗</h1>
+    <p class="lede">Ensembl / Entrez / Symbol / RefSeq 互转时的坑：版本号、别名、大小写。</p>
+    <div class="chips"><span class="chip">基因ID</span><span class="chip">Ensembl</span><span class="chip">Entrez</span><span class="chip">ID转换</span></div>
+  </header>
 
-    <!-- ========== 幻灯片 1：总览 · 四种ID ========== -->
-    <div class="slide">
-        <div class="title-md reveal-item" data-duration="1200">四种 ID 类型 · 一目了然</div>
-        <div class="sub reveal-item" data-duration="1200">它们都和基因有关，但 <span class="highlight-gold">不是一回事</span></div>
-        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
-            <div class="quad-grid" style="gap: 1rem;">
-                <div class="unit-badge badge-symbol reveal-item" data-duration="2000" style="min-width: 120px; width: 200px;">
-                    <span style="color:#22d3ee;">🧬 SYMBOL</span>
-                    <span style="font-size:0.75rem; color:#b9c7e0;">官方基因名</span>
-                    <span style="font-size:0.7rem; color:#9aabca; font-family:monospace;">TP53</span>
-                </div>
-                <div class="unit-badge badge-ensembl reveal-item" data-duration="2500" style="min-width: 120px; width: 200px;">
-                    <span style="color:#c084fc;">📦 ENSEMBL</span>
-                    <span style="font-size:0.75rem; color:#b9c7e0;">数据库编号</span>
-                    <span style="font-size:0.7rem; color:#9aabca; font-family:monospace;">ENSG00000141510</span>
-                </div>
-                <div class="unit-badge badge-entrez reveal-item" data-duration="3000" style="min-width: 120px; width: 200px;">
-                    <span style="color:#f472b6;">🔢 ENTREZID</span>
-                    <span style="font-size:0.75rem; color:#b9c7e0;">NCBI 数字ID</span>
-                    <span style="font-size:0.7rem; color:#9aabca; font-family:monospace;">7157</span>
-                </div>
-                <div class="unit-badge badge-probe reveal-item" data-duration="3500" style="min-width: 120px; width: 200px;">
-                    <span style="color:#f59e0b;">🔬 Probe</span>
-                    <span style="font-size:0.75rem; color:#b9c7e0;">芯片探针编号</span>
-                    <span style="font-size:0.7rem; color:#9aabca; font-family:monospace;">204016_at</span>
-                </div>
-            </div>
-            <div class="two-col-compare" style="margin-top: 0.8rem;">
-                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #34d399; flex:1;">
-                    <h3 style="color:#34d399;">📋 补充 ID</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li><span class="highlight-emerald">RefSeq</span> · 参考序列 (NM_001126112)</li>
-                        <li><span class="highlight-emerald">HGNC</span> · 人类基因命名官方</li>
-                        <li><span class="highlight-emerald">MGI</span> · 小鼠基因命名官方</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="4500" style="border-top: 4px solid #fbbf24; flex:1;">
-                    <h3 style="color:#fbbf24;">⚡ 核心原则</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>每一行代表 <span class="highlight-gold">一个唯一基因</span></li>
-                        <li>不同分析步骤可用 <span class="highlight-gold">不同 ID</span></li>
-                        <li>转换后 <span class="highlight-gold">必须检查</span> 丢失和重复</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="glass-card-inner reveal-item" data-duration="3000" style="margin-top: 0.4rem;">
-                🔑 选对 ID · 少走弯路
-            </div>
-        </div>
+  <div class="body">  <section>
+    <h2>TP53、ENSG00000141510、204016_at——是同一个基因吗？</h2>
+    <p>是。打开表达矩阵，第一列那些奇奇怪怪的 ID 常让人犯嘀咕：为什么有的像名字，有的像编号？它们来自不同命名体系——官方基因符号<sup>1</sup>、Ensembl ID<sup>2</sup>、Entrez 数字 ID、芯片探针——对应不同数据库与适用场景。下面这些翻车现场，多半不是方法选错了，而是第一步的基因 ID 没弄清楚：</p>
+    <ul>
+      <li>差异分析能跑，一到富集分析就报错？</li>
+      <li>ENSEMBL 转 SYMBOL 后，基因数突然少了一大截？</li>
+      <li>同一个基因在矩阵里出现好几行，该信哪个？</li>
+      <li>跨队列验证时，关键基因怎么也找不到？</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>四种核心 ID 一览</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>类型</th><th>来源</th><th>TP53 示例</th><th>特点</th><th>最佳用途</th></tr></thead>
+        <tbody>
+          <tr><td><strong>SYMBOL</strong></td><td>HGNC 官方基因名</td><td><code>TP53</code></td><td>直观易读，但有别名与改名问题</td><td>结果展示：热图、火山图、图表标注</td></tr>
+          <tr><td><strong>ENSEMBL</strong></td><td>Ensembl 数据库</td><td><code>ENSG00000141510</code></td><td>稳定、唯一，带物种前缀</td><td>RNA-seq 定量矩阵的主键</td></tr>
+          <tr><td><strong>ENTREZID</strong></td><td>NCBI Entrez Gene</td><td><code>7157</code></td><td>纯数字、跨物种唯一，但不直观</td><td>GO / KEGG / GSEA 富集分析</td></tr>
+          <tr><td><strong>Probe</strong></td><td>芯片平台（Affymetrix 等）</td><td><code>204016_at</code></td><td>检测工具编号，不等于基因本身</td><td>GEO 芯片数据，需先注释再合并</td></tr>
+        </tbody>
+      </table>
     </div>
+    <p>补充身份体系：RefSeq 参考序列（<code>NM_001126112</code>）锚定转录本；HGNC 与 MGI 分别是人类和小鼠命名的官方权威。核心原则一句话：<em>让分析矩阵的每一行代表一个唯一基因</em>。</p>
+  </section>
 
-    <!-- ========== 幻灯片 2：SYMBOL ========== -->
-    <div class="slide">
-        <div class="title-md reveal-item" data-duration="1200">🧬 SYMBOL · 基因名</div>
-        <div class="sub reveal-item" data-duration="1200">最直观，最常用，但也最容易出问题</div>
-        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
-            <div class="two-col-compare">
-                <div class="col-card reveal-item" data-duration="2500" style="border-top: 4px solid #22d3ee; flex:1;">
-                    <h3 style="color:#22d3ee;">✅ 优点</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li><span class="highlight-cyan">直观易读</span> · 适合结果展示</li>
-                        <li><span class="highlight-cyan">高频示例</span> · TP53, EGFR, VEGFA, GAPDH</li>
-                        <li>画热图、火山图、箱线图 <span class="highlight-cyan">首选</span></li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #f472b6; flex:1;">
-                    <h3 style="color:#f472b6;">⚠️ 陷阱</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>基因会 <span class="highlight-pink">改名</span>（旧名 vs 新名）</li>
-                        <li>存在 <span class="highlight-pink">别名</span> 和同义词</li>
-                        <li>多个不同 ID 可能转成 <span class="highlight-pink">同一个</span> SYMBOL</li>
-                        <li>非编码 RNA 注释版本 <span class="highlight-pink">不一致</span></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="two-col-compare" style="margin-top: 0.4rem;">
-                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #fbbf24; flex:1;">
-                    <h3 style="color:#fbbf24;">📌 典型例子</h3>
-                    <div class="id-example-grid">
-                        <span class="id-example-item" style="color:#22d3ee;">TP53</span>
-                        <span class="id-example-item" style="color:#22d3ee;">EGFR</span>
-                        <span class="id-example-item" style="color:#22d3ee;">VEGFA</span>
-                        <span class="id-example-item" style="color:#22d3ee;">GAPDH</span>
-                        <span class="id-example-item" style="color:#22d3ee;">ACTB</span>
-                    </div>
-                    <div style="margin-top: 0.2rem; font-size:0.8rem; color:#9aabca; text-align:center;">
-                        ⚠️ 同一个 SYMBOL 出现多行 → 必须处理重复
-                    </div>
-                </div>
-                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #34d399; flex:1;">
-                    <h3 style="color:#34d399;">🎯 使用场景</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li><span class="highlight-emerald">结果展示</span> · 文章、图表</li>
-                        <li><span class="highlight-emerald">机器学习</span> · 特征命名</li>
-                        <li><span class="highlight-emerald">多队列验证</span> · 需注意旧名和缺失</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top: 0.3rem;">
-                🔑 SYMBOL 适合 <span class="highlight-cyan">展示</span>，但分析时要注意 <span class="highlight-pink">重复</span> 和 <span class="highlight-pink">改名</span>
-            </div>
-        </div>
+  <section>
+    <h2>SYMBOL：给人看的名字</h2>
+    <p>TP53、EGFR、VEGFA、GAPDH、ACTB——画热图、火山图、写文章都靠它。但直观是有代价的：</p>
+    <ul>
+      <li>基因会改名（旧名 vs 新名），跨队列验证时旧文献里的名字可能已经失效；</li>
+      <li>存在别名和同义词，同一个基因可能被写成几种样子；</li>
+      <li>多个不同 ID 可能转成同一个 SYMBOL——矩阵里出现重复行；</li>
+      <li>非编码 RNA 的注释在各版本间不一致。</li>
+    </ul>
+    <div class="note note-warn"><p><strong>结论：</strong>SYMBOL 适合「展示」，不适合当分析的主键。展示前务必处理重复行，跨队列整合时先统一命名版本。</p></div>
+  </section>
+
+  <section>
+    <h2>ENSEMBL：给机器用的稳定主键</h2>
+    <p>RNA-seq 原始定量结果（featureCounts / Salmon）、TCGA / GEO 的多组学矩阵、GTF 注释文件——这些「机器友好」的数据源几乎都以 ENSEMBL 为主键。ID 前缀自带物种信息：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>物种</th><th>基因 ID 前缀</th><th>示例（TP53 / Trp53）</th></tr></thead>
+        <tbody>
+          <tr><td>人类</td><td><code>ENSG</code></td><td><code>ENSG00000141510</code></td></tr>
+          <tr><td>小鼠</td><td><code>ENSMUSG</code></td><td><code>ENSMUSG00000059552</code></td></tr>
+        </tbody>
+      </table>
     </div>
+    <p>标准处理流程：RNA-seq 原始矩阵以 ENSEMBL 做所有分析 → 展示时转 SYMBOL → 富集时转 ENTREZID。注意两点：新版 Ensembl ID 带<em>版本号后缀</em>（<code>.15</code> 这类），转换前先去掉；植物等其他物种前缀不同，需查阅对应数据库。</p>
+    <div class="note note-warn"><p><strong>关键提醒：</strong>ENSEMBL → SYMBOL 并非 100% 成功。转换后务必统计丢失比例，并检查多对一（多个 ENSEMBL 映射到同一个 SYMBOL）的情况。</p></div>
+  </section>
 
-    <!-- ========== 幻灯片 3：ENSEMBL ========== -->
-    <div class="slide">
-        <div class="title-md reveal-item" data-duration="1200">📦 ENSEMBL · 数据库编号</div>
-        <div class="sub reveal-item" data-duration="1200">RNA-seq 数据中最常见的稳定 ID，注意物种前缀</div>
-        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
-            <div class="two-col-compare">
-                <div class="col-card reveal-item" data-duration="2500" style="border-top: 4px solid #c084fc; flex:1;">
-                    <h3 style="color:#c084fc;">📌 来源与例子</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li><span class="highlight-purple">来源</span> · Ensembl 数据库</li>
-                        <li><span class="highlight-purple">人类前缀</span> · <span class="id-code">ENSG00000141510</span> (TP53)</li>
-                        <li><span class="highlight-purple">小鼠前缀</span> · <span class="id-code">ENSMUSG00000059552</span> (Trp53)</li>
-                        <li><span class="highlight-purple">特点</span> · 稳定、唯一、适合定量</li>
-                    </ul>
-                    <div style="margin-top:0.5rem; margin-left: 0.5rem;">
-                        <span class="species-note">🌱 植物/其他物种前缀不同，需查阅 对应数据库</span>
-                    </div>
-                </div>
-            </div>
-            <div class="two-col-compare" style="margin-top: 0.4rem;">
-                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #22d3ee; flex:1;">
-                    <h3 style="color:#22d3ee;">🎯 使用场景</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li><span class="highlight-cyan">RNA-seq</span> · 原始定量结果（如 featureCounts）</li>
-                        <li><span class="highlight-cyan">TCGA / GEO</span> · 多组学数据</li>
-                        <li><span class="highlight-cyan">GTF 注释</span> · 基因结构文件</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #f472b6; flex:1;">
-                    <h3 style="color:#f472b6;">📋 标准处理流程</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>RNA-seq 原始矩阵 → <span class="highlight-pink">ENSEMBL</span></li>
-                        <li>展示时转 <span class="highlight-pink">SYMBOL</span></li>
-                        <li>富集时转 <span class="highlight-pink">ENTREZID</span></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="tip-box reveal-item" data-duration="3000" style="margin-top: 0.5rem;">
-                <span class="label">💡 关键注意</span> ENSEMBL 转 SYMBOL 并非 100% 成功，转换后务必统计丢失比例，并检查是否存在多对一（多个 ENSEMBL 对应同一个 SYMBOL）的情况。
-            </div>
-            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top: 0.3rem;">
-                ENSEMBL → 根据物种选择正确的注释包 → SYMBOL / ENTREZID
-            </div>
-        </div>
+  <section>
+    <h2>ENTREZID：富集分析的通用钥匙</h2>
+    <p>NCBI 的全局数字编号（人类 TP53 = <code>7157</code>，EGFR = <code>1956</code>）。GO、KEGG、GSEA 等 富集工具<sup>3</sup>都认它，但它必须配合<em>正确物种的注释包</em>使用。高频错误一览：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>常见错误</th><th>后果</th><th>纠正</th></tr></thead>
+        <tbody>
+          <tr><td>输入 SYMBOL 但函数参数写 <code>keyType = "ENTREZID"</code></td><td>全匹配失败，富集结果为空</td><td>先 <code>bitr()</code> 转换，再按实际类型设 keyType</td></tr>
+          <tr><td>输入 ENSEMBL 未设置 <code>keyType</code></td><td>按默认类型匹配，命中寥寥</td><td>显式声明 <code>keyType = "ENSEMBL"</code></td></tr>
+          <tr><td>人类基因用了小鼠注释包（org.Mm.eg.db）</td><td>匹配错乱，结果看似正常实则全错</td><td>物种与 org 包一一核对（人 = org.Hs.eg.db）</td></tr>
+        </tbody>
+      </table>
     </div>
+    <div class="note note-tip"><p><strong>操作前三问：</strong>① 我的输入基因是什么 ID 类型？② 目标函数要求什么类型？③ 我加载的物种注释包对不对？三个问题没弄清，富集结果为空或错误是常有的事。</p></div>
+  </section>
 
-    <!-- ========== 幻灯片 4：ENTREZID ========== -->
-    <div class="slide">
-        <div class="title-md reveal-item" data-duration="1200">ENTREZID · 数字 ID</div>
-        <div class="sub reveal-item" data-duration="1200">NCBI 的全局数字编号，富集分析的“通用钥匙”</div>
-        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
-            <div class="two-col-compare">
-                <div class="col-card reveal-item" data-duration="2500" style="border-top: 4px solid #f472b6; flex:1;">
-                    <h3 style="color:#f472b6;">📌 来源与例子</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li><span class="highlight-pink">来源：</span>NCBI Entrez Gene 数据库</li>
-                        <li><span class="highlight-pink">人类示例：</span><span class="id-code">7157</span>(TP53)，<span class="id-code">1956</span>(EGFR)</li>
-                        <li><span class="highlight-pink">特点：</span>纯数字，跨物种唯一，但不直观</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #fbbf24; flex:1;">
-                    <h3 style="color:#fbbf24;">🎯 核心用途</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li><span class="highlight-gold">GO 富集：</span>基因本体论分析</li>
-                        <li><span class="highlight-gold">KEGG 富集：</span>信号通路分析</li>
-                        <li><span class="highlight-gold">GSEA：</span>基因集富集分析</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="two-col-compare" style="margin-top: 0.4rem;">
-                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #34d399; flex:1;">
-                    <h3 style="color:#34d399;">⚠️ 常见错误</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>输入 <span class="highlight-emerald">SYMBOL</span> 但富集函数参数指定为 ENTREZID</li>
-                        <li>输入 <span class="highlight-emerald">ENSEMBL</span> 但未设置正确的 keyType</li>
-                        <li>人类基因错误使用 <span class="highlight-emerald">小鼠</span> 注释数据库，非模式物种硬套人类数据库</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="4000" style="border-top: 4px solid #c084fc; flex:1;">
-                    <h3 style="color:#c084fc;">📋 操作前检查清单</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>我的输入基因当前是什么 <span class="highlight-purple">ID 类型</span>？</li>
-                        <li>这个函数/包要求输入什么 <span class="highlight-purple">ID 类型</span>？</li>
-                        <li>我加载的物种注释包 <span class="highlight-purple">对不对</span>，如 org.Hs.eg.db？</li>
-                    </ul>
-                    <div style="margin-top:0.3rem; background:rgba(0,0,0,0.3); border-radius:10px; padding:0.3rem 0.6rem; font-size:0.8rem; color:#9aabca;">
-                        ⚡ 这三个问题没弄清，富集结果为空或错误是常有的事
-                    </div>
-                </div>
-            </div>
-            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top: 0.3rem;">
-                🔑 ENTREZID 是富集分析的 <span class="highlight-pink">通用钥匙</span>，但必须配合 <span class="highlight-gold">正确的物种注释包</span>
-            </div>
-        </div>
+  <section>
+    <h2>Probe：芯片数据的「探针」不是基因</h2>
+    <p>GEO 上的芯片数据用探针编号（如 Affymetrix 的 <code>204016_at</code>）。探针是检测工具，不等同于基因：一个基因可能对应多个探针，不同探针的信号值还可能不一致。标准做法是先获取芯片平台对应的 GPL 注释文件，把 Probe ID 映射为 SYMBOL / ENTREZID，再按需合并重复基因：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>合并策略</th><th>做法</th><th>适用</th></tr></thead>
+        <tbody>
+          <tr><td>取平均</td><td>同一基因多探针表达值取均值</td><td>最常用、最稳妥的默认选择</td></tr>
+          <tr><td>取最大 / 中位数</td><td>取最高或居中的探针值</td><td>关注最大表达信号时使用</td></tr>
+          <tr><td>取方差最大</td><td>保留变异最大的代表探针</td><td>差异分析，保留区分度</td></tr>
+          <tr><td>取注释最可靠</td><td>按注释质量挑选代表探针</td><td>注释质量参差的旧平台</td></tr>
+        </tbody>
+      </table>
     </div>
+    <pre><code>Probe → GPL 平台注释 → SYMBOL / ENTREZID → 合并重复 → 后续分析</code></pre>
+  </section>
 
-    <!-- ========== 幻灯片 5：Probe（芯片探针）按常用度排最后 ========== -->
-    <div class="slide">
-        <div class="title-md reveal-item" data-duration="1200">Probe · 芯片探针</div>
-        <div class="sub reveal-item" data-duration="1200">本身不是基因，是芯片上用来检测表达的探针编号</div>
-        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
-            <div class="three-col">
-                <div class="col-card reveal-item" data-duration="2500" style="border-top: 4px solid #f59e0b;">
-                    <h3 style="color:#f59e0b;">📌 来源与例子</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li><span class="highlight-gold">常见于</span> · GEO 等数据库中的芯片数据</li>
-                        <li><span class="highlight-gold">例子</span> · <span class="id-code">204016_at</span> (Affymetrix)</li>
-                        <li><span class="highlight-gold">本质</span> · 探针是检测工具，不等同于基因本身</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #22d3ee;">
-                    <h3 style="color:#22d3ee;">⚠️ 关键问题</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>一个基因可能对应 <span class="highlight-cyan">多个探针</span></li>
-                        <li>不同探针的信号值可能 <span class="highlight-cyan">不一致</span></li>
-                        <li>必须通过 <span class="highlight-cyan">注释文件</span> 将探针映射到基因</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #c084fc;">
-                    <h3 style="color:#c084fc;">📊 重复探针合并方式</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>取 <span class="highlight-purple">平均值</span>（最常用）</li>
-                        <li>取 <span class="highlight-purple">最大值</span> 或 <span class="highlight-purple">中位数</span></li>
-                        <li>取 <span class="highlight-purple">方差最大</span> 的代表探针</li>
-                        <li>取 <span class="highlight-purple">注释最可靠</span> 的探针</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="tip-box reveal-item" data-duration="3000" style="margin-top: 0.5rem;">
-                <span class="label">💡 标准做法</span> 先获取芯片平台对应的 GPL 注释文件，将 Probe ID 映射为 SYMBOL 或 ENTREZID，然后按需合并重复基因。
-            </div>
-            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top: 0.3rem;">
-                🔑 Probe → 平台注释 → SYMBOL / ENTREZID → 合并重复 → 后续分析
-            </div>
-        </div>
+  <section>
+    <h2>转换后必查的四个数字</h2>
+    <pre><code>N     = 输入 ID 总数
+M     = 成功匹配数          匹配率 = M / N
+N − M = 未匹配 ID（版本差异 / 无注释 / 物种用错）
+U     = 去重后唯一基因数     重复度 = M − U</code></pre>
+    <p>基因数量减少的常见原因：部分 ID 无法匹配（数据库版本或注释来源不同）、多个源 ID 映射到同一个 SYMBOL、探针没有对应基因注释、旧基因名未更新或物种数据库用错。记录这四个数字，排查问题时一目了然。</p>
+    <div class="note note-warn"><p><strong>重要提醒：</strong>代码能够运行结束，并不代表 ID 转换是正确的。富集分析返回空结果或只剩极少数基因，通常不是生物学上真的没有富集，而是 ID 类型或物种不匹配。</p></div>
+  </section>
+
+  <section>
+    <h2>常见场景的处理逻辑</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>数据场景</th><th>推荐链路</th></tr></thead>
+        <tbody>
+          <tr><td>芯片数据（GEO）</td><td>Probe → 平台注释（GPL）→ SYMBOL → 合并重复</td></tr>
+          <tr><td>RNA-seq 数据</td><td>ENSEMBL（去版本号）→ 展示转 SYMBOL / 富集转 ENTREZID</td></tr>
+          <tr><td>富集分析</td><td>ENTREZID + 对应物种的 org 包</td></tr>
+          <tr><td>非模式物种</td><td>无现成 org 包 → 构建自定义 TERM2GENE 映射表</td></tr>
+        </tbody>
+      </table>
     </div>
-
-    <!-- ========== 幻灯片 6：ID 转换的共性问题 ========== -->
-    <div class="slide">
-        <div class="title-md reveal-item" data-duration="1200">ID 转换 · 共性问题与检查</div>
-        <div class="sub reveal-item" data-duration="1200">为什么转换后基因变少？代码没报错就是对的吗？</div>
-        <div class="glass-card reveal-item" data-duration="500" style="max-width: 1100px;">
-            <div class="two-col-compare">
-                <div class="col-card reveal-item" data-duration="2500" style="border-top: 4px solid #f472b6; flex:1;">
-                    <h3 style="color:#f472b6;">📉 基因数量减少的常见原因</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>部分 ID <span class="highlight-pink">无法匹配</span> · 数据库版本或注释来源不同</li>
-                        <li>多个源 ID 映射到 <span class="highlight-pink">同一个 SYMBOL</span>（重复）</li>
-                        <li>Probe 没有对应的 <span class="highlight-pink">基因注释</span></li>
-                        <li>旧基因名未更新，或物种数据库 <span class="highlight-pink">用错</span></li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #22d3ee; flex:1;">
-                    <h3 style="color:#22d3ee;">✅ 转换后必须检查的指标</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>原始 ID 总数 = <span class="highlight-cyan">N</span></li>
-                        <li>成功匹配的 ID 数 = <span class="highlight-cyan">M</span></li>
-                        <li>未匹配的 ID 数 = <span class="highlight-cyan">N - M</span></li>
-                        <li>去重后的唯一基因数 = <span class="highlight-cyan">U</span></li>
-                    </ul>
-                    <div style="margin-top:0.3rem; background:rgba(0,0,0,0.3); border-radius:10px; padding:0.3rem 0.6rem; font-size:0.8rem; color:#cffafe;">
-                        📊 记录这四个数字，排查问题时一目了然
-                    </div>
-                </div>
-            </div>
-            <div class="warning-box reveal-item" data-duration="3500" style="margin-top: 0.5rem;">
-                <span class="label">🚨 重要提醒</span> 代码能够运行结束，并不代表 ID 转换是正确的。富集分析返回空结果或极少数基因，通常不是生物学上真的没有富集，而是 ID 类型或物种不匹配。
-            </div>
-            <div class="glass-card-inner reveal-item" data-duration="2500" style="margin-top: 0.3rem;">
-                🔑 转换前明确三要素：<span class="highlight-gold">当前ID类型</span> · <span class="highlight-gold">目标ID类型</span> · <span class="highlight-gold">物种</span>
-            </div>
-        </div>
+    <div class="note note-tip">
+      <p><strong>核心原则：</strong>① 每次转换后检查匹配率与重复情况；② 不同分析步骤可灵活使用不同 ID；③ 跨队列整合时，ID 统一是首要前提。可靠的转录组分析 = 高质量数据 + 正确工具 + 清晰的 ID。</p>
+      <p>动手分析前，先问自己：表达矩阵的第一列，到底是什么 ID？</p>
     </div>
+  </section>
 
-    <!-- ========== 幻灯片 7：总结 ========== -->
-    <div class="slide">
-        <div class="title-md reveal-item" data-duration="1200">📌 总结 · 选对 ID，少走弯路</div>
-        <div class="sub reveal-item" data-duration="1200">SYMBOL · ENSEMBL · ENTREZID · Probe <br>—— 各司其职</div>
-        <div class="glass-card glow-card reveal-item" data-duration="1500" style="max-width: 1100px;">
-            <div class="quad-grid" style="gap: 1rem; margin-bottom: 0.6rem;">
-                <div class="unit-badge badge-symbol" style="min-width: 150px;">
-                    <span style="color:#22d3ee;">🧬 SYMBOL</span>
-                    <span style="font-size:0.7rem; color:#b9c7e0;">展示用，需处理重复</span>
-                </div>
-                <div class="unit-badge badge-ensembl" style="min-width: 150px;">
-                    <span style="color:#c084fc;">📦 ENSEMBL</span>
-                    <span style="font-size:0.7rem; color:#b9c7e0;">RNA-seq 稳定 ID，去版本号</span>
-                </div>
-                <div class="unit-badge badge-entrez" style="min-width: 150px;">
-                    <span style="color:#f472b6;">🔢 ENTREZID</span>
-                    <span style="font-size:0.7rem; color:#b9c7e0;">富集分析通用钥匙</span>
-                </div>
-                <div class="unit-badge badge-probe" style="min-width: 150px;">
-                    <span style="color:#f59e0b;">🔬 Probe</span>
-                    <span style="font-size:0.7rem; color:#b9c7e0;">芯片探针，先注释再合并</span>
-                </div>
-            </div>
-            <div class="three-col" style="margin-top: 0.2rem;">
-                <div class="col-card reveal-item" data-duration="3000" style="border-top: 4px solid #22d3ee;">
-                    <h3 style="color:#22d3ee;">✅ 核心原则</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>确保分析矩阵中 <span class="highlight-cyan">每一行</span> 代表一个唯一基因</li>
-                        <li>不同分析步骤可以灵活使用 <span class="highlight-cyan">不同的 ID 类型</span></li>
-                        <li>每次 ID 转换后 <span class="highlight-cyan">必须检查</span> 匹配率与重复情况</li>
-                        <li>跨队列整合时，<span class="highlight-cyan">ID 统一</span> 是首要前提</li>
-                    </ul>
-                </div>
-                <div class="col-card reveal-item" data-duration="3500" style="border-top: 4px solid #fbbf24;">
-                    <h3 style="color:#fbbf24;">🧠 常见场景的处理逻辑</h3>
-                    <ul class="feature-list feature-list-sm">
-                        <li>芯片数据：<span class="highlight-gold">Probe → 平台注释 → SYMBOL → 合并</span></li>
-                        <li>RNA-seq 数据：<span class="highlight-gold">ENSEMBL（去版本）→ 转换</span></li>
-                        <li>富集分析首选：<span class="highlight-gold">ENTREZID</span> + 对应物种的 org 包</li>
-                        <li>非模式物种：构建 <span class="highlight-gold">自定义 TERM2GENE</span></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="formula-frame small-formula reveal-item" data-duration="2500" style="margin-top: 0.5rem; font-size: 0.9rem;">
-                🔬 可靠的转录组分析 = 高质量数据 + 正确工具 + <span style="color:#fbbf24;">清晰的ID</span>
-            </div>
-            <div class="glass-card-inner reveal-item" data-duration="2000" style="margin-top: 0.3rem; background:rgba(124,58,237,0.15); border-color:rgba(168,139,255,0.3);">
-                💡 动手分析前，先问自己：表达矩阵的第一列，到底是什么 ID？
-            </div>
-        </div>
-    </div>
+  <section>
+    <h2>延伸阅读与参考文献</h2>
+    <ol class="refs">
+      <li>Bruford EA, Braschi B, Denny P, et al. Guidelines for human gene nomenclature. <em>Nature Genetics</em>. 2020;52(8):754–758. doi:10.1038/s41588-020-0669-3</li>
+      <li>Cunningham F, Allen JE, Allen J, et al. Ensembl 2022. <em>Nucleic Acids Research</em>. 2022;50(D1):D988–D995. doi:10.1093/nar/gkab1049</li>
+      <li>Yu G, Wang LG, Han Y, He QY. clusterProfiler: an R package for comparing biological themes among gene clusters. <em>OMICS</em>. 2012;16(5):284–287. doi:10.1089/omi.2011.0118</li>
+    </ol>
+  </section>
+  </div>
 
-    <!-- ========== 底部控件 ========== -->
-    <div class="progress-footer">
-        <div class="timeline-bar" id="timelineBar" style="display: none;"></div>
-    </div>
-    <div class="slide-counter" id="slideCounter">1 / 8</div>
-    <div class="control-hint" style="display: none;">␣ 暂停/播放 &nbsp;|&nbsp; ◀ ▶ 切换</div>
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.020</span>
+    <span>2026-07-11</span>
+  </div>
 
-    <script>
-        (function() {
-            const slides = document.querySelectorAll('.slide');
-            const timeline = document.getElementById('timelineBar');
-            const counterSpan = document.getElementById('slideCounter');
-            let currentIdx = 0;
-            const totalSlides = slides.length;
-            let autoPlay = true;
+</article>
 
-            let currentSlideItems = [];
-            let currentDurations = [];
-            let currentItemIndex = 0;
-            let currentTotalDuration = 0;
-            let currentElapsed = 0;
-
-            let progressTimer = null;
-            let itemTimer = null;
-
-            function getRevealItems(slide) {
-                return Array.from(slide.querySelectorAll('.reveal-item'));
-            }
-
-            function computeSlideDurations(slide) {
-                const items = getRevealItems(slide);
-                const durations = [];
-                let total = 0;
-                for (let i = 0; i < items.length; i++) {
-                    let dur = items[i].getAttribute('data-duration');
-                    let durNum = dur ? parseInt(dur) : 2000;
-                    if (isNaN(durNum)) durNum = 2000;
-                    durations.push(durNum);
-                    total += durNum;
-                }
-                return { items, durations, total };
-            }
-
-            function resetRevealItems(slide) {
-                const items = getRevealItems(slide);
-                items.forEach(item => {
-                    item.classList.remove('revealed');
-                });
-            }
-
-            function stopAllTimers() {
-                if (progressTimer) {
-                    clearInterval(progressTimer);
-                    progressTimer = null;
-                }
-                if (itemTimer) {
-                    clearTimeout(itemTimer);
-                    itemTimer = null;
-                }
-            }
-
-            function showNextItem() {
-                if (!autoPlay) return;
-                if (currentItemIndex >= currentSlideItems.length) {
-                    if (itemTimer) clearTimeout(itemTimer);
-                    itemTimer = setTimeout(() => {
-                        if (autoPlay) {
-                            goToSlide((currentIdx + 1) % totalSlides);
-                        }
-                    }, 500);
-                    return;
-                }
-
-                const item = currentSlideItems[currentItemIndex];
-                if (item && !item.classList.contains('revealed')) {
-                    item.classList.add('revealed');
-                }
-
-                const duration = currentDurations[currentItemIndex];
-                if (itemTimer) clearTimeout(itemTimer);
-                itemTimer = setTimeout(() => {
-                    if (autoPlay) {
-                        currentItemIndex++;
-                        showNextItem();
-                    }
-                }, duration);
-            }
-
-            function startCurrentSlide() {
-                stopAllTimers();
-
-                resetRevealItems(slides[currentIdx]);
-
-                const { items, durations, total } = computeSlideDurations(slides[currentIdx]);
-                currentSlideItems = items;
-                currentDurations = durations;
-                currentTotalDuration = total;
-                currentItemIndex = 0;
-                currentElapsed = 0;
-
-                if (currentTotalDuration === 0 || items.length === 0) {
-                    itemTimer = setTimeout(() => {
-                        if (autoPlay) goToSlide((currentIdx + 1) % totalSlides);
-                    }, 2000);
-                    return;
-                }
-
-                let startTime = performance.now();
-                if (progressTimer) clearInterval(progressTimer);
-                progressTimer = setInterval(() => {
-                    if (!autoPlay) return;
-                    const now = performance.now();
-                    let elapsed = now - startTime;
-                    if (elapsed > currentTotalDuration) elapsed = currentTotalDuration;
-                    const percent = (elapsed / currentTotalDuration) * 100;
-                    timeline.style.width = `${percent}%`;
-                }, 50);
-
-                showNextItem();
-            }
-
-            function stopCurrentSlide() {
-                stopAllTimers();
-            }
-
-            function goToSlide(index) {
-                if (index === currentIdx) return;
-                if (index < 0) index = 0;
-                if (index >= totalSlides) index = 0;
-
-                stopCurrentSlide();
-
-                slides[currentIdx].classList.remove('active');
-                slides[index].classList.add('active');
-                currentIdx = index;
-                updateCounter();
-
-                timeline.style.width = '0%';
-
-                if (autoPlay) {
-                    startCurrentSlide();
-                } else {
-                    resetRevealItems(slides[currentIdx]);
-                    const firstItem = slides[currentIdx].querySelector('.reveal-item');
-                    if (firstItem) firstItem.classList.add('revealed');
-                    stopAllTimers();
-                }
-            }
-
-            function nextSlide() {
-                if (autoPlay) {
-                    goToSlide((currentIdx + 1) % totalSlides);
-                } else {
-                    goToSlide((currentIdx + 1) % totalSlides);
-                }
-            }
-
-            function prevSlide() {
-                goToSlide((currentIdx - 1 + totalSlides) % totalSlides);
-            }
-
-            function toggleAutoPlay() {
-                autoPlay = !autoPlay;
-                if (autoPlay) {
-                    stopCurrentSlide();
-                    startCurrentSlide();
-                } else {
-                    stopAllTimers();
-                }
-            }
-
-            function updateCounter() {
-                counterSpan.innerText = `${currentIdx+1} / ${totalSlides}`;
-            }
-
-            function onKeyDown(e) {
-                const key = e.key;
-                if (key === ' ' || key === 'Space' || key === 'Spacebar') {
-                    e.preventDefault();
-                    toggleAutoPlay();
-                } else if (key === 'ArrowLeft') {
-                    e.preventDefault();
-                    prevSlide();
-                } else if (key === 'ArrowRight') {
-                    e.preventDefault();
-                    nextSlide();
-                }
-            }
-
-            function init() {
-                slides.forEach((s, idx) => {
-                    if (idx === 0) s.classList.add('active');
-                    else s.classList.remove('active');
-                });
-                currentIdx = 0;
-                updateCounter();
-                autoPlay = true;
-                startCurrentSlide();
-                window.addEventListener('keydown', onKeyDown);
-            }
-
-            init();
-        })();
-    </script>
-
-<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
-<div class="sciviz-promo-no" aria-hidden="true">No.020 · 2026-07-11</div>
-<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
-padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
-border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
-letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
+<script>
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
+    });
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
+</script>
 </body>
 </html>

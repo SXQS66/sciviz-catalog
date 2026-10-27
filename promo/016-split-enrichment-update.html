@@ -2,634 +2,316 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="sciviz-promo" content="no=16;date=2026-06-14;id=016-split-enrichment-update">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>No.016 · 方向性富集（更新版）：通路瘦身策略</title>
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
+
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
+
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
+
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
+
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
+
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
+
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
+
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
+
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
 }
 
-:root {
-  --bg-deep: #05020c;
-  --glow-purple: #7c3aed;
-  --purple-light: #a78bfa;
-  --hot-pink: #ec4899;
-  --cyan-accent: #22d3ee;
-  --emerald: #10b981;
-  --amber: #f59e0b;
-  --slate-dark: #1e293b;
-  --glass: rgba(15, 25, 45, 0.45);
-  --glass-border: rgba(168, 139, 255, 0.25);
-}
-
-body {
-  background: radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.3), transparent 60%),
-              radial-gradient(circle at 85% 90%, rgba(34, 211, 238, 0.2), transparent 55%),
-              #05020c;
-  font-family: 'Inter', system-ui, -apple-system, 'PingFang SC', 'Segoe UI', BlinkMacSystemFont, sans-serif;
-  overflow: hidden;
-  color: #f0f2fe;
-  height: 100vh;
-  width: 100vw;
-}
-
-/* 幻灯片容器 */
-.slide {
-  position: absolute;
-  inset: 0;
-  padding: 2rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  transform: scale(0.96) translateY(18px);
-  transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.7s ease;
-  pointer-events: none;
-  overflow-y: auto;
-  scrollbar-width: thin;
-}
-.slide::-webkit-scrollbar {
-  width: 4px;
-  background: rgba(255,255,255,0.1);
-}
-.slide::-webkit-scrollbar-thumb {
-  background: #a78bfa;
-  border-radius: 10px;
-}
-.slide.active {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  z-index: 10;
-}
-
-/* 标题体系 */
-.title-lg {
-  font-size: 3.8rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #FFFFFF, #c4b5fd, #a78bfa);
-  background-clip: text;
-  -webkit-background-clip: text;
-  /*color: transparent;*/
-  text-align: center;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.6rem;
-}
-.title-md {
-  font-size: 2.8rem;
-  font-weight: 700;
-  text-align: center;
-  background: linear-gradient(120deg, #e0d6ff, #fbcfe8);
-  background-clip: text;
-  -webkit-background-clip: text;
-  /*color: transparent;*/
-  margin-bottom: 1rem;
-}
-.sub {
-  font-size: 1.5rem;
-  color: #bac8e0;
-  text-align: center;
-  max-width: 85%;
-  margin-top: 0.6rem;
-}
-
-/* 玻璃卡片 */
-.glass-card {
-  background: var(--glass);
-  backdrop-filter: blur(18px);
-  border: 1px solid var(--glass-border);
-  border-radius: 48px;
-  padding: 1rem 2rem;
-  box-shadow: 0 25px 45px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,58,237,0.2);
-}
-.glow-card {
-  background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.1));
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(168, 85, 247, 0.65);
-  box-shadow: 0 0 32px rgba(124, 58, 237, 0.4);
-}
-
-/* 公式框 */
-.formula-frame {
-  background: rgba(0, 0, 0, 0.55);
-  border-radius: 40px;
-  padding: 1rem 1.8rem;
-  font-family: 'Courier New', 'Fira Code', monospace;
-  font-size: 1.6rem;
-  font-weight: 600;
-  text-align: center;
-  border-left: 6px solid var(--cyan-accent);
-  color: #cffafe;
-  margin: 0.8rem 0;
-}
-.small-formula {
-  font-size: 1.2rem;
-}
-
-/* 标签网格 */
-.quad-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.2rem;
-  justify-content: center;
-  margin: 1.2rem 0;
-}
-.unit-badge {
-  background: rgba(20, 30, 55, 0.7);
-  backdrop-filter: blur(12px);
-  border-radius: 32px;
-  padding: 0.8rem 1.5rem;
-  text-align: center;
-  min-width: 140px;
-  border-top: 3px solid;
-}
-.unit-badge span:first-child {
-  font-size: 1.3rem;
-  font-weight: 800;
-  display: block;
-}
-.unit-badge span:last-child {
-  font-size: 1.1rem;
-  color: #b9c7e0;
-}
-.badge-up { border-top-color: #22d3ee; }
-.badge-down { border-top-color: #f472b6; }
-.badge-filter { border-top-color: #f59e0b; }
-.badge-core { border-top-color: #10b981; }
-
-/* 两列布局 */
-.two-col-compare {
-  display: flex;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 1100px;
-  margin-top: 1rem;
-}
-.col-card {
-  flex: 1;
-  background: rgba(10, 12, 35, 0.6);
-  backdrop-filter: blur(12px);
-  border-radius: 32px;
-  padding: 1rem;
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-/* 简洁列表 */
-.feature-list {
-  list-style: none;
-  font-size: 1.2rem;
-  line-height: 1.25;
-}
-.feature-list li {
-  margin: 0.5rem 0;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-.feature-list li::before {
-  content: "▹";
-  color: #22d3ee;
-  font-size: 1.1rem;
-}
-
-.highlight-pink { color: #f472b6; font-weight: 600; }
-.highlight-cyan { color: #22d3ee; font-weight: 600; }
-.highlight-purple { color: #c084fc; font-weight: 600; }
-.highlight-gold { color: #fbbf24; font-weight: 600; }
-
-/* 简约表格 */
-.comparison-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 1rem;
-  background: rgba(0,0,0,0.35);
-  border-radius: 28px;
-  overflow: hidden;
-}
-.comparison-table th, .comparison-table td {
-  padding: 0.9rem;
-  text-align: left;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-.comparison-table th {
-  color: #c4b5fd;
-  font-weight: 600;
-}
-.comparison-table tr:last-child td {
-  border-bottom: none;
-}
-
-/* 进度条 + 计数器 */
-.progress-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  background: transparent;
-}
-.timeline-bar {
-  height: 3px;
-  background: linear-gradient(90deg, #7c3aed, #22d3ee, #ec4899);
-  width: 0%;
-  transition: width 0.05s linear;
-}
-.slide-counter {
-  position: fixed;
-  bottom: 16px;
-  right: 20px;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(12px);
-  padding: 4px 14px;
-  border-radius: 60px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #c4b5fd;
-  border: 1px solid rgba(255,255,255,0.2);
-  z-index: 55;
-  font-family: monospace;
-}
-.control-hint {
-  position: fixed;
-  bottom: 16px;
-  left: 20px;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  padding: 4px 12px;
-  border-radius: 32px;
-  font-size: 0.7rem;
-  color: #b9c7e0;
-  z-index: 55;
-  letter-spacing: 0.3px;
-}
-
-/* 动画 */
-@keyframes softFloat {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
-  100% { transform: translateY(0px); }
-}
-.float-icon {
-  animation: softFloat 2.5s ease-in-out infinite;
-  display: inline-block;
-}
-
-/* 响应式 */
-@media (max-width: 750px) {
-  .title-lg { font-size: 2.5rem; }
-  .title-md { font-size: 2rem; }
-  .sub { font-size: 1.2rem; }
-  .glass-card { padding: 1.2rem; }
-  .two-col-compare { flex-direction: column; gap: 1rem; }
-  .formula-frame { font-size: 1.2rem; padding: 0.8rem; }
-  .feature-list { font-size: 1rem; }
-  .comparison-table th, .comparison-table td { font-size: 0.9rem; padding: 0.5rem; }
-}
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
 </style>
 </head>
 <body>
+<article class="post">
 
-<!-- 幻灯片 1: 总览 -->
-<div class="slide active">
-  <div class="title-lg">方向性富集分析</div>
-  <div class="sub" style="margin-bottom: 0.2rem;">上下调分离 · 三部曲与通路瘦身</div>
-  <div class="quad-grid">
-    <div class="unit-badge badge-up"><span>📈 上调ORA</span><span>激活通路 · 炎症/增殖</span></div>
-    <div class="unit-badge badge-down"><span>📉 下调ORA</span><span>抑制过程 · 代谢衰退</span></div>
-    <div class="unit-badge badge-filter"><span>🔍 严格筛选</span><span>FDR+基因数过滤</span></div>
-    <div class="unit-badge badge-core"><span>🎯 核心池</span><span>3~8条/方向</span></div>
-  </div>
-  <div class="glass-card glow-card" style="max-width: 800px; text-align: center; padding: 1rem 1.6rem;">
-    <p style="font-size: 1.5rem; font-weight: 500;">避免信号抵消 · 捕获真实机制</p>
-    <p style="font-size: 1.1rem; margin-top: 8px; color: #cbd5e6;">上调/下调独立富集 → 通路瘦身 → 方向性结论</p>
-  </div>
-  <div class="sub" style="margin-top: 1rem;">⚡ 理论必要性 | 统计流程 | 实战误区</div>
-</div>
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.016</span>
+      <span>2026-06-14</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
+    </div>
+    <h1>方向性富集（更新版）：通路瘦身策略</h1>
+    <p class="lede">上一期的补充：阈值怎么定，通路太胖时先砍哪一层。</p>
+    <div class="chips"><span class="chip">富集</span><span class="chip">上下调</span><span class="chip">通路瘦身</span></div>
+  </header>
 
-<!-- 幻灯片 2: 为什么必须分开富集？混合陷阱 -->
-<div class="slide">
-  <div class="title-md"><span class="float-icon">⚠️</span> 混合富集 · 方向性丢失</div>
-  <div class="glass-card" style="width: 95%; max-width: 1050px;">
-    <div class="formula-frame small-formula" style="font-size:1.4rem;">上调基因 + 下调基因合并ORA <br>→ 正负调控抵消 → 结论模糊</div>
-    <div class="two-col-compare" style="margin-top: 0.5rem;">
-      <div class="col-card">
-        <h3 style="font-size: 1.3rem; color:#f472b6;">❌ 混合富集陷阱</h3>
-        <ul class="feature-list">
-          <li>上/下调基因相互稀释，<i>p</i>值失真</li>
-          <li>完全丢失功能方向性（活化 vs 抑制）</li>
-          <li>真实机制被掩盖，误导下游验证</li>
-        </ul>
-      </div>
-      <div class="col-card">
-        <h3 style="font-size: 1.3rem; color:#22d3ee;">✅ 分离富集优势</h3>
-        <ul class="feature-list">
-          <li>上调ORA → 揭示激活的炎症/信号转导</li>
-          <li>下调ORA → 代谢抑制/凋亡抵抗/分化受阻</li>
-          <li>直接匹配表型，高影响力期刊规范</li>
-        </ul>
-      </div>
-    </div>
-    <div style="background: rgba(0,0,0,0.3); border-radius: 28px; padding: 0.7rem; margin-top: 0.8rem;">
-      <span style="font-size: 1.2rem;">📌 <strong class="highlight-cyan">核心原则</strong>：依据log<sub>2</sub>FC方向分割上调/下调基因，分别进行超几何检验</span>
-    </div>
-  </div>
-  <div class="sub" style="margin-top: 1rem;">混合富集 = 生物学信号的“中和反应”</div>
-</div>
-
-<!-- 幻灯片 3: 标准工作流 + 阈值 -->
-<div class="slide">
-  <div class="title-md">方向性ORA · 标准流程</div>
-  <div class="glass-card glow-card" style="width: 90%; max-width: 1000px;">
-    <div class="two-col-compare" style="margin-top: 0.5rem;">
-      <div class="col-card">
-        <h3 style="font-size: 1.3rem; color:#f472b6;">📤 上调列表：<span style="font-size: 1.1rem"> log₂FC &gt; 阈值 (如 &gt;1)，adj.p &lt; 0.05</span></h3>
-      </div>
-      <div class="col-card">
-        <h3 style="font-size: 1.3rem; color:#22d3ee;">📥 下调列表：<span style="font-size: 1.1rem">log₂FC &lt; -阈值 (如 &lt;1)，adj.p &lt; 0.05</span></h3>
-      </div>
-    </div>
-    <ul class="feature-list" style="margin: 1rem 1rem;">
-      <li>🎯 背景基因集：同一参考基因组注释（Ensembl/Entrez）</li>
-      <li>📊 独立超几何检验 + Benjamini‑Hochberg (BH) 校正</li>
-      <li>📏 多重假设校正后 FDR (q‑value) &lt; 0.05</li>
-      <li>📈 富集倍数 = GeneRatio / BackgroundRatio，用于排序筛选</li>
-      <li>🧹 后续瘦身：基因数过滤 (10~200) + 生物学相关性审查</li>
+  <div class="body">
+  <section>
+    <h2>方向性富集：上下调分离的三部曲</h2>
+    <p>本文是 No.013 的更新版，把方向性富集拆成三步：① 上调、下调基因分别做 ORA，避免正负调控互相抵消；② 对每个方向按「基因数过滤 + FDR + 富集倍数 + 生物学审查」瘦身，保留 3–8 条核心通路；③ 输出带方向标签的结论。混合富集会让「活化 vs 抑制」无法区分，是差异分析最常见的失分点。</p>
+  </section>
+  <section>
+    <h3>混合富集陷阱</h3>
+    <ul>
+      <li>上/下调基因相互稀释，p值失真</li>
+      <li>完全丢失功能方向性（活化 vs 抑制）</li>
+      <li>真实机制被掩盖，误导下游验证</li>
     </ul>
-    <!-- 可选公式展示，注释以保持简洁 -->
-    <!-- <div class="formula-frame small-formula" style="margin-top: 0.5rem; font-size:0.90rem;">超几何检验 P(N,K,n,k) = C(K,k)·C(N-K,n-k)/C(N,n)</div> -->
+  </section>
+  <section>
+    <h3>分离富集优势</h3>
+    <ul>
+      <li>上调ORA → 揭示激活的炎症/信号转导</li>
+      <li>下调ORA → 代谢抑制/凋亡抵抗/分化受阻</li>
+      <li>直接匹配表型，高影响力期刊规范</li>
+    </ul>
+    <p>核心原则：依据 log₂FC 方向分割上调/下调基因，分别进行超几何检验</p>
+    <p>混合富集 = 生物学信号的“中和反应”</p>
+    <p>方向性ORA · 标准流程</p>
+  </section>
+  <section>
+    <h3>上调列表： log₂FC &gt; 阈值 (如 &gt;1)，adj.p &lt; 0.05</h3>
+  </section>
+  <section>
+    <h3>下调列表：log₂FC &lt; -阈值 (如 &lt;1)，adj.p &lt; 0.05</h3>
+    <ul>
+      <li>背景基因集：同一参考基因组注释（Ensembl/Entrez）</li>
+      <li>独立超几何检验 + Benjamini‑Hochberg (BH) 校正</li>
+      <li>多重假设校正后 FDR (q‑value) &lt; 0.05</li>
+      <li>富集倍数 = GeneRatio / BackgroundRatio，用于排序筛选</li>
+      <li>后续瘦身：基因数过滤 (10~200) + 生物学相关性审查</li>
+    </ul>
+    <p>独立ORA → 分别输出上调/下调富集表，保留方向性</p>
+    <p>通路瘦身 · 精选核心机制</p>
+  </section>
+  <section>
+    <h3>严格过滤标准</h3>
+    <ul>
+      <li>基因数过滤：10～200 (排除过窄/过泛通路)</li>
+      <li>FDR (q‑value) &lt; 0.05</li>
+      <li>按富集倍数 (Fold Enrichment) 降序排列</li>
+      <li>人工审查，剔除功能冗余通路</li>
+    </ul>
+  </section>
+  <section>
+    <h3>最终核心通路池</h3>
+    <ul>
+      <li>上调方向保留 3～5 条 (激活/炎症/增殖)</li>
+      <li>下调方向保留 3～4 条 (代谢抑制/凋亡抵抗)</li>
+      <li>选取富集倍数最高且与表型密切相关的通路</li>
+    </ul>
+    <p>瘦身前: 86条通路（含冗余噪音）</p>
+    <p>→ 瘦身后: 上调4条 + 下调4条 → 清晰指导验证</p>
+    <p>GeneRatio排序</p>
+    <p>FDR&lt;0.05</p>
+    <p>生物学精选</p>
+    <p>目标：每个方向3～8条高置信通路，避免冗余干扰</p>
+    <p>案例对比 · 方向性揭示真相</p>
+    <p>茉莉酸处理番茄叶片 | 上调547 / 下调412 (|log₂FC|&gt;1, adj.p&lt;0.05)</p>
+    <p>分析策略Top通路示例q‑value (FDR)生物学方向</p>
+    <p>混合富集</p>
+    <p>植物激素信号转导</p>
+    <p>MAPK signaling</p>
+    <p>1.2e-05</p>
+    <p>3.1e-04</p>
+    <p>无法区分激活/抑制，丢失代谢表型</p>
+    <p>上调独立ORA</p>
+    <p>植物激素信号转导 (38)</p>
+    <p>MAPK signaling (29)</p>
+    <p>次生代谢合成</p>
+    <p>2.1e-05</p>
+    <p>防御/激素通路强激活</p>
+    <p>下调独立ORA</p>
+    <p>光合作用-天线蛋白 (21)</p>
+    <p>淀粉蔗糖代谢 (17)</p>
+    <p>卟啉代谢</p>
+    <p>1.2e-04</p>
+    <p>光合/能量代谢被抑制，防御‑生长权衡</p>
+    <p>生物学结论：混合富集仅见激素信号，丢失“光合抑制”；分离富集同时捕获防御激活与代谢抑制，完整诠释植物防御—生长权衡机制。此原理同样适用于肿瘤、免疫、神经科学等领域。</p>
+    <p>方向性ORA是避免“信号抵消”的黄金标准</p>
+    <p>误区纠正 · 核心清单</p>
+  </section>
+  <section>
+    <h3>常见误区</h3>
+    <ul>
+      <li>合并上下调直接ORA → 丢失方向</li>
+      <li>仅凭原始p值取top10 → 假阳性/无生物学支持</li>
+      <li>忽视上下调协同网络 → 机制割裂</li>
+    </ul>
+  </section>
+  <section>
+    <h3>正确策略</h3>
+    <ul>
+      <li>上调/下调独立ORA，综合解读</li>
+      <li>基因数过滤 + FDR校正 + 富集倍数排序 + 人工审核</li>
+      <li>绘制上下调通路网络图，分层阐释</li>
+    </ul>
+    <p>核心通路池构建清单（精简版）</p>
+    <p>① FDR &lt; 0.05 且基因数 ≥ 10；② 按富集倍数降序排列；③ 剔除冗余及与表型无关的通路；④ 每个方向保留3～8条最终通路。</p>
+    <p>clusterProfiler</p>
+    <p>Metascape</p>
+    <p>DAVID</p>
+    <p>规范：方向性ORA + 通路瘦身 = 精准生物学解读</p>
+    <h3 class="refs-title">延伸阅读与参考文献</h3>
+    <ol class="refs">
+      <li>Yu G, Wang LG, Han Y, He QY. clusterProfiler: an R package for comparing biological themes among gene clusters. <em>OMICS</em>. 2012;16(5):284–287. doi:10.1089/omi.2011.0118</li>
+      <li>Subramanian A, Tamayo P, Mootha VK, et al. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. <em>PNAS</em>. 2005;102(43):15545–15550. doi:10.1073/pnas.0506580102</li>
+      <li>Benjamini Y, Hochberg Y. Controlling the false discovery rate: a practical and powerful approach to multiple testing. <em>Journal of the Royal Statistical Society B</em>. 1995;57(1):289–300. doi:10.1111/j.2517-6161.1995.tb02031.x</li>
+    </ol>
+
+  </section>
   </div>
-  <div class="sub" style="margin-top: 1rem;">独立ORA → 分别输出上调/下调富集表，保留方向性</div>
-</div>
 
-<!-- 幻灯片 4: 通路瘦身 · 从冗余到核心池 -->
-<div class="slide">
-  <div class="title-md"><span class="float-icon">🧹</span> 通路瘦身 · 精选核心机制</div>
-  <div class="glass-card" style="width: 90%; max-width: 1000px;">
-    <div class="two-col-compare" style="margin-bottom: 0.8rem;">
-      <div class="col-card">
-        <h3 style="color:#fbbf24;">🔻 严格过滤标准</h3>
-        <ul class="feature-list">
-          <li>✅ 基因数过滤：10～200 (排除过窄/过泛通路)</li>
-          <li>✅ FDR (q‑value) &lt; 0.05</li>
-          <li>✅ 按富集倍数 (Fold Enrichment) 降序排列</li>
-          <li>✅ 人工审查，剔除功能冗余通路</li>
-        </ul>
-      </div>
-      <div class="col-card">
-        <h3 style="color:#10b981;">🎯 最终核心通路池</h3>
-        <ul class="feature-list">
-          <li>📈 <span style="color:#22d3ee;">上调方向</span>保留 <strong>3～5 条</strong> (激活/炎症/增殖)</li>
-          <li>📉 <span style="color:#f472b6;">下调方向</span>保留 <strong>3～4 条</strong> (代谢抑制/凋亡抵抗)</li>
-          <li>🏆 选取富集倍数最高且与表型密切相关的通路</li>
-        </ul>
-      </div>
-    </div>
-    <div style="background: rgba(0,0,0,0.4); border-radius: 28px; padding: 0.7rem; margin-top: 0.3rem; text-align: center;">
-      <span class="highlight-cyan">瘦身前: 86条通路（含冗余噪音）</span><br><br>→ 瘦身后: <span class="highlight-pink">上调4条</span> + <span style="color:#22d3ee;">下调4条</span> → <span class="highlight-purple">清晰指导验证</span>
-    </div>
-    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 0.8rem;">
-      <div class="unit-badge" style="border-top-color: #22d3ee; background:rgba(34,211,238,0.15); padding:0.3rem 0.8rem;">📐 GeneRatio排序</div>
-      <div class="unit-badge" style="border-top-color: #f472b6; background:rgba(244,114,182,0.15); padding:0.3rem 0.8rem;">🎯 FDR&lt;0.05</div>
-      <div class="unit-badge" style="border-top-color: #10b981; background:rgba(16,185,129,0.15); padding:0.3rem 0.8rem;">🧬 生物学精选</div>
-    </div>
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.016</span>
+    <span>2026-06-14</span>
   </div>
-  <div class="sub" style="margin-top: 1rem;">目标：每个方向3～8条高置信通路，避免冗余干扰</div>
-</div>
 
-<!-- 幻灯片 5: 实战案例 · 混合 vs 分离 (番茄激素处理) -->
-<div class="slide">
-  <div class="title-md"><span class="float-icon">📋</span> 案例对比 · 方向性揭示真相</div>
-  <div class="glass-card" style="width: 95%; max-width: 1050px; padding: 1.2rem;">
-    <p style="font-size: 1rem; margin-bottom: 0.5rem; text-align: center;">🌱 茉莉酸处理番茄叶片 | 上调547 / 下调412 (|log₂FC|&gt;1, adj.p&lt;0.05)</p>
-    <table class="comparison-table">
-      <thead>
-        <tr><th>分析策略</th><th>Top通路示例</th><th>q‑value (FDR)</th><th>生物学方向</th></tr>
-      </thead>
-      <tbody>
-        <tr style="background: rgba(244,114,182,0.1);">
-          <td>❌ 混合富集</td>
-          <td>植物激素信号转导<br>MAPK signaling</td>
-          <td>1.2e-05<br>3.1e-04</td>
-          <td>⚠️ 无法区分激活/抑制，丢失代谢表型</td>
-        </tr>
-        <tr style="background: rgba(34,211,238,0.12);">
-          <td>📈 上调独立ORA</td>
-          <td>植物激素信号转导 (38)<br>MAPK signaling (29)<br>次生代谢合成</td>
-          <td>2.1e-05<br>0.0003<br>0.002</td>
-          <td>✅ 防御/激素通路强激活</td>
-        </tr>
-        <tr style="background: rgba(236,72,153,0.12);">
-          <td>📉 下调独立ORA</td>
-          <td>光合作用-天线蛋白 (21)<br>淀粉蔗糖代谢 (17)<br>卟啉代谢</td>
-          <td>1.2e-04<br>0.0015<br>0.008</td>
-          <td>✅ 光合/能量代谢被抑制，防御‑生长权衡</td>
-        </tr>
-      </tbody>
-    </table>
-    <div style="background: rgba(168,85,247,0.2); border-radius: 28px; padding: 0.7rem; margin-top: 0.8rem; line-height: 1.25rem;">
-      <span style="font-size: 1rem;">💡 <strong class="highlight-cyan">生物学结论</strong>：混合富集仅见激素信号，丢失“光合抑制”；分离富集同时捕获防御激活与代谢抑制，完整诠释植物防御—生长权衡机制。此原理同样适用于肿瘤、免疫、神经科学等领域。</span>
-    </div>
-  </div>
-  <div class="sub" style="margin-top: 1rem;">方向性ORA是避免“信号抵消”的黄金标准</div>
-</div>
+</article>
 
-<!-- 幻灯片 6: 常见误区 + 核心池构建清单 -->
-<div class="slide">
-  <div class="title-md">⚠️ 误区纠正 · 核心清单</div>
-  <div class="glass-card glow-card" style="width: 90%; max-width: 1000px; padding: 1.2rem;">
-    <div class="two-col-compare" style="margin-bottom: 0.5rem;">
-      <div class="col-card">
-        <h3 style="color:#f472b6;">❌ 常见误区</h3>
-        <ul class="feature-list">
-          <li>合并上下调直接ORA → 丢失方向</li>
-          <li>仅凭原始p值取top10 → 假阳性/无生物学支持</li>
-          <li>忽视上下调协同网络 → 机制割裂</li>
-        </ul>
-      </div>
-      <div class="col-card">
-        <h3 style="color:#22d3ee;">✅ 正确策略</h3>
-        <ul class="feature-list">
-          <li>上调/下调独立ORA，综合解读</li>
-          <li>基因数过滤 + FDR校正 + 富集倍数排序 + 人工审核</li>
-          <li>绘制上下调通路网络图，分层阐释</li>
-        </ul>
-      </div>
-    </div>
-    <div style="background: rgba(0,0,0,0.35); border-radius: 28px; padding: 0.8rem; margin: 0.6rem 0;">
-      <span class="highlight-gold">📋 核心通路池构建清单（精简版）</span><br>
-      ① FDR &lt; 0.05 且 基因数 ≥ 10；② 按富集倍数降序排列；③ 剔除冗余及与表型无关的通路；④ 每个方向保留3～8条最终通路。
-    </div>
-    <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 0.5rem;">
-      <div class="unit-badge" style="border-top-color: #10b981;">🧬 clusterProfiler</div>
-      <div class="unit-badge" style="border-top-color: #22d3ee;">📘 Metascape</div>
-      <div class="unit-badge" style="border-top-color: #f59e0b;">🔬 DAVID</div>
-    </div>
-  </div>
-  <div class="sub" style="margin-top: 1rem;">✨ 规范：方向性ORA + 通路瘦身 = 精准生物学解读</div>
-</div>
-
-<!-- 底部控件 -->
-<div class="progress-footer" style="display: none;">
-  <div class="timeline-bar" id="timelineBar"></div>
-</div>
-<div class="slide-counter" id="slideCounter">1 / 6</div>
-<div class="control-hint" style="display: none;">🎮 空格 暂停/播放  |  ◀  ▶ 左右键切换</div>
-
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
 <script>
-  (function() {
-    const slides = document.querySelectorAll('.slide');
-    const timeline = document.getElementById('timelineBar');
-    const counterSpan = document.getElementById('slideCounter');
-    let currentIdx = 0;
-    const totalSlides = slides.length;      // 确保为6张
-    const slideDuration = 8000;             // 8秒/页
-    let autoPlay = true;
-    let slideTimer = null;
-    let progressInterval = null;
-    let currentProgress = 0;
-    let progressStep = 0;
-
-    function updateCounter() {
-      counterSpan.innerText = `${currentIdx+1} / ${totalSlides}`;
-    }
-
-    function stopAllTimers() {
-      if (slideTimer) { clearInterval(slideTimer); slideTimer = null; }
-      if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
-    }
-
-    function resetProgressBarVisual(value = 0) {
-      currentProgress = value;
-      if (timeline) timeline.style.width = `${value}%`;
-    }
-
-    function startProgressIncrement() {
-      if (progressInterval) clearInterval(progressInterval);
-      const intervalStep = 50;
-      const steps = slideDuration / intervalStep;
-      progressStep = 100 / steps;
-      progressInterval = setInterval(() => {
-        if (!autoPlay) return;
-        if (currentProgress < 100) {
-          currentProgress = Math.min(currentProgress + progressStep, 100);
-          timeline.style.width = `${currentProgress}%`;
-        }
-      }, intervalStep);
-    }
-
-    function startAutoPlay() {
-      if (slideTimer) clearInterval(slideTimer);
-      currentProgress = 0;
-      timeline.style.width = '0%';
-      if (progressInterval) clearInterval(progressInterval);
-      const intervalStep = 50;
-      const steps = slideDuration / intervalStep;
-      progressStep = 100 / steps;
-      progressInterval = setInterval(() => {
-        if (!autoPlay) return;
-        if (currentProgress < 100) {
-          currentProgress = Math.min(currentProgress + progressStep, 100);
-          timeline.style.width = `${currentProgress}%`;
-        }
-      }, intervalStep);
-      slideTimer = setInterval(() => {
-        if (!autoPlay) return;
-        nextSlideInternal();
-      }, slideDuration);
-    }
-
-    function stopAutoPlay() {
-      if (slideTimer) { clearInterval(slideTimer); slideTimer = null; }
-      if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
-    }
-
-    function goToSlide(index, resetTimer = true) {
-      if (index < 0) index = 0;
-      if (index >= totalSlides) index = 0;
-      if (index === currentIdx) return;
-      slides.forEach((slide, i) => {
-        slide.classList.remove('active');
-      });
-      slides[index].classList.add('active');
-      currentIdx = index;
-      updateCounter();
-      if (autoPlay) {
-        stopAutoPlay();
-        currentProgress = 0;
-        timeline.style.width = '0%';
-        startAutoPlay();
-      } else {
-        stopAutoPlay();
-        currentProgress = 0;
-        timeline.style.width = '0%';
-      }
-    }
-    
-    function nextSlideInternal() {
-      let next = currentIdx + 1;
-      if (next >= totalSlides) next = 0;
-      goToSlide(next, true);
-    }
-    
-    function prevSlideInternal() {
-      let prev = currentIdx - 1;
-      if (prev < 0) prev = totalSlides - 1;
-      goToSlide(prev, true);
-    }
-    
-    function toggleAutoPlay() {
-      autoPlay = !autoPlay;
-      if (autoPlay) {
-        stopAutoPlay();
-        currentProgress = 0;
-        timeline.style.width = '0%';
-        startAutoPlay();
-      } else {
-        stopAutoPlay();
-      }
-    }
-
-    function onKeyDown(e) {
-      const key = e.key;
-      if (key === ' ' || key === 'Space' || key === 'Spacebar') {
-        e.preventDefault();
-        toggleAutoPlay();
-      } else if (key === 'ArrowLeft') {
-        e.preventDefault();
-        prevSlideInternal();
-      } else if (key === 'ArrowRight') {
-        e.preventDefault();
-        nextSlideInternal();
-      }
-    }
-
-    function init() {
-      slides.forEach((s, idx) => {
-        if (idx === 0) s.classList.add('active');
-        else s.classList.remove('active');
-      });
-      currentIdx = 0;
-      updateCounter();
-      autoPlay = true;
-      currentProgress = 0;
-      timeline.style.width = '0%';
-      startAutoPlay();
-      window.addEventListener('keydown', onKeyDown);
-    }
-    
-    init();
-  })();
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
+    });
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
 </script>
-
-<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
-<div class="sciviz-promo-no" aria-hidden="true">No.016 · 2026-06-14</div>
-<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
-padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
-border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
-letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
 </body>
 </html>

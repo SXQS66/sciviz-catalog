@@ -1,37 +1,1029 @@
 <!DOCTYPE html>
-<html lang='zh-CN'>
+<html lang="zh-CN">
 <head>
-<meta charset='UTF-8'>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="sciviz-promo" content="no=33;date=2026-10-18;id=033-circular-tree">
-<meta name='viewport' content='width=device-width, initial-scale=1.0'>
 <title>No.033 · Science 神图复刻：环形细胞注释树（R / Python）</title>
-</head>
-<body style='margin:0;padding:16px 12px;background:#f4f6f9;'>
-<!-- 使用说明 ================================================================
-  1. 本文件为微信公众号文章内容，全部样式已内联（公众号编辑器会剥离 style 标签，内联样式可保留）。
-  2. 代码块换行已改为显式 <br> + &nbsp; 缩进，粘贴到公众号编辑器不会塌成一行。
-  3. 推荐发布方式：浏览器打开本文件 → 全选复制 → 粘贴进公众号后台编辑器；
-     图片不会随复制上传，需在编辑器内依次上传这 4 张图并替换对应位置：
-     Figure1E_ref.png / Figure1E.png / Figure1E_python.png / schematic.png
-     （也可用 md-nice / 135editor / doocs-md 的「上传图片」功能一键替换）。
-=========================================================================== -->
-<section style='max-width:677px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:#3b3b4a;font-size:14px;line-height:1.8;letter-spacing:.3px;'>
-<section style='background:linear-gradient(135deg,#1a3a4a 0%,#23809d 55%,#4a9ab5 100%);border-radius:14px;padding:24px 22px;margin-bottom:16px;'><p style='margin:0;color:rgba(255,255,255,.85);font-size:13px;'>🧬 科研可视化灵感 30 · 顶刊复刻系列</p><p style='margin:10px 0 0;color:#fff;font-size:22px;font-weight:800;line-height:1.45;'>Science 神图复刻 · 环形细胞注释树</p><p style='margin:6px 0 0;color:rgba(255,255,255,.95);font-size:14px;font-weight:600;'>树布局 × 四联轨道 × R / Python 全代码 + 数据模板</p></section>
-<p style='margin:0 0 6px;'>刷到 <strong>Science《Chinese Immune Multi-omics Atlas》Fig. 1E</strong> 直接看呆：一整圈画下 <strong>72 种免疫细胞</strong>——谱系关系、细胞占比、Sex / Age 双组学信号全在一张图里。本文拆解它的构图方法，并给出 R / Python 双版本<strong>全套复现代码与数据模板</strong>。</p>
-<section style='margin:26px 0 12px;'><span style='display:inline-block;background:#23809d;color:#fff;font-size:15px;font-weight:700;padding:4px 14px;border-radius:20px;'>📕 原图 vs 🛠️ 代码复刻</span></section><section style='background:#f5fbfd;border:1px solid #cfe3ec;border-radius:12px;padding:14px 16px;margin:12px 0;'><img src='Figure1E_ref.png' alt='📕 Science 原图 · Yin et al. 2026 · Fig. 1E：树状分类 + Sex/Age 四联轨道' style='width:100%;display:block;border-radius:8px;box-shadow:0 2px 8px rgba(31,75,110,.12);'/><p style='text-align:center;color:#5a7684;font-size:12px;margin:6px 0 0;line-height:1.6;'>📕 Science 原图 · Yin et al. 2026 · Fig. 1E：树状分类 + Sex/Age 四联轨道</p></section><section style='background:#f5fbfd;border:1px solid #cfe3ec;border-radius:12px;padding:14px 16px;margin:12px 0;'><img src='Figure1E.png' alt='💠 R 版复刻 · tidygraph + ggraph' style='width:100%;display:block;border-radius:8px;box-shadow:0 2px 8px rgba(31,75,110,.12);'/><p style='text-align:center;color:#5a7684;font-size:12px;margin:6px 0 0;line-height:1.6;'>💠 R 版复刻 · tidygraph + ggraph</p></section><section style='background:#f5fbfd;border:1px solid #cfe3ec;border-radius:12px;padding:14px 16px;margin:12px 0;'><img src='Figure1E_python.png' alt='🐍 Python 版复刻 · matplotlib' style='width:100%;display:block;border-radius:8px;box-shadow:0 2px 8px rgba(31,75,110,.12);'/><p style='text-align:center;color:#5a7684;font-size:12px;margin:6px 0 0;line-height:1.6;'>🐍 Python 版复刻 · matplotlib</p></section><p style='text-align:center;color:#5a7684;font-size:12px;margin:6px 0 0;line-height:1.6;'>同一份 <strong>input.csv</strong>，双语言同款成图 ✅</p>
-<section style='margin:26px 0 12px;'><span style='display:inline-block;background:#23809d;color:#fff;font-size:15px;font-weight:700;padding:4px 14px;border-radius:20px;'>📐 结构解剖 · 一图流</span></section><section style='background:#f5fbfd;border:1px solid #cfe3ec;border-radius:12px;padding:14px 16px;margin:12px 0;'><img src='schematic.png' alt='从圆心向外逐层堆叠：根 → 主枝 → 胶囊枝 → 叶端 → 轨道 → 标签 → 迷你树（8 大构件）' style='width:100%;display:block;border-radius:8px;box-shadow:0 2px 8px rgba(31,75,110,.12);'/><p style='text-align:center;color:#5a7684;font-size:12px;margin:6px 0 0;line-height:1.6;'>从圆心向外逐层堆叠：根 → 主枝 → 胶囊枝 → 叶端 → 轨道 → 标签 → 迷你树（8 大构件）</p></section><section style='margin:26px 0 12px;'><span style='display:inline-block;background:#23809d;color:#fff;font-size:15px;font-weight:700;padding:4px 14px;border-radius:20px;'>🌳 构图巧思</span></section><section style='background:#f5fbfd;border:1px solid #cfe3ec;border-radius:12px;padding:14px 16px;margin:12px 0;'><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>①</strong> <strong>树形类比</strong>：细胞分类 = 从圆心生长的树，L1 谱系 → L2/L3 分支 → 叶端即细胞亚型。</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>②</strong> <strong>扇区着色</strong>：5 大谱系淡彩扇底 + L3 同色环带与胶囊枝，层级一眼可辨。</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>③</strong> <strong>四联轨道</strong>：内 Sex 外 Age 各两圈，ATAC 淡色 + 星号、RNA 饱和色；蓝 = Female/Younger，红 = Male/Elder。</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>④</strong> <strong>编号衔接</strong>：叶端 1–72 编号方块衔接内外圈「细胞名 (占比)」标签。</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>⑤</strong> <strong>多而不乱</strong>：白底图例环抱轨道、右下迷你树复述结构、L1–L4 标尺辅助读图。</p></section><section style='margin:26px 0 12px;'><span style='display:inline-block;background:#23809d;color:#fff;font-size:15px;font-weight:700;padding:4px 14px;border-radius:20px;'>🛠️ 实现方法</span></section><section style='background:#f5fbfd;border:1px solid #cfe3ec;border-radius:12px;padding:14px 16px;margin:12px 0;'><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>①</strong> <strong>树布局</strong>：<code style='background:#ddf0f5;padding:0 6px;border-radius:4px;font-size:13px;color:#1f6a8e;font-family:Menlo,Consolas,'Courier New',monospace;'>tidygraph</code> 建树 + 极坐标 x=r·sinθ, y=r·cosθ</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>②</strong> <strong>树枝</strong>：<code style='background:#ddf0f5;padding:0 6px;border-radius:4px;font-size:13px;color:#1f6a8e;font-family:Menlo,Consolas,'Courier New',monospace;'>geom_edge_diagonal</code> 弯枝；L3 用 <code style='background:#ddf0f5;padding:0 6px;border-radius:4px;font-size:13px;color:#1f6a8e;font-family:Menlo,Consolas,'Courier New',monospace;'>geom_segment</code> 直线胶囊</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>③</strong> <strong>扇形与环轨</strong>：<code style='background:#ddf0f5;padding:0 6px;border-radius:4px;font-size:13px;color:#1f6a8e;font-family:Menlo,Consolas,'Courier New',monospace;'>ggforce::geom_arc_bar</code> 画扇区 / 环带 / 方块 / 轨道</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>④</strong> <strong>发散配色</strong>：<code style='background:#ddf0f5;padding:0 6px;border-radius:4px;font-size:13px;color:#1f6a8e;font-family:Menlo,Consolas,'Courier New',monospace;'>colorRamp</code> RdBu + gamma 提亮中低强度</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>⑤</strong> <strong>结构图例</strong>：<code style='background:#ddf0f5;padding:0 6px;border-radius:4px;font-size:13px;color:#1f6a8e;font-family:Menlo,Consolas,'Courier New',monospace;'>cowplot</code> 叠加右下角迷你树；matplotlib 同款复刻</p></section><section style='margin:26px 0 12px;'><span style='display:inline-block;background:#23809d;color:#fff;font-size:15px;font-weight:700;padding:4px 14px;border-radius:20px;'>⚡ 五步构图法（拿走即用）</span></section><section style='background:#f5fbfd;border:1px solid #cfe3ec;border-radius:12px;padding:14px 16px;margin:12px 0;'><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>STEP 1</strong> <strong>整理宽表</strong>：一行一个细胞，层级 l1/l2/l3 + 占比 + 配色。</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>STEP 2</strong> <strong>极坐标布局</strong>：θ=(i-0.5)·2π/n，x=r·sinθ，层级定半径。</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>STEP 3</strong> <strong>画树枝</strong>：贝塞尔弯枝 + L3 径向胶囊枝（白字）+ 淡彩环带。</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>STEP 4</strong> <strong>环形轨道</strong>：Wedge / geom_arc_bar 画 4 圈，ATAC 淡化、RNA 饱和。</p><p style='margin:0 0 8px;line-height:1.8;font-size:14px;'><strong style='color:#1f6a8e;'>STEP 5</strong> <strong>图例系统</strong>：径向旋转 90°-θ 标签；白底图例盖轨道；cowplot 叠迷你树。</p></section><section style='margin:26px 0 12px;'><span style='display:inline-block;background:#23809d;color:#fff;font-size:15px;font-weight:700;padding:4px 14px;border-radius:20px;'>⌨️ 核心代码速览</span></section><section style='background:#f5fbfd;border:1px solid #cfe3ec;border-radius:12px;padding:14px 16px;margin:12px 0;'><p style='margin:0 0 8px;font-size:14px;font-weight:700;color:#1f4b6e;'>💠 R 版 · tidygraph + ggraph <span style='font-weight:400;color:#5a7684;font-size:12px;'>circle_tree.R</span></p><pre style='background:#14283a;color:#d9e6ee;font-size:12px;line-height:1.55;padding:14px 12px;border-radius:8px;overflow-x:auto;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;font-family:Menlo,Consolas,'Courier New',monospace;margin:0;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;'><span style='color:#7ba7b5;'># 环境（实测版本）：R 4.2.1 · tidyverse 2.0.0 · tidygraph 1.2.3<br>#                   ggraph 2.1.0 · ggforce 0.4.1 · cowplot 1.1.1<br># ① 极坐标布局：theta 均匀铺满 360°，层级定半径</span><br>data &lt;- read.csv(<span style='color:#ffcf8f;'>"input.csv"</span>) |&gt; arrange(id) |&gt;<br>&nbsp;&nbsp;mutate(theta = (row_number() - 0.5) * 2 * pi / n())<br>node_radius &lt;- c(root = 0, l1 = 0.19, l2 = 0.42, l3 = 0.86, cell_type = 1)<br>nodes &lt;- nodes |&gt; mutate(x = radius * sin(theta), y = radius * cos(theta))<br><br><span style='color:#7ba7b5;'># ② 贝塞尔弯枝 + L3 径向胶囊枝（白字标在枝内）</span><br>ggraph(tree_layout) +<br>&nbsp;&nbsp;<span style='color:#7fd0f0;'>geom_edge_diagonal</span>(aes(width = width, color = color), lineend = <span style='color:#ffcf8f;'>"round"</span>) +<br>&nbsp;&nbsp;<span style='color:#7fd0f0;'>geom_segment</span>(data = l3_capsule,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;aes(x = x0, y = y0, xend = x1, yend = y1),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;linewidth = 5.1, lineend = <span style='color:#ffcf8f;'>"round"</span>) +<br>&nbsp;&nbsp;<span style='color:#7fd0f0;'>geom_text</span>(aes(x = xt, y = yt, angle = angle, label = branch_label),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size = font_size / 5.0, color = <span style='color:#ffcf8f;'>"white"</span>)<br><br><span style='color:#7ba7b5;'># ③ 环形轨道 + 顶部白底图例（直接盖在轨道上）</span><br><span style='color:#7fd0f0;'>geom_arc_bar</span>(aes(r0 = inner, r1 = outer, start = start, end = end)) +<br><span style='color:#7fd0f0;'>annotate</span>(<span style='color:#ffcf8f;'>"label"</span>, x = 0, y = c(1.15, 1.31), label.size = 0, fill = <span style='color:#ffcf8f;'>"white"</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label = c(<span style='color:#ffcf8f;'>"Sex: cell proportion\nATAC / RNA"</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color:#ffcf8f;'>"Age: cell proportion\nATAC / RNA"</span>))</pre></section><section style='background:#f5fbfd;border:1px solid #cfe3ec;border-radius:12px;padding:14px 16px;margin:12px 0;'><p style='margin:0 0 8px;font-size:14px;font-weight:700;color:#1f4b6e;'>🐍 Python 版 · matplotlib <span style='font-weight:400;color:#5a7684;font-size:12px;'>circle_tree.py</span></p><pre style='background:#14283a;color:#d9e6ee;font-size:12px;line-height:1.55;padding:14px 12px;border-radius:8px;overflow-x:auto;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;font-family:Menlo,Consolas,'Courier New',monospace;margin:0;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;'><span style='color:#7ba7b5;'># 环境（实测版本）：Python 3.10.9 · matplotlib 3.10.8 · pandas 2.2.3 · numpy 2.0.2<br># ① 极坐标布局：theta 均匀铺满 360°，层级定半径</span><br>df[<span style='color:#ffcf8f;'>"theta"</span>] = (df.index + 0.5) * 2 * np.pi / n<br>node_radius = {<span style='color:#ffcf8f;'>"root"</span>: 0, <span style='color:#ffcf8f;'>"l1"</span>: 0.19, <span style='color:#ffcf8f;'>"l2"</span>: 0.42, <span style='color:#ffcf8f;'>"l3"</span>: 0.86, <span style='color:#ffcf8f;'>"cell_type"</span>: 1}<br>nodes[name] = dict(theta=th, x=r * np.sin(th), y=r * np.cos(th))<br><br><span style='color:#7ba7b5;'># ② 贝塞尔弯枝 + L3 径向胶囊枝（白字标在枝内）</span><br>path = Path([p0, (p0[0], ym), (p1[0], ym), p1],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])<br>ax.add_patch(<span style='color:#7fd0f0;'>PathPatch</span>(path, lw=lw, color=color, capstyle=<span style='color:#ffcf8f;'>"round"</span>))<br>ax.plot([x0, x1], [y0, y1], lw=5.1 * MM2PT, solid_capstyle=<span style='color:#ffcf8f;'>"round"</span>)  <span style='color:#7ba7b5;'># L3 胶囊</span><br>ax.text(xt, yt, branch_label, color=<span style='color:#ffcf8f;'>"white"</span>, rotation=ang)<br><br><span style='color:#7ba7b5;'># ③ 环形轨道 + 顶部白底图例（直接盖在轨道上）</span><br>ax.add_patch(<span style='color:#7fd0f0;'>Wedge</span>((0, 0), inner + ring_w, t1, t2, width=ring_w))<br>ax.text(0, 1.15, <span style='color:#ffcf8f;'>"Sex: cell proportion\nATAC / RNA"</span>, ha=<span style='color:#ffcf8f;'>"center"</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bbox=dict(boxstyle=<span style='color:#ffcf8f;'>"round,pad=0.18"</span>, fc=<span style='color:#ffcf8f;'>"white"</span>, ec=<span style='color:#ffcf8f;'>"none"</span>))</pre></section><section style='margin:26px 0 12px;'><span style='display:inline-block;background:#23809d;color:#fff;font-size:15px;font-weight:700;padding:4px 14px;border-radius:20px;'>📦 完整代码 + 数据模板</span></section><p style='margin:0 0 4px;font-size:13px;color:#5a7684;'>⚠️ 踩坑提醒：R 里 γδ 变点点不是字体问题，是 locale —— 脚本开头已强制 <strong>Sys.setlocale("LC_CTYPE","en_US.UTF-8")</strong>；Python 侧请用装有 matplotlib ≥ 3.10 的环境运行。</p>
-<p style='margin:14px 0 8px;font-size:14px;font-weight:700;color:#1f4b6e;'>📄 circle_tree.R <span style='font-weight:400;color:#5a7684;font-size:12px;'>（R · 环境 R 4.2.1 · tidyverse 2.0.0 · tidygraph 1.2.3 · ggraph 2.1.0 · ggforce 0.4.1 · cowplot 1.1.1）</span></p><pre style='background:#14283a;color:#d9e6ee;font-size:12px;line-height:1.55;padding:14px 12px;border-radius:8px;overflow-x:auto;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;font-family:Menlo,Consolas,'Courier New',monospace;margin:0;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;'># =============================================================================<br># Title: Circular cell annotation tree | 环形细胞注释树（Science Fig.1E 风格）<br># Author: Shang Xia Qiu Suo<br>#<br># 图面结构（由内向外）：<br>#   中心根节点 → L1 谱系主枝 → L2 分支 → L3 直线胶囊枝（白字标在枝内）<br>#   → 72 个编号叶端方块 → 4 条环形轨道（内 2 圈 Sex / 外 2 圈 Age）<br>#   → 外圈&quot;细胞名 (占比)&quot;两行标签<br>#   顶部白底 Age/Sex 图例 · 左下 L1-L4 层级标尺 · 右下角迷你树结构图例<br>#<br># ★ 风格速调索引（最常改的参数都在这里，改完重跑脚本即可）──────────────────<br>#   全局字号          font_size          所有文字均写为 font_size / n，一改全改<br>#   谱系配色          lineage_colors     L1 枝色 = 扇形底色基色，换风格先改这<br>#   发散色系          rdbu_pal           轨道热图色带（蓝↔红发散）<br>#   树的疏密          node_radius        各层半径；l3 越大 L3 越贴近叶端<br>#   枝干粗细          edge_widths        单位 mm；L3 胶囊粗细另见主图 linewidth<br>#   叶端方块厚薄      tip_r0 / tip_r1    两者之差 = 方块厚度<br>#   轨道圈数/位置     tracks             加一行 = 多一圈；inner 为内半径<br>#   轨道厚薄          ring_w             色块缝隙见 pad<br>#   L3 突出环带       &quot;l3_ring&quot; 段       深浅看 mix_white(0.84)，外缘 r = 0.868<br>#   外圈标签远近      label_radius<br>#   顶部图例文字/位置 annotate(&quot;label&quot;)  y 需跟随 tracks 改动同步<br>#   迷你树位置/大小   draw_plot(x,y,width,height)   画布相对坐标 0-1<br>#   画布范围          coord_fixed(xlim, ylim)       标签被裁时放大<br># =============================================================================<br><br># 运行环境（实测版本；更老版本可能出现 API 差异）：<br>#   R 4.2.1 · tidyverse 2.0.0 · tidygraph 1.2.3<br>#   ggraph 2.1.0 · ggforce 0.4.1 · cowplot 1.1.1<br><br>library(tidyverse)<br>library(tidygraph)<br>library(ggraph)<br>library(ggforce)<br>library(cowplot)   # 右下角迷你树图例叠加（ggdraw + draw_plot）<br><br># 修复希腊字母渲染：强制 UTF-8 locale（默认 C locale 会把 γδ 变成点）<br>if (!l10n_info()$&quot;UTF-8&quot;) {<br>&nbsp;&nbsp;ok &lt;- tryCatch(Sys.setlocale(&quot;LC_CTYPE&quot;, &quot;en_US.UTF-8&quot;), warning = function(w) NULL)<br>&nbsp;&nbsp;if (is.null(ok)) Sys.setlocale(&quot;LC_CTYPE&quot;, &quot;UTF-8&quot;)<br>}<br><br>font_size &lt;- 14   # ★ 全局字号基准：所有文字 = font_size / n，n 越大字越小<br><br># 1. 读取宽表并清洗 -----------------------------------------------------------<br># input.csv 每行一个细胞亚型，必需列：<br>#   id             顺时针排序编号（决定叶端角度位置，务必从 1 连续编号）<br>#   l1/l2/l3       三级分类路径（l3 允许与 l2 同名）<br>#   cell_type      末级细胞名（外圈标签第一行）<br>#   percent        scRNA 占比（外圈标签第二行 / L3 胶囊枝内占比）<br>#   tip_color      该细胞的主题色（叶端方块 + L2/L3 枝 + 外标签）<br>#   sex_score / age_score        轨道热图数值，范围 [-1, 1]<br>#   sex_atac_stars 等四列        显著性星号（空 = 不显示）<br>data &lt;- read.csv(&quot;input.csv&quot;, stringsAsFactors = FALSE, na.strings = c(&quot;&quot;, &quot;NA&quot;)) |&gt;<br>&nbsp;&nbsp;mutate(across(where(is.character), trimws)) |&gt;<br>&nbsp;&nbsp;arrange(id) |&gt;                                    # id 决定顺时针顺序，先排序<br>&nbsp;&nbsp;mutate(<br>&nbsp;&nbsp;&nbsp;&nbsp;id = as.integer(id),<br>&nbsp;&nbsp;&nbsp;&nbsp;theta = (row_number() - 0.5) * 2 * pi / n()     # 均匀铺满 360°，顺时针自顶部<br>&nbsp;&nbsp;)<br>half_step &lt;- pi / nrow(data)  # 每个叶端扇形单元的角度半宽（弧度）= π/n<br><br># 2. 配色 ---------------------------------------------------------------------<br># ★ 谱系主色：同时决定 L1 枝条颜色与内圈扇形底色（外标签色来自 tip_color 列）<br>#   换风格改这里的 hex 即可；新增谱系时追加一行<br>lineage_colors &lt;- c(<br>&nbsp;&nbsp;&quot;CD4 T&quot;   = &quot;#2F4B8F&quot;,<br>&nbsp;&nbsp;&quot;CD8 T&quot;   = &quot;#23809D&quot;,<br>&nbsp;&nbsp;&quot;ILC&quot;     = &quot;#8A3B96&quot;,<br>&nbsp;&nbsp;&quot;B cells&quot; = &quot;#E08A00&quot;,<br>&nbsp;&nbsp;&quot;Myeloid&quot; = &quot;#7E9C3F&quot;<br>)<br><br># RdBu 发散色 ramp：score ∈ [-1, 1]，负=蓝（Female/Younger），正=红（Male/Elder）<br>#   想换色系：替换 11 个 hex，保持&quot;深→浅→白→浅→深&quot;左右对称即可套用任意发散色<br>rdbu_pal &lt;- colorRamp(c(<br>&nbsp;&nbsp;&quot;#053061&quot;, &quot;#2166AC&quot;, &quot;#4393C3&quot;, &quot;#92C5DE&quot;, &quot;#D1E5F0&quot;, &quot;#F2F2F2&quot;,<br>&nbsp;&nbsp;&quot;#FDDBC7&quot;, &quot;#F4A582&quot;, &quot;#D6604D&quot;, &quot;#B2182B&quot;, &quot;#67001F&quot;<br>))<br>rdbu &lt;- function(x) {<br>&nbsp;&nbsp;x &lt;- pmin(pmax(x, -1), 1)<br>&nbsp;&nbsp;x &lt;- sign(x) * abs(x)^0.55  # gamma 压缩：指数 &lt;1 会提亮中小值；改成 1 = 线性映射<br>&nbsp;&nbsp;rgb(rdbu_pal((x + 1) / 2), maxColorValue = 255)<br>}<br># 向白色混合：f = 混白比例，f 越大越淡<br>#   本图用到三档：0.92 内圈扇形底（极淡）/ 0.84 L3 突出环带 / 0.74 ATAC 轨道淡化<br>mix_white &lt;- function(col, f = 0.74) {<br>&nbsp;&nbsp;m &lt;- col2rgb(col)  # 0-255 标度<br>&nbsp;&nbsp;rgb(m[1, ] * (1 - f) + 255 * f, m[2, ] * (1 - f) + 255 * f,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m[3, ] * (1 - f) + 255 * f, maxColorValue = 255)<br>}<br><br># 3. 整理作图数据 --------------------------------------------------------------<br># 把每行宽表展开为 root→l1→l2→l3→cell_type 五个节点；<br>#   name 用累积路径拼接，避免不同父分支下的同名节点被错误合并<br>paths &lt;- data |&gt;<br>&nbsp;&nbsp;select(id, l1, l2, l3, cell_type, percent, tip_color, theta) |&gt;<br>&nbsp;&nbsp;mutate(root = &quot;Cells&quot;, group = l1) |&gt;<br>&nbsp;&nbsp;pivot_longer(c(root, l1, l2, l3, cell_type), names_to = &quot;level&quot;, values_to = &quot;label&quot;) |&gt;<br>&nbsp;&nbsp;mutate(name = accumulate(label, paste, sep = &quot; / &quot;), .by = id) |&gt;<br>&nbsp;&nbsp;mutate(name = if_else(level == &quot;cell_type&quot;, paste(name, id, sep = &quot; / &quot;), name)) |&gt;<br>&nbsp;&nbsp;mutate(from = lag(name), repeat_label = label == lead(label), .by = id)<br><br># 节点表：theta 取其下属叶端的角度均值<br># ★ node_radius 只表示层级深度（非进化距离）：l1/l2 越大中心越空；<br>#   l3 越大 L3 越贴近叶端（连接枝越短）；改后需同步主图 L1-L4 标尺的 y 值<br>node_radius &lt;- c(&quot;root&quot; = 0, &quot;l1&quot; = 0.19, &quot;l2&quot; = 0.42, &quot;l3&quot; = 0.86, &quot;cell_type&quot; = 1)<br>nodes &lt;- paths |&gt;<br>&nbsp;&nbsp;summarise(label = first(label), level = first(level), theta = mean(theta), .by = name) |&gt;<br>&nbsp;&nbsp;mutate(radius = node_radius[level], x = radius * sin(theta), y = radius * cos(theta))<br><br># 连线表：from 父节点 → to 子节点；proportion = 下属叶端 percent 求和<br># ★ edge_widths 单位 mm（ggplot linewidth 尺度）：l1 主干最粗、cell_type 连接枝最细<br>#   注意：主图 L3 胶囊的粗细由 geom_segment(linewidth = 5.1) 单独控制，<br>#   此处 l3 的值仅作用于迷你树缩略图<br>edge_widths &lt;- c(&quot;l1&quot; = 7, &quot;l2&quot; = 3.2, &quot;l3&quot; = 5.1, &quot;cell_type&quot; = 0.8)<br>edges &lt;- paths |&gt;<br>&nbsp;&nbsp;filter(level != &quot;root&quot;) |&gt;<br>&nbsp;&nbsp;summarise(<br>&nbsp;&nbsp;&nbsp;&nbsp;label = first(label), level = first(level), group = first(group),<br>&nbsp;&nbsp;&nbsp;&nbsp;tip = first(tip_color), proportion = sum(percent),<br>&nbsp;&nbsp;&nbsp;&nbsp;repeat_label = all(repeat_label), .by = c(from, name)<br>&nbsp;&nbsp;) |&gt;<br>&nbsp;&nbsp;rename(to = name) |&gt;<br>&nbsp;&nbsp;mutate(<br>&nbsp;&nbsp;&nbsp;&nbsp;color = if_else(level == &quot;l1&quot;, lineage_colors[group], tip),  # L1 用谱系主色，其余用叶端色<br>&nbsp;&nbsp;&nbsp;&nbsp;branch_label = case_when(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level == &quot;cell_type&quot; ~ &quot;&quot;,                                # 叶端连接枝不标字<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level == &quot;l2&quot; &amp; repeat_label ~ &quot;&quot;,                        # l2 与 l3 全员同名时抑制重复<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level == &quot;l3&quot; ~ sprintf(&quot;%s %.2f%%&quot;, label, proportion),  # 胶囊枝：名称 + 占比<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TRUE ~ label<br>&nbsp;&nbsp;&nbsp;&nbsp;),<br>&nbsp;&nbsp;&nbsp;&nbsp;width = edge_widths[level],<br>&nbsp;&nbsp;&nbsp;&nbsp;label_size = case_when(        # ★ 枝上白字大小 = font_size / n，n 越大字越小<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level == &quot;l1&quot; ~ font_size / 3.1,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level == &quot;l2&quot; ~ font_size / 4.6,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level == &quot;l3&quot; ~ font_size / 5.0,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TRUE ~ 0<br>&nbsp;&nbsp;&nbsp;&nbsp;),<br>&nbsp;&nbsp;&nbsp;&nbsp;label_pos = if_else(level == &quot;l3&quot;, 0.55, 0.62)   # 文字在枝上的位置（0 父端 → 1 子端）<br>&nbsp;&nbsp;)<br><br># L3 胶囊 = 径向直线段（圆角矩形），与贝塞尔弯枝分开画：<br>#   主图树只保留非 L3 边（edges_main），L3 另用 geom_segment 画，便于控制粗细与文字<br>#   ★ 想改回弯曲 L3 枝：删除 edges_main 过滤 + 主图两个 L3 图层，<br>#     让 geom_edge_diagonal 直接用完整 edges 即可<br>edges_main &lt;- edges |&gt; filter(level != &quot;l3&quot;)<br>tree &lt;- tbl_graph(nodes = nodes, edges = edges_main, directed = TRUE)<br>tree_layout &lt;- create_layout(tree, layout = &quot;manual&quot;, x = x, y = y)<br>tree_layout$circular &lt;- TRUE            # manual 布局必须显式声明圆形<br>attr(tree_layout, &quot;circular&quot;) &lt;- TRUE<br><br># 迷你树图例使用完整边（细枝缩略树，不剔除 L3）<br>tree_layout_full &lt;- create_layout(tbl_graph(nodes = nodes, edges = edges, directed = TRUE),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;layout = &quot;manual&quot;, x = x, y = y)<br><br># L3 胶囊：L2 节点 → L3 节点的直线段<br>#   xt/yt = 白字锚点（t = 0.55，与 edges 的 label_pos 对应）<br>#   angle 归一化到 (-90, 90]，保证左半圆文字不倒置<br>l3_capsule &lt;- edges |&gt;<br>&nbsp;&nbsp;filter(level == &quot;l3&quot;) |&gt;<br>&nbsp;&nbsp;left_join(nodes |&gt; select(name, x0 = x, y0 = y), by = c(&quot;from&quot; = &quot;name&quot;)) |&gt;<br>&nbsp;&nbsp;left_join(nodes |&gt; select(name, x1 = x, y1 = y), by = c(&quot;to&quot; = &quot;name&quot;)) |&gt;<br>&nbsp;&nbsp;mutate(<br>&nbsp;&nbsp;&nbsp;&nbsp;xt = x0 + 0.55 * (x1 - x0), yt = y0 + 0.55 * (y1 - y0),<br>&nbsp;&nbsp;&nbsp;&nbsp;angle = atan2(y1 - y0, x1 - x0) * 180 / pi,<br>&nbsp;&nbsp;&nbsp;&nbsp;angle = if_else(angle &gt; 90, angle - 180, if_else(angle &lt; -90, angle + 180, angle))<br>&nbsp;&nbsp;)<br><br># 4. 叶端、扇形底色与热图轨道 ---------------------------------------------------<br># ★ tip_r1 - tip_r0 = 叶端方块厚度（0.05），想加厚调 tip_r1<br># ★ ring_w = 轨道厚度；pad = 色块角向缝隙（弧度），调大缝隙更明显<br>tip_r0 &lt;- 0.965; tip_r1 &lt;- 1.015; ring_w &lt;- 0.070; pad &lt;- 0.002<br>tips &lt;- data |&gt;<br>&nbsp;&nbsp;mutate(<br>&nbsp;&nbsp;&nbsp;&nbsp;x = sin(theta), y = cos(theta),<br>&nbsp;&nbsp;&nbsp;&nbsp;start = theta - half_step + pad, end = theta + half_step - pad,<br>&nbsp;&nbsp;&nbsp;&nbsp;angle = 90 - theta * 180 / pi, hjust = if_else(x &lt; 0, 1, 0),  # 外标签径向旋转<br>&nbsp;&nbsp;&nbsp;&nbsp;angle = if_else(x &lt; 0, angle + 180, angle)                    # 左半圆翻转 180° 保证可读<br>&nbsp;&nbsp;)<br><br># 扇形底色两层：<br>#   内圈（0.02-0.42，L1/L2 区）= 很淡的谱系色（mix 0.92）<br>#   外圈 = L3 突出环带（见下），按 L3 分支着色<br>sectors_inner &lt;- tips |&gt;<br>&nbsp;&nbsp;summarise(start = min(start) - 0.01, end = max(end) + 0.01,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;color = mix_white(lineage_colors[l1], 0.92), .by = l1) |&gt;<br>&nbsp;&nbsp;mutate(r0 = 0.02, r = 0.42)<br><br># ★ L3 突出环带：包住每个 L3 分支的淡彩宽环（0.42 → 0.868）<br>#   mix_white 0.84 = 深浅（越大越淡）；±0.006 = 角向外扩（相邻环带近乎相接）<br>#   外缘 0.868 与叶端内缘 0.965 之间留 ~0.1 作 L3 → 编号方块的连接枝空间<br>l3_ring &lt;- paths |&gt;<br>&nbsp;&nbsp;filter(level == &quot;l3&quot;) |&gt;<br>&nbsp;&nbsp;summarise(start = min(theta) - half_step - 0.006,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end = max(theta) + half_step + 0.006, .by = name) |&gt;<br>&nbsp;&nbsp;left_join(edges |&gt; filter(level == &quot;l3&quot;) |&gt; select(to, color), by = c(&quot;name&quot; = &quot;to&quot;)) |&gt;<br>&nbsp;&nbsp;mutate(color = mix_white(color, 0.84), r0 = 0.42, r = 0.868)<br><br>sectors &lt;- bind_rows(sectors_inner, l3_ring)<br><br># ★ 4 条环形轨道：inner 为内半径，outer = inner + ring_w<br>#   加轨道：tribble 加一行 + ring_data 里加一段 transmute（列名前缀对应即可）<br>#   改组间距：调各 inner；改厚薄：调 ring_w<br>tracks &lt;- tribble(<br>&nbsp;&nbsp;~track,      ~inner,<br>&nbsp;&nbsp;&quot;sex_atac&quot;,  1.035,<br>&nbsp;&nbsp;&quot;sex_rna&quot;,   1.117,<br>&nbsp;&nbsp;&quot;age_atac&quot;,  1.199,<br>&nbsp;&nbsp;&quot;age_rna&quot;,   1.281<br>) |&gt; mutate(outer = inner + ring_w)<br><br># 轨道数据：每个叶端一格；ATAC 圈 mix_white(f=0.74) 淡化 + 星号，RNA 圈饱和<br>ring_data &lt;- bind_rows(<br>&nbsp;&nbsp;data |&gt; transmute(id, theta, stars = sex_atac_stars, score = sex_score, mod = &quot;atac&quot;, track = &quot;sex_atac&quot;),<br>&nbsp;&nbsp;data |&gt; transmute(id, theta, stars = sex_rna_stars,  score = sex_score, mod = &quot;rna&quot;,  track = &quot;sex_rna&quot;),<br>&nbsp;&nbsp;data |&gt; transmute(id, theta, stars = age_atac_stars, score = age_score, mod = &quot;atac&quot;, track = &quot;age_atac&quot;),<br>&nbsp;&nbsp;data |&gt; transmute(id, theta, stars = age_rna_stars,  score = age_score, mod = &quot;rna&quot;,  track = &quot;age_rna&quot;)<br>) |&gt;<br>&nbsp;&nbsp;inner_join(tracks, by = &quot;track&quot;) |&gt;<br>&nbsp;&nbsp;mutate(<br>&nbsp;&nbsp;&nbsp;&nbsp;fill  = if_else(mod == &quot;atac&quot;, mix_white(rdbu(score)), rdbu(score)),<br>&nbsp;&nbsp;&nbsp;&nbsp;start = theta - half_step + pad, end = theta + half_step - pad,<br>&nbsp;&nbsp;&nbsp;&nbsp;radius = (inner + outer) / 2,<br>&nbsp;&nbsp;&nbsp;&nbsp;x = radius * sin(theta), y = radius * cos(theta),<br>&nbsp;&nbsp;&nbsp;&nbsp;angle = -theta * 180 / pi       # 星号沿轨道切向<br>&nbsp;&nbsp;)<br><br># 星号颜色：深色格用白星、浅色格用黑星（RGB 平均亮度阈值 130/255）<br>brightness &lt;- colMeans(col2rgb(ring_data$fill))<br>ring_data$text_color &lt;- if_else(brightness &lt; 130, &quot;white&quot;, &quot;#202020&quot;)<br><br># 顶部图例区不避让轨道：与参考实现一致，轨道完整绘制，<br># 由两个白底 label 直接盖在轨道上方，文字被热图环抱<br>label_radius &lt;- 1.46    # ★ 外圈标签的径向位置（越大脑外标签离圆越远）<br>outer_circle &lt;- 1.42    # 绿色参考圆半径<br><br># 5. 绘制主图 ------------------------------------------------------------------<br># 图层自下而上：扇形底色 → 树枝 → L3 胶囊 → 叶端方块/编号 → 轨道 → 参考圆<br>#              → 星号 → 外圈标签 → 顶部图例 → L1-L4 标尺<br>p &lt;- ggraph(tree_layout) +<br>&nbsp;&nbsp;# 谱系扇形底色 + L3 突出环带<br>&nbsp;&nbsp;geom_arc_bar(<br>&nbsp;&nbsp;&nbsp;&nbsp;data = sectors, aes(x0 = 0, y0 = 0, r0 = r0, r = r, start = start, end = end, fill = color),<br>&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, color = NA<br>&nbsp;&nbsp;) +<br>&nbsp;&nbsp;# 树枝 + 枝上标签（三次贝塞尔对角枝，lineend round = 圆角端点）<br>&nbsp;&nbsp;geom_edge_diagonal(<br>&nbsp;&nbsp;&nbsp;&nbsp;aes(edge_colour = color, edge_width = width,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label = branch_label, label_size = label_size, label_pos = label_pos),<br>&nbsp;&nbsp;&nbsp;&nbsp;label_colour = &quot;white&quot;, angle_calc = &quot;along&quot;, lineend = &quot;round&quot;, family = &quot;Arial&quot;<br>&nbsp;&nbsp;) +<br>&nbsp;&nbsp;# L3 胶囊枝：L2 → L3 径向直线段（圆角矩形），白字在枝内<br>&nbsp;&nbsp;# ★ linewidth = 胶囊粗细（mm），需明显粗于 cell_type 连接枝才呈&quot;胶囊&quot;效果<br>&nbsp;&nbsp;geom_segment(data = l3_capsule, aes(x = x0, y = y0, xend = x1, yend = y1, colour = color),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, linewidth = 5.1, lineend = &quot;round&quot;) +<br>&nbsp;&nbsp;geom_text(data = l3_capsule,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;aes(x = xt, y = yt, label = sprintf(&quot;%s %.2f%%&quot;, label, proportion), angle = angle),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, color = &quot;white&quot;, size = font_size / 5.0, family = &quot;Arial&quot;) +<br>&nbsp;&nbsp;# 叶端编号方块<br>&nbsp;&nbsp;geom_arc_bar(<br>&nbsp;&nbsp;&nbsp;&nbsp;data = tips, aes(x0 = 0, y0 = 0, r0 = tip_r0, r = tip_r1, start = start, end = end, fill = tip_color),<br>&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, color = NA<br>&nbsp;&nbsp;) +<br>&nbsp;&nbsp;geom_text(<br>&nbsp;&nbsp;&nbsp;&nbsp;data = tips, aes(x = x * 0.99, y = y * 0.99, label = id),<br>&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, color = &quot;white&quot;, size = font_size / 4.6, family = &quot;Arial&quot;<br>&nbsp;&nbsp;) +<br>&nbsp;&nbsp;# 4 圈热图轨道<br>&nbsp;&nbsp;geom_arc_bar(<br>&nbsp;&nbsp;&nbsp;&nbsp;data = ring_data, aes(x0 = 0, y0 = 0, r0 = inner, r = outer, start = start, end = end, fill = fill),<br>&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, color = NA<br>&nbsp;&nbsp;) +<br>&nbsp;&nbsp;# 外圈绿色参考圆（两组轨道的分隔线）<br>&nbsp;&nbsp;geom_circle(<br>&nbsp;&nbsp;&nbsp;&nbsp;data = tibble(x0 = 0, y0 = 0, r = outer_circle), aes(x0 = x0, y0 = y0, r = r),<br>&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, color = &quot;#A3D39B&quot;, linewidth = 0.5<br>&nbsp;&nbsp;) +<br>&nbsp;&nbsp;# 星号（颜色取预先算好的黑/白）<br>&nbsp;&nbsp;geom_text(<br>&nbsp;&nbsp;&nbsp;&nbsp;data = filter(ring_data, !is.na(stars)),<br>&nbsp;&nbsp;&nbsp;&nbsp;aes(x, y, label = stars, angle = angle, color = I(text_color)),<br>&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, size = font_size / 4.7, fontface = &quot;bold&quot;, family = &quot;Arial&quot;<br>&nbsp;&nbsp;) +<br>&nbsp;&nbsp;# 外圈两行标签：细胞名 + (占比)，按叶端着色<br>&nbsp;&nbsp;geom_text(<br>&nbsp;&nbsp;&nbsp;&nbsp;data = tips,<br>&nbsp;&nbsp;&nbsp;&nbsp;aes(x = x * label_radius, y = y * label_radius,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label = sprintf(&quot;%s\n(%.2f%%)&quot;, cell_type, percent), color = tip_color,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;angle = angle, hjust = hjust),<br>&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, size = font_size / 3.7, family = &quot;Arial&quot;, lineheight = 0.85<br>&nbsp;&nbsp;) +<br>&nbsp;&nbsp;# ---- 顶部 Age / Sex 图例：白底 label 直接盖在轨道上（对齐参考代码写法） ----<br>&nbsp;&nbsp;# ★ y 取各自轨道组的中心偏上：Sex 组 1.035-1.187 → 1.15；Age 组 1.199-1.351 → 1.31<br>&nbsp;&nbsp;#   改 tracks 后同步这两个 y（≈ 组内半径均值 + 0.04）<br>&nbsp;&nbsp;#   size = font_size / 5.4 控制字号；label.padding = 白底留白；label.size = 0 去边框<br>&nbsp;&nbsp;annotate(&quot;label&quot;, x = 0, y = c(1.15, 1.31),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label = c(&quot;Sex: cell proportion\nATAC / RNA&quot;, &quot;Age: cell proportion\nATAC / RNA&quot;),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label.size = 0, size = font_size / 5.4, fill = &quot;white&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;family = &quot;Arial&quot;, label.padding = unit(0.1, &quot;lines&quot;)) +<br>&nbsp;&nbsp;# ---- 层级标尺 L1-L4（虚线竖尺 + 灰色圆点标记） ----<br>&nbsp;&nbsp;# ★ 圆点 y 对应 node_radius 各层半径，改 node_radius 后同步这四个值<br>&nbsp;&nbsp;annotate(&quot;segment&quot;, x = -0.07, y = -0.19, xend = -0.07, yend = -0.99,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;linewidth = 0.4, linetype = &quot;22&quot;, color = &quot;#CCCCCC&quot;) +<br>&nbsp;&nbsp;annotate(&quot;point&quot;, x = -0.07, y = c(-0.19, -0.42, -0.86, -0.99), size = font_size / 1.8, color = &quot;#DDDDDD&quot;) +<br>&nbsp;&nbsp;annotate(&quot;text&quot;, x = -0.07, y = c(-0.19, -0.42, -0.86, -0.99), label = paste0(&quot;L&quot;, 1:4),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size = font_size / 4, color = &quot;#333333&quot;, family = &quot;Arial&quot;) +<br>&nbsp;&nbsp;scale_fill_identity(na.value = &quot;#FFFFFF&quot;) +<br>&nbsp;&nbsp;scale_color_identity() +<br>&nbsp;&nbsp;scale_edge_colour_identity() +<br>&nbsp;&nbsp;scale_edge_width_identity() +<br>&nbsp;&nbsp;scale_continuous_identity(aesthetics = &quot;label_size&quot;) +<br>&nbsp;&nbsp;# 等比例坐标（圆环不变形）+ 画布范围：外圈标签被裁时放大 xlim/ylim<br>&nbsp;&nbsp;coord_fixed(xlim = c(-2.45, 2.45), ylim = c(-2.45, 2.45), clip = &quot;off&quot;) +<br>&nbsp;&nbsp;theme_void(base_family = &quot;Arial&quot;, base_size = font_size) +<br>&nbsp;&nbsp;theme(<br>&nbsp;&nbsp;&nbsp;&nbsp;legend.position = &quot;none&quot;, plot.margin = margin(12, 12, 12, 12),<br>&nbsp;&nbsp;&nbsp;&nbsp;plot.background = element_rect(fill = &quot;white&quot;, color = NA)<br>&nbsp;&nbsp;)<br><br># 6. 右下角迷你树图例（复用主图数据：细枝缩略树 + 色带 + 热图轨道 + 说明文字） ------<br># 与主图同构但极简化：细枝 0.6 / alpha 0.7，无编号、无枝上文字<br># ★ 想调迷你树内部比例：改 coord_fixed(xlim, ylim)；上下说明文字 y = ±1.7<br>guide_plot &lt;- ggraph(tree_layout_full) +<br>&nbsp;&nbsp;# 缩略树只保留细枝，不显示枝上文字<br>&nbsp;&nbsp;geom_edge_diagonal(aes(edge_colour = color), edge_width = 0.6, alpha = 0.7) +<br>&nbsp;&nbsp;# 叶端分类色带<br>&nbsp;&nbsp;geom_arc_bar(data = tips, aes(x0 = 0, y0 = 0, r0 = tip_r0, r = tip_r1, start = start, end = end, fill = tip_color),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, color = NA) +<br>&nbsp;&nbsp;# 四条热图轨道<br>&nbsp;&nbsp;geom_arc_bar(data = ring_data, aes(x0 = 0, y0 = 0, r0 = inner, r = outer, start = start, end = end, fill = fill),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inherit.aes = FALSE, color = NA) +<br>&nbsp;&nbsp;# 中心白底标题（label.size = 0 去边框）<br>&nbsp;&nbsp;annotate(&quot;label&quot;, x = 0, y = 0, label = &quot;Cell Annotation\nLineage&quot;, size = font_size / 4, label.size = 0,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fill = &quot;white&quot;, family = &quot;Arial&quot;) +<br>&nbsp;&nbsp;# 上方说明：内侧轨道组为性别，外侧为年龄<br>&nbsp;&nbsp;annotate(&quot;text&quot;, x = 0, y = 1.7, label = &quot;Inner: Sex  |  Outer: Age&quot;, size = font_size / 4, family = &quot;Arial&quot;) +<br>&nbsp;&nbsp;# 下方说明：每组 ATAC / RNA 顺序及外圈百分比含义<br>&nbsp;&nbsp;annotate(&quot;text&quot;, x = 0, y = -1.7, label = &quot;Each pair: ATAC / RNA\nOuter labels: scRNA proportion&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size = font_size / 4.3, family = &quot;Arial&quot;, lineheight = 0.9) +<br>&nbsp;&nbsp;scale_fill_identity(na.value = &quot;white&quot;) +<br>&nbsp;&nbsp;scale_edge_colour_identity() +<br>&nbsp;&nbsp;coord_fixed(xlim = c(-1.8, 1.8), ylim = c(-2, 2), clip = &quot;off&quot;) +<br>&nbsp;&nbsp;theme_void()<br><br># 主图为画布，右下角叠放迷你树图例<br># ★ x/y/width/height 为画布相对坐标（0-1）；与外圈标签重叠时可微调 x/y 或缩小<br>final_plot &lt;- ggdraw(p) + draw_plot(guide_plot, x = 0.79, y = 0.008, width = 0.185, height = 0.185)<br><br># 7. 保存 ----------------------------------------------------------------------<br>ggsave(&quot;Figure1E.pdf&quot;, final_plot, width = 15, height = 15, device = cairo_pdf, bg = &quot;white&quot;)<br>png(&quot;Figure1E.png&quot;, width = 15, height = 15, units = &quot;in&quot;, res = 150, type = &quot;cairo&quot;, bg = &quot;white&quot;)<br>print(final_plot)<br>dev.off()<br><br>cat(&quot;Done: Figure1E.pdf / Figure1E.png\n&quot;)</pre>
-<p style='margin:14px 0 8px;font-size:14px;font-weight:700;color:#1f4b6e;'>📄 circle_tree.py <span style='font-weight:400;color:#5a7684;font-size:12px;'>（Python · 环境 Python 3.10.9 · matplotlib 3.10.8 · pandas 2.2.3 · numpy 2.0.2）</span></p><pre style='background:#14283a;color:#d9e6ee;font-size:12px;line-height:1.55;padding:14px 12px;border-radius:8px;overflow-x:auto;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;font-family:Menlo,Consolas,'Courier New',monospace;margin:0;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;'># =============================================================================<br># Title: Circular cell annotation tree | 环形细胞注释树（Science Fig.1E 风格）Python 版<br># Author: Shang Xia Qiu Suo<br># 与 R 版 (circle_tree.R) 同一套数据与布局逻辑、逐段对应；注释含风格调参说明。<br>#<br># 图面结构（由内向外）：<br>#   中心根节点 → L1 谱系主枝 → L2 分支 → L3 直线胶囊枝（白字标在枝内）<br>#   → 72 个编号叶端方块 → 4 条环形轨道（内 2 圈 Sex / 外 2 圈 Age）<br>#   → 外圈&quot;细胞名 (占比)&quot;两行标签<br>#   顶部白底 Age/Sex 图例 · 左下 L1-L4 层级标尺 · 右下角迷你树结构图例<br>#<br># ★ 风格速调索引（最常改的参数都在这里，改完重跑脚本即可）──────────────────<br>#   全局字号          FONT                所有文字 = FONT / n * MM2PT<br>#   单位换算          MM2PT               ggplot 尺寸(mm) → matplotlib 磅(pt)<br>#   谱系配色          lineage_colors      L1 枝色 = 扇形底色基色<br>#   发散色系          RDBU / rdbu()       轨道热图色带（蓝↔红发散）<br>#   树的疏密          node_radius         各层半径；l3 越大 L3 越贴近叶端<br>#   枝干粗细          edge_widths         磅（已乘 MM2PT）<br>#   叶端方块厚薄      tip_r0 / tip_r1     两者之差 = 方块厚度<br>#   轨道圈数/位置     tracks              加一项 = 多一圈；值为内半径<br>#   轨道厚薄          ring_w              色块缝隙见 pad<br>#   L3 突出环带       l3_rows 段          深浅看 mix_white(0.84)，外缘 r = 0.868<br>#   外圈标签远近      label_radius<br>#   顶部图例文字/位置 &quot;顶部 Age / Sex 图例&quot; for 循环   y 需跟随 tracks 同步<br>#   迷你树位置/大小   fig.add_axes([...]) figure 相对坐标 0-1<br>#   画布范围          ax.set_xlim / ax.set_ylim       标签被裁时放大<br>#<br># 环境（实测版本）：Python 3.10.9 · matplotlib 3.10.8 · pandas 2.2.3 · numpy 2.0.2<br># =============================================================================<br><br>import numpy as np<br>import pandas as pd<br>import matplotlib<br>matplotlib.use(&quot;Agg&quot;)<br>import matplotlib.pyplot as plt<br>from matplotlib.patches import Wedge, Circle, PathPatch<br>from matplotlib.path import Path<br><br>plt.rcParams[&quot;font.family&quot;] = [&quot;Arial&quot;, &quot;Helvetica&quot;, &quot;sans-serif&quot;]<br>plt.rcParams[&quot;pdf.fonttype&quot;] = 42          # PDF 内嵌 TrueType，文字可编辑<br><br>FONT = 14.0    # ★ 全局字号基准：所有文字 = FONT / n * MM2PT，n 越大字越小<br>MM2PT = 2.845  # ggplot 的 size 单位(mm) → matplotlib 磅值；两版观感一致的关键<br><br># ---------- 1. 读取数据 -------------------------------------------------------<br># input.csv 列说明同 R 版：id / l1 / l2 / l3 / cell_type / percent / tip_color<br>#                          / sex_score / age_score / *_stars 四列星号<br>df = pd.read_csv(&quot;input.csv&quot;)<br>df = df.sort_values(&quot;id&quot;).reset_index(drop=True)<br>n = len(df)<br>half_step = np.pi / n          # 每个叶端扇形单元的角度半宽（弧度）= π/n<br>pad = 0.002                    # ★ 色块角向缝隙（弧度），调大缝隙更明显<br>df[&quot;theta&quot;] = (df.index + 0.5) * 2 * np.pi / n   # 均匀铺满 360°，顺时针自顶部<br>df[&quot;root&quot;] = &quot;Cells&quot;<br><br># ---------- 2. 配色 -----------------------------------------------------------<br># ★ 谱系主色：同时决定 L1 枝条颜色与内圈扇形底色（外标签色来自 tip_color 列）<br>lineage_colors = {<br>&nbsp;&nbsp;&nbsp;&nbsp;&quot;CD4 T&quot;: &quot;#2F4B8F&quot;, &quot;CD8 T&quot;: &quot;#23809D&quot;, &quot;ILC&quot;: &quot;#8A3B96&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&quot;B cells&quot;: &quot;#E08A00&quot;, &quot;Myeloid&quot;: &quot;#7E9C3F&quot;,<br>}<br># RdBu 发散色：深→浅→白→浅→深 11 档；换色系时保持左右对称即可<br>RDBU = [&quot;#053061&quot;, &quot;#2166AC&quot;, &quot;#4393C3&quot;, &quot;#92C5DE&quot;, &quot;#D1E5F0&quot;, &quot;#F2F2F2&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;#FDDBC7&quot;, &quot;#F4A582&quot;, &quot;#D6604D&quot;, &quot;#B2182B&quot;, &quot;#67001F&quot;]<br>RDBU_RGB = np.array([[int(c[i:i+2], 16) for i in (1, 3, 5)] for c in RDBU], float)<br><br>def hex2rgb(h):<br>&nbsp;&nbsp;&nbsp;&nbsp;return np.array([int(h[i:i+2], 16) for i in (1, 3, 5)], float)<br><br>def rgb2hex(c):<br>&nbsp;&nbsp;&nbsp;&nbsp;return &quot;#{:02X}{:02X}{:02X}&quot;.format(*(int(round(v)) for v in np.clip(c, 0, 255)))<br><br>def mix_white(h, f=0.74):      # ★ 向白色混合：f = 混白比例，越大越淡<br>&nbsp;&nbsp;&nbsp;&nbsp;return rgb2hex(hex2rgb(h) * (1 - f) + 255 * f)   # 0.92 扇形底 / 0.84 L3 环带 / 0.74 ATAC<br><br>def rdbu(x):                   # RdBu 发散色：负=蓝（Female/Younger），正=红（Male/Elder）<br>&nbsp;&nbsp;&nbsp;&nbsp;x = np.clip(x, -1, 1)<br>&nbsp;&nbsp;&nbsp;&nbsp;x = np.sign(x) * np.abs(x) ** 0.55   # ★ gamma 压缩：&lt;1 提亮中小值；改 1 = 线性<br>&nbsp;&nbsp;&nbsp;&nbsp;t = (x + 1) / 2 * (len(RDBU) - 1)<br>&nbsp;&nbsp;&nbsp;&nbsp;lo = int(np.floor(t)); hi = min(lo + 1, len(RDBU) - 1); f = t - lo<br>&nbsp;&nbsp;&nbsp;&nbsp;return rgb2hex(RDBU_RGB[lo] * (1 - f) + RDBU_RGB[hi] * f)<br><br># ---------- 3. 节点 / 连线表 ---------------------------------------------------<br># ★ node_radius 只表示层级深度（非进化距离）：l1/l2 越大中心越空；<br>#   l3 越大 L3 越贴近叶端；改后需同步主图 L1-L4 标尺的 y 值<br>node_radius = {&quot;root&quot;: 0, &quot;l1&quot;: 0.19, &quot;l2&quot;: 0.42, &quot;l3&quot;: 0.86, &quot;cell_type&quot;: 1}<br><br>def leaf_path(row, upto):<br>&nbsp;&nbsp;&nbsp;&nbsp;&quot;&quot;&quot;叶端路径的累积名（与 R 的 accumulate 一致），upto ∈ {root,l1,l2,l3,cell_type}&quot;&quot;&quot;<br>&nbsp;&nbsp;&nbsp;&nbsp;order = [&quot;root&quot;, &quot;l1&quot;, &quot;l2&quot;, &quot;l3&quot;, &quot;cell_type&quot;]<br>&nbsp;&nbsp;&nbsp;&nbsp;labels = {&quot;root&quot;: row[&quot;root&quot;], &quot;l1&quot;: row[&quot;l1&quot;], &quot;l2&quot;: row[&quot;l2&quot;],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;l3&quot;: row[&quot;l3&quot;], &quot;cell_type&quot;: f&quot;{row[&#x27;cell_type&#x27;]} / {row[&#x27;id&#x27;]}&quot;}<br>&nbsp;&nbsp;&nbsp;&nbsp;return &quot; / &quot;.join(labels[k] for k in order[: order.index(upto) + 1])<br><br># 收集每个节点的叶端 theta，取均值（同 R 版 summarise(mean(theta))）<br>theta_pool = {}<br>for _, row in df.iterrows():<br>&nbsp;&nbsp;&nbsp;&nbsp;for lvl in (&quot;root&quot;, &quot;l1&quot;, &quot;l2&quot;, &quot;l3&quot;, &quot;cell_type&quot;):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;theta_pool.setdefault((lvl, leaf_path(row, lvl)), []).append(row[&quot;theta&quot;])<br><br>nodes = {}<br>for (lvl, name), ths in theta_pool.items():<br>&nbsp;&nbsp;&nbsp;&nbsp;th = float(np.mean(ths))<br>&nbsp;&nbsp;&nbsp;&nbsp;nodes[name] = dict(level=lvl, theta=th,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x=node_radius[lvl] * np.sin(th), y=node_radius[lvl] * np.cos(th))<br><br># 连线：L1 用谱系主色，其余层级取该分支下第一个叶端颜色<br># ★ edge_widths 磅值（R 的 mm × MM2PT）：l1 主干最粗、cell_type 连接枝最细；<br>#   L3 胶囊在下面绘图循环里固定用 edge_widths[&quot;l3&quot;]<br>edge_widths = {&quot;l1&quot;: 7 * MM2PT, &quot;l2&quot;: 3.2 * MM2PT, &quot;l3&quot;: 5.1 * MM2PT, &quot;cell_type&quot;: 0.8 * MM2PT}<br>label_sizes = {&quot;l1&quot;: FONT / 3.1 * MM2PT, &quot;l2&quot;: FONT / 4.6 * MM2PT, &quot;l3&quot;: FONT / 5.0 * MM2PT}<br><br>edges = {}<br>for _, row in df.iterrows():<br>&nbsp;&nbsp;&nbsp;&nbsp;seq = [(leaf_path(row, a), leaf_path(row, b))<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for a, b in zip((&quot;root&quot;, &quot;l1&quot;, &quot;l2&quot;, &quot;l3&quot;), (&quot;l1&quot;, &quot;l2&quot;, &quot;l3&quot;, &quot;cell_type&quot;))]<br>&nbsp;&nbsp;&nbsp;&nbsp;for from_name, to_name in seq:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key = (from_name, to_name)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e = edges.setdefault(key, dict(proportion=0.0, ids=[]))<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;level&quot;] = nodes[to_name][&quot;level&quot;]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;proportion&quot;] += row[&quot;percent&quot;]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;ids&quot;].append(row[&quot;id&quot;])<br><br>for (from_name, to_name), e in edges.items():<br>&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;from&quot;], e[&quot;to&quot;] = from_name, to_name<br>&nbsp;&nbsp;&nbsp;&nbsp;last = to_name.split(&quot; / &quot;)[-1]<br>&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;color&quot;] = lineage_colors[last] if e[&quot;level&quot;] == &quot;l1&quot; else \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;df.loc[df[&quot;id&quot;] == e[&quot;ids&quot;][0], &quot;tip_color&quot;].iloc[0]<br>&nbsp;&nbsp;&nbsp;&nbsp;# branch_label：cell_type 无标签；l2 在 l2==l3 全员重复时抑制；l3 显示&quot;名称 占比%&quot;<br>&nbsp;&nbsp;&nbsp;&nbsp;if e[&quot;level&quot;] == &quot;cell_type&quot;:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;branch_label&quot;], e[&quot;label_size&quot;] = &quot;&quot;, 0<br>&nbsp;&nbsp;&nbsp;&nbsp;else:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sub = df[df[&quot;id&quot;].isin(e[&quot;ids&quot;])]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if e[&quot;level&quot;] == &quot;l2&quot;:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repeat = bool((sub[&quot;l2&quot;] == sub[&quot;l3&quot;]).all())<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;branch_label&quot;] = &quot;&quot; if repeat else last<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elif e[&quot;level&quot;] == &quot;l3&quot;:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;branch_label&quot;] = f&quot;{last} {e[&#x27;proportion&#x27;]:.2f}%&quot;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;branch_label&quot;] = last<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;label_size&quot;] = label_sizes[e[&quot;level&quot;]]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# ★ 文字在枝上的位置（0 父端 → 1 子端）；L3 胶囊文字取 0.55<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e[&quot;label_pos&quot;] = 0.55 if e[&quot;level&quot;] == &quot;l3&quot; else 0.62<br><br># ---------- 4. 叶端、扇形底色与热图轨道 ----------------------------------------<br># ★ tip_r1 - tip_r0 = 叶端方块厚度；ring_w = 轨道厚度<br>tip_r0, tip_r1, ring_w = 0.965, 1.015, 0.070<br>tips = df.copy()<br>tips[&quot;start&quot;] = tips[&quot;theta&quot;] - half_step + pad<br>tips[&quot;end&quot;] = tips[&quot;theta&quot;] + half_step - pad<br>tips[&quot;x&quot;] = np.sin(tips[&quot;theta&quot;]); tips[&quot;y&quot;] = np.cos(tips[&quot;theta&quot;])<br><br># 扇形底色两层：内圈（0.02-0.42，L1/L2 区）为很淡的谱系色（mix 0.92）；<br># 外圈为 L3 突出环带（见下），按 L3 分支着色<br>sectors = (tips.groupby(&quot;l1&quot;)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.agg(start=(&quot;start&quot;, &quot;min&quot;), end=(&quot;end&quot;, &quot;max&quot;)).reset_index())<br>sectors[&quot;start&quot;] -= 0.01; sectors[&quot;end&quot;] += 0.01<br>sectors[&quot;color&quot;] = [mix_white(lineage_colors[l1], 0.92) for l1 in sectors[&quot;l1&quot;]]<br>sectors[&quot;r0&quot;], sectors[&quot;r&quot;] = 0.02, 0.42<br><br># ★ L3 突出环带：包住每个 L3 分支的淡彩宽环（0.42 → 0.868）<br>#   mix_white 0.84 = 深浅（越大越淡）；±0.006 = 角向外扩（相邻环带近乎相接）；<br>#   外缘 0.868 与叶端内缘 0.965 之间留 ~0.1 作 L3 → 编号方块的连接枝空间<br>l3_rows = []<br>for e in edges.values():<br>&nbsp;&nbsp;&nbsp;&nbsp;if e[&quot;level&quot;] != &quot;l3&quot;:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;continue<br>&nbsp;&nbsp;&nbsp;&nbsp;th = df.loc[df[&quot;id&quot;].isin(e[&quot;ids&quot;]), &quot;theta&quot;]<br>&nbsp;&nbsp;&nbsp;&nbsp;l3_rows.append(dict(start=th.min() - half_step - 0.006, end=th.max() + half_step + 0.006,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;color=mix_white(e[&quot;color&quot;], 0.84), r0=0.42, r=0.868))<br>sectors = pd.concat([sectors, pd.DataFrame(l3_rows)], ignore_index=True)<br><br># ★ 4 条环形轨道：键 = 轨道名，值 = 内半径（outer = inner + ring_w）<br>#   加轨道：这里加一项 + 下面 ring_rows 循环自动套用（列名前缀对应即可）<br>tracks = {&quot;sex_atac&quot;: 1.035, &quot;sex_rna&quot;: 1.117, &quot;age_atac&quot;: 1.199, &quot;age_rna&quot;: 1.281}<br>ring_rows = []<br>for track, inner in tracks.items():<br>&nbsp;&nbsp;&nbsp;&nbsp;mod = track.split(&quot;_&quot;)[1]<br>&nbsp;&nbsp;&nbsp;&nbsp;score_col = &quot;sex_score&quot; if track.startswith(&quot;sex&quot;) else &quot;age_score&quot;<br>&nbsp;&nbsp;&nbsp;&nbsp;for _, row in df.iterrows():<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# ATAC 圈 mix_white(f=0.74) 淡化，RNA 圈饱和 —— 两模组的视觉分工<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fill = mix_white(rdbu(row[score_col])) if mod == &quot;atac&quot; else rdbu(row[score_col])<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ring_rows.append(dict(track=track, inner=inner, outer=inner + ring_w,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;start=row[&quot;theta&quot;] - half_step + pad,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end=row[&quot;theta&quot;] + half_step - pad, fill=fill,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stars=row[track + &quot;_stars&quot;], theta=row[&quot;theta&quot;]))<br>rings = pd.DataFrame(ring_rows)<br>rings[&quot;radius&quot;] = (rings[&quot;inner&quot;] + rings[&quot;outer&quot;]) / 2<br>rings[&quot;x&quot;] = rings[&quot;radius&quot;] * np.sin(rings[&quot;theta&quot;])<br>rings[&quot;y&quot;] = rings[&quot;radius&quot;] * np.cos(rings[&quot;theta&quot;])<br># 星号颜色：深色格白星、浅色格黑星（RGB 平均亮度阈值 130/255）<br>rings[&quot;text_color&quot;] = np.where(<br>&nbsp;&nbsp;&nbsp;&nbsp;rings[&quot;fill&quot;].map(lambda h: hex2rgb(h).mean()) &lt; 130, &quot;white&quot;, &quot;#202020&quot;)<br><br># 顶部图例区不避让轨道：与参考实现一致，轨道完整绘制，<br># 由两个白底 label 直接盖在轨道上方，文字被热图环抱<br>label_radius, outer_circle = 1.46, 1.42   # ★ 外标签径向位置 / 绿色参考圆半径<br><br># ---------- 5. 绘图 -----------------------------------------------------------<br># 图层自下而上：扇形底色 → 树枝/L3 胶囊 → 轨道 → 参考圆 → 星号<br>#              → 叶端方块/编号 → 外圈标签 → 顶部图例 → L1-L4 标尺<br>fig = plt.figure(figsize=(15, 15))         # ★ 15×15 英寸方形画布<br>ax = fig.add_axes([0, 0, 1, 1])<br>ax.set_xlim(-2.45, 2.45); ax.set_ylim(-2.45, 2.45)   # ★ 标签被裁时放大范围<br>ax.set_aspect(&quot;equal&quot;); ax.axis(&quot;off&quot;)<br>fig.patch.set_facecolor(&quot;white&quot;)<br><br>def mdeg(start, end):          # theta 自顶部顺时针 → matplotlib 角度逆时针自 +x<br>&nbsp;&nbsp;&nbsp;&nbsp;return 90 - np.rad2deg(end), 90 - np.rad2deg(start)<br><br># 谱系扇形底色 + L3 突出环带<br>for _, s in sectors.iterrows():<br>&nbsp;&nbsp;&nbsp;&nbsp;t1, t2 = mdeg(s[&quot;start&quot;], s[&quot;end&quot;])<br>&nbsp;&nbsp;&nbsp;&nbsp;ax.add_patch(Wedge((0, 0), s[&quot;r&quot;], t1, t2, width=s[&quot;r&quot;] - s[&quot;r0&quot;],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;facecolor=s[&quot;color&quot;], edgecolor=&quot;none&quot;, zorder=1))<br><br># 树枝：ggraph diagonal 风格三次贝塞尔（两端切线竖直 → 极坐标下为平滑弯枝）<br>def bezier_edge(p0, p1, lw, color, zorder=4):<br>&nbsp;&nbsp;&nbsp;&nbsp;ym = (p0[1] + p1[1]) / 2<br>&nbsp;&nbsp;&nbsp;&nbsp;path = Path([p0, (p0[0], ym), (p1[0], ym), p1],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])<br>&nbsp;&nbsp;&nbsp;&nbsp;ax.add_patch(PathPatch(path, fill=False, lw=lw, color=color,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;capstyle=&quot;round&quot;, zorder=zorder))<br>&nbsp;&nbsp;&nbsp;&nbsp;return path<br><br>def bez_point_tangent(path, t):<br>&nbsp;&nbsp;&nbsp;&nbsp;&quot;&quot;&quot;贝塞尔曲线上 t 处的坐标与切线角（用于白字沿枝排布）&quot;&quot;&quot;<br>&nbsp;&nbsp;&nbsp;&nbsp;p0, c1, c2, p1 = path.vertices<br>&nbsp;&nbsp;&nbsp;&nbsp;mt = 1 - t<br>&nbsp;&nbsp;&nbsp;&nbsp;pt = mt**3 * p0 + 3 * mt**2 * t * c1 + 3 * mt * t**2 * c2 + t**3 * p1<br>&nbsp;&nbsp;&nbsp;&nbsp;d = 3 * mt**2 * (c1 - p0) + 6 * mt * t * (c2 - c1) + 3 * t**2 * (p1 - c2)<br>&nbsp;&nbsp;&nbsp;&nbsp;return pt, np.degrees(np.arctan2(d[1], d[0]))<br><br>for e in edges.values():<br>&nbsp;&nbsp;&nbsp;&nbsp;p0, p1 = nodes[e[&quot;from&quot;]], nodes[e[&quot;to&quot;]]<br>&nbsp;&nbsp;&nbsp;&nbsp;if e[&quot;level&quot;] == &quot;l3&quot;:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# L3 胶囊枝：L2 → L3 径向直线段（圆角矩形），白字在枝内中段<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# ★ solid_capstyle=&quot;round&quot; = 圆角端；lw 由 edge_widths[&quot;l3&quot;] 控制<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x0, y0, x1, y1 = p0[&quot;x&quot;], p0[&quot;y&quot;], p1[&quot;x&quot;], p1[&quot;y&quot;]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ax.plot([x0, x1], [y0, y1], lw=edge_widths[&quot;l3&quot;], color=e[&quot;color&quot;],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solid_capstyle=&quot;round&quot;, zorder=4)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ang = np.degrees(np.arctan2(y1 - y0, x1 - x0))<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if ang &gt; 90: ang -= 180       # 角度归一化到 (-90, 90]，左半圆不倒置<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if ang &lt; -90: ang += 180<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ax.text(x0 + 0.55 * (x1 - x0), y0 + 0.55 * (y1 - y0), e[&quot;branch_label&quot;],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rotation=ang, rotation_mode=&quot;anchor&quot;, ha=&quot;center&quot;, va=&quot;center&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;color=&quot;white&quot;, fontsize=FONT / 5.0 * MM2PT, zorder=5)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;continue<br>&nbsp;&nbsp;&nbsp;&nbsp;path = bezier_edge((p0[&quot;x&quot;], p0[&quot;y&quot;]), (p1[&quot;x&quot;], p1[&quot;y&quot;]),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;edge_widths[e[&quot;level&quot;]], e[&quot;color&quot;])<br>&nbsp;&nbsp;&nbsp;&nbsp;if e[&quot;branch_label&quot;]:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pt, ang = bez_point_tangent(path, e[&quot;label_pos&quot;])<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if ang &gt; 90: ang -= 180<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if ang &lt; -90: ang += 180<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ax.text(pt[0], pt[1], e[&quot;branch_label&quot;], rotation=ang, rotation_mode=&quot;anchor&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ha=&quot;center&quot;, va=&quot;center&quot;, color=&quot;white&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fontsize=e[&quot;label_size&quot;],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fontweight=&quot;bold&quot; if e[&quot;level&quot;] in (&quot;l1&quot;, &quot;l2&quot;) else &quot;normal&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zorder=5)<br><br># 4 圈热图轨道<br>for _, r in rings.iterrows():<br>&nbsp;&nbsp;&nbsp;&nbsp;t1, t2 = mdeg(r[&quot;start&quot;], r[&quot;end&quot;])<br>&nbsp;&nbsp;&nbsp;&nbsp;ax.add_patch(Wedge((0, 0), r[&quot;outer&quot;], t1, t2, width=r[&quot;outer&quot;] - r[&quot;inner&quot;],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;facecolor=r[&quot;fill&quot;], edgecolor=&quot;none&quot;, zorder=3))<br><br># 外圈绿色参考圆（两组轨道的分隔线）<br>ax.add_patch(Circle((0, 0), outer_circle, fill=False, ec=&quot;#A3D39B&quot;, lw=0.5, zorder=8))<br><br># 星号（沿轨道切向；颜色取预先算好的黑/白）<br>stars = rings[rings[&quot;stars&quot;].notna()]<br>for _, s in stars.iterrows():<br>&nbsp;&nbsp;&nbsp;&nbsp;ax.text(s[&quot;x&quot;], s[&quot;y&quot;], s[&quot;stars&quot;], rotation=-np.rad2deg(s[&quot;theta&quot;]),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rotation_mode=&quot;anchor&quot;, ha=&quot;center&quot;, va=&quot;center&quot;, color=s[&quot;text_color&quot;],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fontsize=FONT / 4.7 * MM2PT, fontweight=&quot;bold&quot;, zorder=9)<br><br># 叶端编号方块 + 编号<br>for _, t in tips.iterrows():<br>&nbsp;&nbsp;&nbsp;&nbsp;t1, t2 = mdeg(t[&quot;start&quot;], t[&quot;end&quot;])<br>&nbsp;&nbsp;&nbsp;&nbsp;ax.add_patch(Wedge((0, 0), tip_r1, t1, t2, width=tip_r1 - tip_r0,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;facecolor=t[&quot;tip_color&quot;], edgecolor=&quot;none&quot;, zorder=6))<br>&nbsp;&nbsp;&nbsp;&nbsp;ax.text(t[&quot;x&quot;] * 0.99, t[&quot;y&quot;] * 0.99, str(int(t[&quot;id&quot;])), ha=&quot;center&quot;, va=&quot;center&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;color=&quot;white&quot;, fontsize=FONT / 4.6 * MM2PT, zorder=7)<br><br># 外圈两行标签：细胞名 + (占比)，按叶端着色<br>for _, t in tips.iterrows():<br>&nbsp;&nbsp;&nbsp;&nbsp;ang = 90 - np.rad2deg(t[&quot;theta&quot;])<br>&nbsp;&nbsp;&nbsp;&nbsp;if t[&quot;x&quot;] &lt; 0: ang += 180         # 左半圆翻转 180° 保证可读<br>&nbsp;&nbsp;&nbsp;&nbsp;ax.text(t[&quot;x&quot;] * label_radius, t[&quot;y&quot;] * label_radius,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f&quot;{t[&#x27;cell_type&#x27;]}\n({t[&#x27;percent&#x27;]:.2f}%)&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rotation=ang, rotation_mode=&quot;anchor&quot;, linespacing=0.85,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ha=&quot;right&quot; if t[&quot;x&quot;] &lt; 0 else &quot;left&quot;, va=&quot;center&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;color=t[&quot;tip_color&quot;], fontsize=FONT / 3.7 * MM2PT, zorder=9)<br><br># ---- 顶部 Age / Sex 图例：白底 label 直接盖在轨道上（对齐参考代码写法） ----<br># ★ y 取各自轨道组的中心偏上：Sex 组 1.035-1.187 → 1.15；Age 组 1.199-1.351 → 1.31<br>#   改 tracks 后同步这两个 y（≈ 组内半径均值 + 0.04）；<br>#   字号 = FONT / 5.4 * MM2PT；boxstyle pad = 白底留白；ec=&quot;none&quot; 无边框<br>for ly, lab in ((1.15, &quot;Sex: cell proportion\nATAC / RNA&quot;),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(1.31, &quot;Age: cell proportion\nATAC / RNA&quot;)):<br>&nbsp;&nbsp;&nbsp;&nbsp;ax.text(0, ly, lab, ha=&quot;center&quot;, va=&quot;center&quot;, linespacing=1.1, zorder=13,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fontsize=FONT / 5.4 * MM2PT,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bbox=dict(boxstyle=&quot;round,pad=0.18&quot;, fc=&quot;white&quot;, ec=&quot;none&quot;))<br><br># ---- 层级标尺 L1-L4（虚线竖尺 + 灰色圆点标记） ----<br># ★ 圆点 y 对应 node_radius 各层半径，改 node_radius 后同步这四个值<br>ax.plot([-0.07, -0.07], [-0.19, -0.99], lw=1.1, ls=(0, (2, 2)),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;color=&quot;#CCCCCC&quot;, zorder=9)<br>for i, y in enumerate((-0.19, -0.42, -0.86, -0.99), start=1):<br>&nbsp;&nbsp;&nbsp;&nbsp;ax.add_patch(Circle((-0.07, y), 0.05, facecolor=&quot;#DDDDDD&quot;, edgecolor=&quot;none&quot;, zorder=10))<br>&nbsp;&nbsp;&nbsp;&nbsp;ax.text(-0.07, y, f&quot;L{i}&quot;, ha=&quot;center&quot;, va=&quot;center&quot;, color=&quot;#333333&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fontsize=FONT / 4 * MM2PT, zorder=11)<br><br># ---- 右下角迷你树图例（复用主图数据：细枝缩略树 + 色带 + 热图轨道 + 说明文字） ----<br># 与主图同构但极简化：细枝 alpha 0.7，无编号、无枝上文字<br># ★ 位置与大小由 add_axes([左, 下, 宽, 高]) 控制（figure 相对坐标 0-1）<br>axm = fig.add_axes([0.79, 0.008, 0.185, 0.185])<br>axm.set_xlim(-1.8, 1.8); axm.set_ylim(-2, 2)   # ★ 迷你树内部比例<br>axm.set_aspect(&quot;equal&quot;); axm.axis(&quot;off&quot;)<br>for e in edges.values():                    # 细枝缩略树<br>&nbsp;&nbsp;&nbsp;&nbsp;p0, p1 = nodes[e[&quot;from&quot;]], nodes[e[&quot;to&quot;]]<br>&nbsp;&nbsp;&nbsp;&nbsp;ym = (p0[&quot;y&quot;] + p1[&quot;y&quot;]) / 2<br>&nbsp;&nbsp;&nbsp;&nbsp;mini_path = Path([(p0[&quot;x&quot;], p0[&quot;y&quot;]), (p0[&quot;x&quot;], ym), (p1[&quot;x&quot;], ym), (p1[&quot;x&quot;], p1[&quot;y&quot;])],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])<br>&nbsp;&nbsp;&nbsp;&nbsp;axm.add_patch(PathPatch(mini_path, fill=False, lw=1.7, color=e[&quot;color&quot;],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alpha=0.7, capstyle=&quot;round&quot;, zorder=2))<br>for _, r in rings.iterrows():               # 四条热图轨道<br>&nbsp;&nbsp;&nbsp;&nbsp;t1, t2 = mdeg(r[&quot;start&quot;], r[&quot;end&quot;])<br>&nbsp;&nbsp;&nbsp;&nbsp;axm.add_patch(Wedge((0, 0), r[&quot;outer&quot;], t1, t2, width=r[&quot;outer&quot;] - r[&quot;inner&quot;],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;facecolor=r[&quot;fill&quot;], edgecolor=&quot;none&quot;, zorder=1))<br>for _, t in tips.iterrows():                # 叶端分类色带<br>&nbsp;&nbsp;&nbsp;&nbsp;t1, t2 = mdeg(t[&quot;start&quot;], t[&quot;end&quot;])<br>&nbsp;&nbsp;&nbsp;&nbsp;axm.add_patch(Wedge((0, 0), tip_r1, t1, t2, width=tip_r1 - tip_r0,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;facecolor=t[&quot;tip_color&quot;], edgecolor=&quot;none&quot;, zorder=3))<br>axm.text(0, 0, &quot;Cell Annotation\nLineage&quot;, ha=&quot;center&quot;, va=&quot;center&quot;, zorder=5,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fontsize=FONT / 4 * MM2PT,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bbox=dict(boxstyle=&quot;round,pad=0.35&quot;, fc=&quot;white&quot;, ec=&quot;black&quot;, lw=0.8))<br>axm.text(0, 1.7, &quot;Inner: Sex  |  Outer: Age&quot;, ha=&quot;center&quot;, va=&quot;center&quot;,   # 上说明<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fontsize=FONT / 4 * MM2PT)<br>axm.text(0, -1.7, &quot;Each pair: ATAC / RNA\nOuter labels: scRNA proportion&quot;,  # 下说明<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ha=&quot;center&quot;, va=&quot;center&quot;, fontsize=FONT / 4.3 * MM2PT, linespacing=0.9)<br><br># ---------- 6. 保存 ------------------------------------------------------------<br>fig.savefig(&quot;Figure1E_python.pdf&quot;, facecolor=&quot;white&quot;)<br>fig.savefig(&quot;Figure1E_python.png&quot;, dpi=150, facecolor=&quot;white&quot;)   # ★ 印刷可提到 300<br>print(&quot;Done: Figure1E_python.pdf / Figure1E_python.png&quot;)</pre>
-<p style='margin:14px 0 8px;font-size:14px;font-weight:700;color:#1f4b6e;'>📄 input.csv <span style='font-weight:400;color:#5a7684;font-size:12px;'>（数据模板 · 72 种免疫细胞：层级 + 占比 + 配色 + 双组学得分）</span></p><pre style='background:#14283a;color:#d9e6ee;font-size:12px;line-height:1.55;padding:14px 12px;border-radius:8px;overflow-x:auto;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;font-family:Menlo,Consolas,'Courier New',monospace;margin:0;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;'>id,l1,l2,l3,cell_type,percent,tip_color,sex_score,age_score,sex_atac_stars,sex_rna_stars,age_atac_stars,age_rna_stars<br>1,ILC,ILC2,ILC2C,ILC2C-IL12RB2,1.30,#B15CA8,-0.45,-0.10,**,***,**,*<br>2,ILC,NK-T,NKT,NKT-IL12RA,1.02,#9B3F9B,-0.20,0.35,*,*,NA,*<br>3,ILC,NK,NKbright,NKbright-XCL1,3.04,#7E2B86,-0.30,-0.55,**,**,***,**<br>4,ILC,NK,Transit. NK,Transitional NK,0.86,#6E2568,0.10,0.15,NA,NA,NA,*<br>5,ILC,NK,Mature NK,Mature NK-CD160,0.84,#8E4A9E,0.55,-0.20,*,***,NA,*<br>6,ILC,NK,Mature NK,Mature NK-FCGR3A,4.54,#A05EB0,0.80,-0.30,***,***,**,*<br>7,ILC,NK,Inflamed NK,Inflamed NK-IFIT1,0.03,#C08CCB,-0.15,0.60,*,NA,*,**<br>8,ILC,NK,Prolif. NK,Proliferative NK-MKI67,0.03,#D0A5D8,-0.10,-0.70,*,*,**,***<br>9,B cells,Naive B,Transit. B,Transitional B-MME,0.68,#F5E17E,-0.35,-0.45,*,*,**,*<br>10,B cells,Naive B,Naive B,Naive B-TCL1A,2.18,#F3D96E,-0.40,-0.60,**,*,***,**<br>11,B cells,Naive B,Naive B,Naive B-IL6,0.21,#F0C95C,-0.25,-0.30,NA,*,*,NA<br>12,B cells,Memory B,Atypical Bm,Atypical Bm-ITGAX,0.44,#F2B04C,0.45,0.50,**,**,*,**<br>13,B cells,Memory B,Unswi. Bm,Unswitched Bm-IL6,0.10,#F09A3E,-0.10,0.10,NA,NA,NA,NA<br>14,B cells,Memory B,Unswi. Bm,Unswitched Bm-IFIT3,0.11,#EE8A32,-0.05,-0.05,NA,*,NA,*<br>15,B cells,Memory B,pre-Swi. Bm,pre-Switched Bm-IFIT3,0.02,#EC7A2C,0.15,-0.10,NA,NA,NA,NA<br>16,B cells,Memory B,pre-Swi. Bm,pre-Switched Bm-JAM3,0.28,#E96A28,-0.30,-0.25,*,*,NA,*<br>17,B cells,Memory B,Swi. Bm,Switched Bm-IGHDneg,1.24,#E05A2E,0.20,0.30,*,**,NA,*<br>18,B cells,Memory B,Swi. Bm,Switched Bm-IGHE,0.52,#D84A30,0.10,0.40,NA,*,*,**<br>19,B cells,Memory B,Swi. Bm,Switched Act. Bm-CD86,0.50,#CE3A34,-0.60,-0.35,**,***,**,*<br>20,B cells,Plasma,Plasmablast,Plasmablast,0.02,#C42E38,-0.15,0.55,NA,*,NA,*<br>21,B cells,Plasma,Plasmablast,Plasmablast-MKI67,0.02,#BA283C,-0.10,0.60,*,NA,*,*<br>22,B cells,Plasma,Plasma,Plasma-IGHA1,2.00,#B02440,-0.25,0.50,**,**,***,*<br>23,B cells,Plasma,Plasma,Plasma-IGHG1,0.08,#A62044,-0.20,0.45,*,*,**,NA<br>24,Myeloid,HSPC,HSPC,HSPC-CD34,0.28,#3FA05C,-0.30,-0.75,*,**,***,***<br>25,Myeloid,HSPC,HSPC,HSPC-MKI67,0.08,#5CAE70,-0.20,-0.65,*,*,**,**<br>26,Myeloid,HSPC,MK,MK-GP9,0.07,#7CB884,0.10,-0.35,NA,NA,*,*<br>27,Myeloid,DC,DC1,DC1-CLEC9A,0.46,#3E8C7E,-0.15,0.10,*,*,NA,NA<br>28,Myeloid,DC,DC2,DC2-CD1C,0.62,#4A9688,-0.10,0.25,NA,*,*,NA<br>29,Myeloid,DC,pDC,pDC-LILRA4,0.25,#58A092,-0.35,-0.15,**,*,NA,*<br>30,Myeloid,DC,AS DC,AS DC-IRF4,0.04,#6AAA9C,-0.05,0.05,NA,NA,NA,NA<br>31,Myeloid,Mono,Clas. Mono,Mono-S100A8,4.44,#8FA33C,0.40,0.20,***,***,**,*<br>32,Myeloid,Mono,Clas. Mono,Mono-CD14,2.53,#839638,0.35,0.15,**,**,*,**<br>33,Myeloid,Mono,Intm. Mono,Interm. Mono,0.38,#99AC46,0.15,0.10,*,*,NA,NA<br>34,Myeloid,Mono,Intm. Mono,Interm. Mono-IFI44L,0.09,#A3B452,-0.10,0.30,NA,*,NA,*<br>35,Myeloid,Mono,Non-clas. Mono,Mono-FCGR3A,0.86,#8A9C40,0.55,-0.10,**,*,*,NA<br>36,Myeloid,Masto,Mast,Mast-TPSAB1,0.54,#A8925E,-0.05,0.15,NA,NA,NA,*<br>37,Myeloid,Masto,Mast,Mast-CPA3,0.21,#B09A68,-0.10,0.05,*,NA,NA,NA<br>38,Myeloid,nRbc,nRbc Mono,nRbc Mono-S100A8,1.11,#7E9CC4,0.20,0.25,*,*,NA,*<br>39,Myeloid,nRbc,nRbc Mono,nRbc Mono-FCGR3A,0.38,#8AA6CC,0.10,-0.15,NA,*,NA,NA<br>40,Myeloid,nRbc,nRbc T,nRbc T-FCGR3A,0.03,#96B0D4,-0.15,-0.20,*,*,NA,NA<br>41,Myeloid,nRbc,nRbc T,nRbc T-C1QA,0.38,#A2BADC,0.05,0.10,NA,NA,NA,NA<br>42,CD4 T,Naive T,CD4 Naive,CD4 Naive T-CCR7,22.49,#2F4B8F,-0.30,-0.90,***,***,***,***<br>43,CD4 T,Naive T,CD4 Naive,CD4 Naive T-SOX4,7.43,#3A5699,-0.25,-0.75,**,***,**,***<br>44,CD4 T,Naive T,CD4 Naive,CD4 Naive T-LIMS1,0.65,#4661A3,-0.15,-0.40,*,*,**,*<br>45,CD4 T,Naive T,CD4 Naive,CD4 Naive T-IL7R,1.05,#526CAD,-0.20,-0.50,*,**,*,***<br>46,CD4 T,Memory T,CD4 Tem,CD4 Tem-S100A4,3.57,#2C4685,0.30,0.55,**,***,**,***<br>47,CD4 T,Memory T,CD4 Tem,CD4 Tem-IFI44L,1.70,#33508F,0.25,0.60,*,***,**,***<br>48,CD4 T,Memory T,CD4 Tem,CD4 Tem-CCR5,0.04,#3A5A99,0.10,0.20,NA,*,NA,*<br>49,CD4 T,Memory T,Tfh-like,CD4 Tfh-like-CCR5,2.44,#2A4480,-0.35,-0.25,**,*,*,**<br>50,CD4 T,Memory T,CD4 Th,CD4 Th-LMNA,0.84,#33508F,0.15,0.30,*,*,NA,*<br>51,CD4 T,Memory T,CD4 Th,CD4 Th-CCR1,0.52,#3A5A99,0.10,0.15,NA,NA,NA,*<br>52,CD4 T,Memory T,CD4 Th1,CD4 Th1-TNFRSF18,1.01,#2C4685,0.35,0.45,**,**,*,***<br>53,CD4 T,Memory T,CD4 Th1,CD4 Th1-CCR4,0.28,#33508F,0.20,0.25,*,*,NA,*<br>54,CD4 T,Memory T,CD4 Th17,CD4 Th17-GZMK,2.72,#2A4480,-0.20,-0.35,*,**,*,**<br>55,CD4 T,Memory T,CD4 Th17,CD4 Th17-RORC,1.55,#33508F,-0.15,-0.30,*,*,*,*<br>56,CD4 T,Memory T,CD4 Th22,CD4 Th22-CCR10,0.41,#3A5A99,-0.10,-0.15,NA,*,NA,NA<br>57,CD4 T,Memory T,CD4 Tr1,CD4 Tr1-IL10,0.16,#2C4685,-0.25,0.10,*,*,NA,*<br>58,CD4 T,Memory T,CD4 Treg,CD4 Treg-FCRL3,1.03,#33508F,-0.40,-0.20,**,**,*,*<br>59,CD4 T,Memory T,CD4 Treg,CD4 Treg-FOXP3,0.37,#2A4480,-0.30,-0.15,*,*,*,NA<br>60,CD4 T,Memory T,CD4 CTL,CD4 CTL-GZMH,1.93,#33508F,0.25,0.65,**,***,*,**<br>61,CD8 T,Naive T,CD8 Naive,CD8 Naive T-CCR7,8.88,#2E86AE,-0.35,-0.85,***,***,***,***<br>62,CD8 T,Naive T,CD8 Naive,CD8 Naive T-SOX4,1.22,#26789E,-0.25,-0.70,**,**,***,**<br>63,CD8 T,Effector T,CD8 Tem,CD8 Tem-IL7R,4.19,#3590B8,-0.15,-0.35,*,**,*,**<br>64,CD8 T,Effector T,CD8 Tem,CD8 Tem-CCR7,4.55,#2E86AE,-0.20,-0.45,**,***,*,**<br>65,CD8 T,Effector T,CD8 Tem,CD8 Tem-CD7,0.60,#26789E,0.05,-0.10,NA,*,NA,NA<br>66,CD8 T,Effector T,CD8 CTL,CD8 CTL-GZMH,3.54,#1F6A8E,0.40,0.50,***,***,*,**<br>67,CD8 T,Effector T,CD8 CTL,CD8 CTL-GZMB,0.72,#1F6A8E,0.30,0.40,**,***,*,**<br>68,CD8 T,Prolif. T,Immature T,Immature T-ASAP1,0.27,#46A0C4,-0.20,-0.55,*,*,**,*<br>69,CD8 T,Prolif. T,Proliferative T,Proliferative T-MKI67,0.05,#52AACA,-0.10,-0.60,*,*,**,**<br>70,CD8 T,MAIT,MAIT,MAIT-SLC4A10,0.61,#2E86AE,0.15,-0.20,*,*,NA,*<br>71,CD8 T,Gamma Delta T,Vδ1,γδT-Vδ1-TRDV1,0.11,#3590B8,-0.10,-0.25,*,NA,NA,*<br>72,CD8 T,Gamma Delta T,Vδ2,γδT-Vδ2-TRDV2,0.48,#26789E,0.05,-0.30,NA,*,*,*</pre>
-<p style='margin:18px 0 0;text-align:center;font-size:13px;color:#1f6a8e;'>需要 input.csv 可编辑模板？后台回复「<strong>环形树</strong>」获取 📩</p>
-<p style='margin:22px 0 0;text-align:center;color:#8ab0c0;font-size:12px;border-top:1px solid #e0f0f5;padding-top:14px;'>🧬 科研可视化灵感 30 · 环形细胞注释树 &nbsp;|&nbsp; © 2026</p>
-</section>
+<style>
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
 
-<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
-<div class="sciviz-promo-no" aria-hidden="true">No.033 · 2026-10-18</div>
-<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
-padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
-border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
-letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
+
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
+
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
+
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
+
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
+
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
+
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
+
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
+}
+
+
+/* ---- 外链 ---- */
+.body a{color:var(--brand);text-decoration:none;border-bottom:1px solid var(--line);word-break:break-all}
+.body a:hover{color:var(--brand2);border-bottom-color:var(--brand2)}
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
+</style>
+</head>
+<body>
+<article class="post">
+
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.033</span>
+      <span>2026-10-18</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
+    </div>
+    <h1>Science 神图复刻：环形细胞注释树（R / Python）</h1>
+    <p class="lede">环状树 + 多轨道热图，R 与 Python 两套完整代码与输入数据。</p>
+    <div class="chips"><span class="chip">环状树</span><span class="chip">多轨道热图</span><span class="chip">顶刊复刻</span><span class="chip">R</span><span class="chip">Python</span></div>
+  </header>
+
+  <div class="body">
+  <section>
+    <h2>原图与复刻思路</h2>
+    <p>Science《Chinese Immune Multi-omics Atlas》的 Fig. 1E（Yin et al. 2026）用一整圈环形树画下了 72 种免疫细胞：谱系关系、细胞占比、Sex / Age 双组学信号全部收进一张图。本文拆解它的构图方法，并给出 <strong>R（tidygraph + ggraph）与 Python（matplotlib）双版本</strong>复现代码和同一份 <code>input.csv</code> 数据模板——双语言同款成图。</p>
+    <blockquote>
+      <p>结构解剖（从圆心向外逐层堆叠，8 大构件）：根 → 主枝 → 胶囊枝 → 叶端 → 轨道 → 标签 → 图例 → 迷你树。</p>
+    </blockquote>
+  </section>
+
+  <section>
+    <h2>构图巧思：为什么这张图「多而不乱」</h2>
+    <ol>
+      <li><strong>树形类比</strong>——细胞分类 = 从圆心生长的树，L1 谱系 → L2/L3 分支 → 叶端即细胞亚型；</li>
+      <li><strong>扇区着色</strong>——5 大谱系淡彩扇底 + L3 同色环带与胶囊枝，层级一眼可辨；</li>
+      <li><strong>四联轨道</strong>——内 Sex 外 Age 各两圈，ATAC 淡色 + 星号、RNA 饱和色；蓝 = Female/Younger，红 = Male/Elder；</li>
+      <li><strong>编号衔接</strong>——叶端 1–72 编号方块衔接内外圈「细胞名 (占比)」标签；</li>
+      <li><strong>图例系统</strong>——白底图例环抱轨道、右下迷你树复述结构、L1–L4 标尺辅助读图。</li>
+    </ol>
+    <h3>实现要点</h3>
+    <ul>
+      <li>树布局：tidygraph 建树 + 极坐标 <code>x = r·sinθ, y = r·cosθ</code>；</li>
+      <li>树枝：<code>geom_edge_diagonal</code> 弯枝，L3 用 <code>geom_segment</code> 直线胶囊；</li>
+      <li>扇形与环轨：<code>ggforce::geom_arc_bar</code> 画扇区 / 环带 / 方块 / 轨道；</li>
+      <li>发散配色：RdBu <code>colorRamp</code> + gamma 提亮中低强度；</li>
+      <li>结构图例：cowplot 叠加右下角迷你树，matplotlib 同款复刻。</li>
+    </ul>
+    <h3>五步构图法（拿走即用）</h3>
+    <ol>
+      <li>整理宽表：一行一个细胞，层级 <code>l1/l2/l3</code> + 占比 + 配色；</li>
+      <li>极坐标布局：<code>θ = (i − 0.5)·2π/n</code>，层级定半径；</li>
+      <li>画树枝：贝塞尔弯枝 + L3 径向胶囊枝（白字）+ 淡彩环带；</li>
+      <li>环形轨道：<code>Wedge</code> / <code>geom_arc_bar</code> 画 4 圈，ATAC 淡化、RNA 饱和；</li>
+      <li>图例系统：径向旋转 <code>90° − θ</code> 标签；白底图例盖轨道；cowplot 叠迷你树。</li>
+    </ol>
+  </section>
+
+  <section>
+    <h3>核心代码速览</h3>
+    <h4>R 版速览 · tidygraph + ggraph（环境见下文完整脚本）</h4>
+    <pre><code><span class="c"># 环境（实测版本）：R 4.2.1 · tidyverse 2.0.0 · tidygraph 1.2.3</span>
+<span class="c"># ggraph 2.1.0 · ggforce 0.4.1 · cowplot 1.1.1</span>
+<span class="c"># ① 极坐标布局：theta 均匀铺满 360°，层级定半径</span>
+data &lt;- read.csv("input.csv") |&gt; arrange(id) |&gt;
+mutate(theta = (row_number() - 0.5) * 2 * pi / n())
+node_radius &lt;- c(root = 0, l1 = 0.19, l2 = 0.42, l3 = 0.86, cell_type = 1)
+nodes &lt;- nodes |&gt; mutate(x = radius * sin(theta), y = radius * cos(theta))
+<span class="c"># ② 贝塞尔弯枝 + L3 径向胶囊枝（白字标在枝内）</span>
+ggraph(tree_layout) +
+geom_edge_diagonal(aes(width = width, color = color), lineend = "round") +
+geom_segment(data = l3_capsule,
+aes(x = x0, y = y0, xend = x1, yend = y1),
+linewidth = 5.1, lineend = "round") +
+geom_text(aes(x = xt, y = yt, angle = angle, label = branch_label),
+size = font_size / 5.0, color = "white")
+<span class="c"># ③ 环形轨道 + 顶部白底图例（直接盖在轨道上）</span>
+geom_arc_bar(aes(r0 = inner, r1 = outer, start = start, end = end)) +
+annotate("label", x = 0, y = c(1.15, 1.31), label.size = 0, fill = "white",
+label = c("Sex: cell proportion\nATAC / RNA",
+"Age: cell proportion\nATAC / RNA"))</code></pre>
+    <h4>Python 版速览 · matplotlib（环境见下文完整脚本）</h4>
+    <pre><code><span class="c"># 环境（实测版本）：Python 3.10.9 · matplotlib 3.10.8 · pandas 2.2.3 · numpy 2.0.2</span>
+df["theta"] = (df.index + 0.5) * 2 * np.pi / n
+node_radius = {"root": 0, "l1": 0.19, "l2": 0.42, "l3": 0.86, "cell_type": 1}
+nodes[name] = dict(theta=th, x=r * np.sin(th), y=r * np.cos(th))
+path = Path([p0, (p0[0], ym), (p1[0], ym), p1],
+[Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
+ax.add_patch(PathPatch(path, lw=lw, color=color, capstyle="round"))
+ax.plot([x0, x1], [y0, y1], lw=5.1 * MM2PT, solid_capstyle="round") # L3 胶囊
+ax.text(xt, yt, branch_label, color="white", rotation=ang)
+ax.add_patch(Wedge((0, 0), inner + ring_w, t1, t2, width=ring_w))
+ax.text(0, 1.15, "Sex: cell proportion\nATAC / RNA", ha="center",
+bbox=dict(boxstyle="round,pad=0.18", fc="white", ec="none"))</code></pre>
+    <h3>完整代码 + 数据模板</h3>
+    <div class="note"><p>R / Python 两份脚本已按原逻辑<strong>重建缩进并补齐转排中丢失的括号与续行</strong>（补齐处以代码逻辑与上方速览块互证）；如与随工具包分发的原始脚本存在细节出入，以原始脚本为准。</p></div>
+    <h4>circle_tree.R · R 完整脚本（R 4.2.1 · tidyverse 2.0.0 · tidygraph 1.2.3 · ggraph 2.1.0 · ggforce 0.4.1 · cowplot 1.1.1）</h4>
+    <pre><code><span class="c"># =============================================================================</span>
+<span class="c"># Title: Circular cell annotation tree | 环形细胞注释树（Science Fig.1E 风格）</span>
+<span class="c"># Author: Shang Xia Qiu Suo</span>
+<span class="c">#</span>
+<span class="c"># 图面结构（由内向外）：</span>
+<span class="c"># 中心根节点 → L1 谱系主枝 → L2 分支 → L3 直线胶囊枝（白字标在枝内）</span>
+<span class="c"># → 72 个编号叶端方块 → 4 条环形轨道（内 2 圈 Sex / 外 2 圈 Age）</span>
+<span class="c"># → 外圈"细胞名 (占比)"两行标签</span>
+<span class="c"># 顶部白底 Age/Sex 图例 · 左下 L1-L4 层级标尺 · 右下角迷你树结构图例</span>
+<span class="c">#</span>
+<span class="c"># ★ 风格速调索引（最常改的参数都在这里，改完重跑脚本即可）：</span>
+<span class="c"># 全局字号   font_size      所有文字均写为 font_size / n，一改全改</span>
+<span class="c"># 谱系配色   lineage_colors L1 枝色 = 扇形底色基色，换风格先改这</span>
+<span class="c"># 发散色系   rdbu_pal       轨道热图色带（蓝↔红发散）</span>
+<span class="c"># 树的疏密   node_radius    各层半径；l3 越大 L3 越贴近叶端</span>
+<span class="c"># 枝干粗细   edge_widths    单位 mm；L3 胶囊粗细另见主图 linewidth</span>
+<span class="c"># 叶端方块   tip_r0 / tip_r1 两者之差 = 方块厚度</span>
+<span class="c"># 轨道圈数   tracks         加一行 = 多一圈；inner 为内半径</span>
+<span class="c"># 轨道厚薄   ring_w         色块缝隙见 pad</span>
+<span class="c"># L3 突出环带               段深浅看 mix_white(0.84)，外缘 r = 0.868</span>
+<span class="c"># 外圈标签   label_radius</span>
+<span class="c"># 顶部图例   annotate("label") y 需跟随 tracks 改动同步</span>
+<span class="c"># 迷你树     draw_plot(x,y,width,height) 画布相对坐标 0-1</span>
+<span class="c"># 画布范围   coord_fixed(xlim, ylim) 标签被裁时放大</span>
+<span class="c">#</span>
+<span class="c"># 运行环境（实测版本；更老版本可能出现 API 差异）：</span>
+<span class="c"># R 4.2.1 · tidyverse 2.0.0 · tidygraph 1.2.3</span>
+<span class="c"># ggraph 2.1.0 · ggforce 0.4.1 · cowplot 1.1.1</span>
+library(tidyverse)
+library(tidygraph)
+library(ggraph)
+library(ggforce)
+library(cowplot)  # 右下角迷你树图例叠加（ggdraw + draw_plot）
+
+<span class="c"># 修复希腊字母渲染：强制 UTF-8 locale（默认 C locale 会把 γδ 变成点）</span>
+if (!l10n_info()$"UTF-8") {
+  ok &lt;- tryCatch(Sys.setlocale("LC_CTYPE", "en_US.UTF-8"), warning = function(w) NULL)
+  if (is.null(ok)) Sys.setlocale("LC_CTYPE", "UTF-8")
+}
+
+font_size &lt;- 14  # ★ 全局字号基准：所有文字 = font_size / n，n 越大字越小
+
+<span class="c"># 1. 读取宽表并清洗 -----------------------------------------------------------</span>
+<span class="c"># input.csv 每行一个细胞亚型，必需列：</span>
+<span class="c">#   id        顺时针排序编号（决定叶端角度位置，务必从 1 连续编号）</span>
+<span class="c">#   l1/l2/l3  三级分类路径（l3 允许与 l2 同名）</span>
+<span class="c">#   cell_type 末级细胞名（外圈标签第一行）</span>
+<span class="c">#   percent   scRNA 占比（外圈标签第二行 / L3 胶囊枝内占比）</span>
+<span class="c">#   tip_color 该细胞的主题色（叶端方块 + L2/L3 枝 + 外标签）</span>
+<span class="c">#   sex_score / age_score 轨道热图数值，范围 [-1, 1]</span>
+<span class="c">#   sex_atac_stars 等四列显著性星号（空 = 不显示）</span>
+data &lt;- read.csv("input.csv", stringsAsFactors = FALSE, na.strings = c("", "NA")) |&gt;
+  mutate(across(where(is.character), trimws)) |&gt;
+  arrange(id) |&gt;  # id 决定顺时针顺序，先排序
+  mutate(
+    id = as.integer(id),
+    theta = (row_number() - 0.5) * 2 * pi / n()  # 均匀铺满 360°，顺时针自顶部
+  )
+half_step &lt;- pi / nrow(data)  # 每个叶端扇形单元的角度半宽（弧度）= π/n
+
+<span class="c"># 2. 配色 ---------------------------------------------------------------------</span>
+<span class="c"># ★ 谱系主色：同时决定 L1 枝条颜色与内圈扇形底色（外标签色来自 tip_color 列）</span>
+<span class="c"># 换风格改这里的 hex 即可；新增谱系时追加一行</span>
+lineage_colors &lt;- c(
+  "CD4 T"   = "#2F4B8F",
+  "CD8 T"   = "#23809D",
+  "ILC"     = "#8A3B96",
+  "B cells" = "#E08A00",
+  "Myeloid" = "#7E9C3F"
+)
+
+<span class="c"># RdBu 发散色 ramp：score ∈ [-1, 1]，负=蓝（Female/Younger），正=红（Male/Elder）</span>
+<span class="c"># 想换色系：替换 11 个 hex，保持"深→浅→白→浅→深"左右对称即可套用任意发散色</span>
+rdbu_pal &lt;- colorRamp(c(
+  "#053061", "#2166AC", "#4393C3", "#92C5DE", "#D1E5F0", "#F2F2F2",
+  "#FDDBC7", "#F4A582", "#D6604D", "#B2182B", "#67001F"
+))
+rdbu &lt;- function(x) {
+  x &lt;- pmin(pmax(x, -1), 1)
+  x &lt;- sign(x) * abs(x)^0.55  # gamma 压缩：指数 &lt;1 会提亮中小值；改成 1 = 线性映射
+  rgb(rdbu_pal((x + 1) / 2), maxColorValue = 255)
+}
+
+<span class="c"># 向白色混合：f = 混白比例，f 越大越淡</span>
+<span class="c"># 本图用到三档：0.92 内圈扇形底（极淡）/ 0.84 L3 突出环带 / 0.74 ATAC 轨道淡化</span>
+mix_white &lt;- function(col, f = 0.74) {
+  m &lt;- col2rgb(col)  # 0-255 标度
+  rgb(m[1, ] * (1 - f) + 255 * f, m[2, ] * (1 - f) + 255 * f,
+      m[3, ] * (1 - f) + 255 * f, maxColorValue = 255)
+}
+
+<span class="c"># 3. 整理作图数据 --------------------------------------------------------------</span>
+<span class="c"># 把每行宽表展开为 root→l1→l2→l3→cell_type 五个节点；</span>
+<span class="c"># name 用累积路径拼接，避免不同父分支下的同名节点被错误合并</span>
+paths &lt;- data |&gt;
+  select(id, l1, l2, l3, cell_type, percent, tip_color, theta) |&gt;
+  mutate(root = "Cells", group = l1) |&gt;
+  pivot_longer(c(root, l1, l2, l3, cell_type), names_to = "level", values_to = "label") |&gt;
+  mutate(name = accumulate(label, paste, sep = " / "), .by = id) |&gt;
+  mutate(name = if_else(level == "cell_type", paste(name, id, sep = " / "), name)) |&gt;
+  mutate(from = lag(name), repeat_label = label == lead(label), .by = id)
+
+<span class="c"># 节点表：theta 取其下属叶端的角度均值</span>
+<span class="c"># ★ node_radius 只表示层级深度（非进化距离）：l1/l2 越大中心越空；</span>
+<span class="c">#   l3 越大 L3 越贴近叶端（连接枝越短）；改后需同步主图 L1-L4 标尺的 y 值</span>
+node_radius &lt;- c("root" = 0, "l1" = 0.19, "l2" = 0.42, "l3" = 0.86, "cell_type" = 1)
+nodes &lt;- paths |&gt;
+  summarise(label = first(label), level = first(level), theta = mean(theta), .by = name) |&gt;
+  mutate(radius = node_radius[level], x = radius * sin(theta), y = radius * cos(theta))
+
+<span class="c"># 连线表：from 父节点 → to 子节点；proportion = 下属叶端 percent 求和</span>
+<span class="c"># ★ edge_widths 单位 mm（ggplot linewidth 尺度）：l1 主干最粗、cell_type 连接枝最细</span>
+<span class="c"># 注意：主图 L3 胶囊的粗细由 geom_segment(linewidth = 5.1) 单独控制，</span>
+<span class="c">#       此处 l3 的值仅作用于迷你树缩略图</span>
+edge_widths &lt;- c("l1" = 7, "l2" = 3.2, "l3" = 5.1, "cell_type" = 0.8)
+edges &lt;- paths |&gt;
+  filter(level != "root") |&gt;
+  summarise(
+    label = first(label), level = first(level), group = first(group),
+    tip = first(tip_color), proportion = sum(percent),
+    repeat_label = all(repeat_label), .by = c(from, name)
+  ) |&gt;
+  rename(to = name) |&gt;
+  mutate(
+    color = if_else(level == "l1", lineage_colors[group], tip),  # L1 用谱系主色，其余用叶端色
+    branch_label = case_when(
+      level == "cell_type" ~ "",                                   # 叶端连接枝不标字
+      level == "l2" &amp; repeat_label ~ "",                           # l2 与 l3 全员同名时抑制重复
+      level == "l3" ~ sprintf("%s %.2f%%", label, proportion),     # 胶囊枝：名称 + 占比
+      TRUE ~ label
+    ),
+    width = edge_widths[level],
+    label_size = case_when(  # ★ 枝上白字大小 = font_size / n，n 越大字越小
+      level == "l1" ~ font_size / 3.1,
+      level == "l2" ~ font_size / 4.6,
+      level == "l3" ~ font_size / 5.0,
+      TRUE ~ 0
+    ),
+    label_pos = if_else(level == "l3", 0.55, 0.62)  # 文字在枝上的位置（0 父端 → 1 子端）
+  )
+
+<span class="c"># L3 胶囊 = 径向直线段（圆角矩形），与贝塞尔弯枝分开画：</span>
+<span class="c"># 主图树只保留非 L3 边（edges_main），L3 另用 geom_segment 画，便于控制粗细与文字</span>
+<span class="c"># ★ 想改回弯曲 L3 枝：删除 edges_main 过滤 + 主图两个 L3 图层，</span>
+<span class="c">#   让 geom_edge_diagonal 直接用完整 edges 即可</span>
+edges_main &lt;- edges |&gt; filter(level != "l3")
+tree &lt;- tbl_graph(nodes = nodes, edges = edges_main, directed = TRUE)
+tree_layout &lt;- create_layout(tree, layout = "manual", x = x, y = y)
+tree_layout$circular &lt;- TRUE   # manual 布局必须显式声明圆形
+attr(tree_layout, "circular") &lt;- TRUE
+<span class="c"># 迷你树图例使用完整边（细枝缩略树，不剔除 L3）</span>
+tree_layout_full &lt;- create_layout(tbl_graph(nodes = nodes, edges = edges, directed = TRUE),
+                                  layout = "manual", x = x, y = y)
+
+<span class="c"># L3 胶囊：L2 节点 → L3 节点的直线段</span>
+<span class="c"># xt/yt = 白字锚点（t = 0.55，与 edges 的 label_pos 对应）</span>
+<span class="c"># angle 归一化到 (-90, 90]，保证左半圆文字不倒置</span>
+l3_capsule &lt;- edges |&gt;
+  filter(level == "l3") |&gt;
+  left_join(nodes |&gt; select(name, x0 = x, y0 = y), by = c("from" = "name")) |&gt;
+  left_join(nodes |&gt; select(name, x1 = x, y1 = y), by = c("to" = "name")) |&gt;
+  mutate(
+    xt = x0 + 0.55 * (x1 - x0), yt = y0 + 0.55 * (y1 - y0),
+    angle = atan2(y1 - y0, x1 - x0) * 180 / pi,
+    angle = if_else(angle &gt; 90, angle - 180, if_else(angle &lt; -90, angle + 180, angle))
+  )
+
+<span class="c"># 4. 叶端、扇形底色与热图轨道 ---------------------------------------------------</span>
+<span class="c"># ★ tip_r1 - tip_r0 = 叶端方块厚度（0.05），想加厚调 tip_r1</span>
+<span class="c"># ★ ring_w = 轨道厚度；pad = 色块角向缝隙（弧度），调大缝隙更明显</span>
+tip_r0 &lt;- 0.965; tip_r1 &lt;- 1.015; ring_w &lt;- 0.070; pad &lt;- 0.002
+tips &lt;- data |&gt;
+  mutate(
+    x = sin(theta), y = cos(theta),
+    start = theta - half_step + pad, end = theta + half_step - pad,
+    angle = 90 - theta * 180 / pi,           # 外标签径向旋转
+    hjust = if_else(x &lt; 0, 1, 0),
+    angle = if_else(x &lt; 0, angle + 180, angle)  # 左半圆翻转 180° 保证可读
+  )
+
+<span class="c"># 扇形底色两层：</span>
+<span class="c">#   内圈（0.02-0.42，L1/L2 区）= 很淡的谱系色（mix 0.92）</span>
+<span class="c">#   外圈 = L3 突出环带（见下），按 L3 分支着色</span>
+sectors_inner &lt;- tips |&gt;
+  summarise(start = min(start) - 0.01, end = max(end) + 0.01,
+            color = mix_white(lineage_colors[l1], 0.92), .by = l1) |&gt;
+  mutate(r0 = 0.02, r = 0.42)
+
+<span class="c"># ★ L3 突出环带：包住每个 L3 分支的淡彩宽环（0.42 → 0.868）</span>
+<span class="c"># mix_white 0.84 = 深浅（越大越淡）；±0.006 = 角向外扩（相邻环带近乎相接）</span>
+<span class="c"># 外缘 0.868 与叶端内缘 0.965 之间留 ~0.1 作 L3 → 编号方块的连接枝空间</span>
+l3_ring &lt;- paths |&gt;
+  summarise(start = min(theta) - half_step - 0.006,
+            end = max(theta) + half_step + 0.006, .by = name) |&gt;
+  left_join(edges |&gt; filter(level == "l3") |&gt; select(to, color), by = c("name" = "to")) |&gt;
+  mutate(color = mix_white(color, 0.84), r0 = 0.42, r = 0.868)
+sectors &lt;- bind_rows(sectors_inner, l3_ring)
+
+<span class="c"># ★ 4 条环形轨道：inner 为内半径，outer = inner + ring_w</span>
+<span class="c"># 加轨道：tribble 加一行 + ring_data 里加一段 transmute（列名前缀对应即可）</span>
+<span class="c"># 改组间距：调各 inner；改厚薄：调 ring_w</span>
+tracks &lt;- tribble(
+  ~track,     ~inner,
+  "sex_atac", 1.035,
+  "sex_rna",  1.117,
+  "age_atac", 1.199,
+  "age_rna",  1.281
+) |&gt; mutate(outer = inner + ring_w)
+
+<span class="c"># 轨道数据：每个叶端一格；ATAC 圈 mix_white(f=0.74) 淡化 + 星号，RNA 圈饱和</span>
+ring_data &lt;- bind_rows(
+  data |&gt; transmute(id, theta, stars = sex_atac_stars, score = sex_score, mod = "atac", track = "sex_atac"),
+  data |&gt; transmute(id, theta, stars = sex_rna_stars,  score = sex_score, mod = "rna",  track = "sex_rna"),
+  data |&gt; transmute(id, theta, stars = age_atac_stars, score = age_score, mod = "atac", track = "age_atac"),
+  data |&gt; transmute(id, theta, stars = age_rna_stars,  score = age_score, mod = "rna",  track = "age_rna")
+) |&gt;
+  inner_join(tracks, by = "track") |&gt;
+  mutate(
+    fill = if_else(mod == "atac", mix_white(rdbu(score)), rdbu(score)),
+    radius = (inner + outer) / 2,
+    x = radius * sin(theta), y = radius * cos(theta),
+    angle = -theta * 180 / pi  # 星号沿轨道切向
+  )
+<span class="c"># 星号颜色：深色格用白星、浅色格用黑星（RGB 平均亮度阈值 130/255）</span>
+brightness &lt;- colMeans(col2rgb(ring_data$fill))
+ring_data$text_color &lt;- if_else(brightness &lt; 130, "white", "#202020")
+
+<span class="c"># 顶部图例区不避让轨道：与参考实现一致，轨道完整绘制，</span>
+<span class="c"># 由两个白底 label 直接盖在轨道上方，文字被热图环抱</span>
+label_radius &lt;- 1.46  # ★ 外圈标签的径向位置（越大脑外标签离圆越远）
+outer_circle &lt;- 1.42  # 绿色参考圆半径
+
+<span class="c"># 5. 绘制主图 ------------------------------------------------------------------</span>
+<span class="c"># 图层自下而上：扇形底色 → 树枝 → L3 胶囊 → 叶端方块/编号 → 轨道 → 参考圆</span>
+<span class="c"># → 星号 → 外圈标签 → 顶部图例 → L1-L4 标尺</span>
+p &lt;- ggraph(tree_layout) +
+<span class="c">  # 谱系扇形底色 + L3 突出环带</span>
+  geom_arc_bar(
+    data = sectors,
+    aes(x0 = 0, y0 = 0, r0 = r0, r = r, start = start, end = end, fill = color),
+    inherit.aes = FALSE, color = NA
+  ) +
+<span class="c">  # 树枝 + 枝上标签（三次贝塞尔对角枝，lineend round = 圆角端点）</span>
+  geom_edge_diagonal(
+    aes(edge_colour = color, edge_width = width,
+        label = branch_label, label_size = label_size, label_pos = label_pos),
+    label_colour = "white", angle_calc = "along", lineend = "round", family = "Arial"
+  ) +
+<span class="c">  # L3 胶囊枝：L2 → L3 径向直线段（圆角矩形），白字在枝内</span>
+<span class="c">  # ★ linewidth = 胶囊粗细（mm），需明显粗于 cell_type 连接枝才呈"胶囊"效果</span>
+  geom_segment(data = l3_capsule,
+               aes(x = x0, y = y0, xend = x1, yend = y1, colour = color),
+               inherit.aes = FALSE, linewidth = 5.1, lineend = "round") +
+  geom_text(data = l3_capsule,
+            aes(x = xt, y = yt, label = sprintf("%s %.2f%%", label, proportion), angle = angle),
+            inherit.aes = FALSE, color = "white", size = font_size / 5.0, family = "Arial") +
+<span class="c">  # 叶端编号方块 + 编号</span>
+  geom_arc_bar(
+    data = tips,
+    aes(x0 = 0, y0 = 0, r0 = tip_r0, r = tip_r1, start = start, end = end, fill = tip_color),
+    inherit.aes = FALSE, color = NA
+  ) +
+  geom_text(
+    data = tips, aes(x = x * 0.99, y = y * 0.99, label = id),
+    inherit.aes = FALSE, color = "white", size = font_size / 4.6, family = "Arial"
+  ) +
+<span class="c">  # 4 圈热图轨道</span>
+  geom_arc_bar(
+    data = ring_data,
+    aes(x0 = 0, y0 = 0, r0 = inner, r = outer, start = start, end = end, fill = fill),
+    inherit.aes = FALSE, color = NA
+  ) +
+<span class="c">  # 外圈绿色参考圆（两组轨道的分隔线）</span>
+  geom_circle(
+    data = tibble(x0 = 0, y0 = 0, r = outer_circle), aes(x0 = x0, y0 = y0, r = r),
+    inherit.aes = FALSE, color = "#A3D39B", linewidth = 0.5
+  ) +
+<span class="c">  # 星号（颜色取预先算好的黑/白）</span>
+  geom_text(
+    data = filter(ring_data, !is.na(stars)),
+    aes(x, y, label = stars, angle = angle, color = I(text_color)),
+    inherit.aes = FALSE, size = font_size / 4.7, fontface = "bold", family = "Arial"
+  ) +
+<span class="c">  # 外圈两行标签：细胞名 + (占比)，按叶端着色</span>
+  geom_text(
+    data = tips,
+    aes(x = x * label_radius, y = y * label_radius,
+        label = sprintf("%s\n(%.2f%%)", cell_type, percent), color = tip_color,
+        angle = angle, hjust = hjust),
+    inherit.aes = FALSE, size = font_size / 3.7, family = "Arial", lineheight = 0.85
+  ) +
+<span class="c">  # ---- 顶部 Age / Sex 图例：白底 label 直接盖在轨道上（对齐参考代码写法） ----</span>
+<span class="c">  # ★ y 取各自轨道组的中心偏上：Sex 组 1.035-1.187 → 1.15；Age 组 1.199-1.351 → 1.31</span>
+<span class="c">  #   改 tracks 后同步这两个 y（≈ 组内半径均值 + 0.04）</span>
+<span class="c">  #   size = font_size / 5.4 控制字号；label.padding = 白底留白；label.size = 0 去边框</span>
+  annotate("label", x = 0, y = c(1.15, 1.31),
+           label = c("Sex: cell proportion\nATAC / RNA", "Age: cell proportion\nATAC / RNA"),
+           label.size = 0, size = font_size / 5.4, fill = "white",
+           family = "Arial", label.padding = unit(0.1, "lines")) +
+<span class="c">  # ---- 层级标尺 L1-L4（虚线竖尺 + 灰色圆点标记） ----</span>
+<span class="c">  # ★ 圆点 y 对应 node_radius 各层半径，改 node_radius 后同步这四个值</span>
+  annotate("segment", x = -0.07, y = -0.19, xend = -0.07, yend = -0.99,
+           linewidth = 0.3, linetype = "22", color = "#CCCCCC") +
+  annotate("point", x = -0.07, y = c(-0.19, -0.42, -0.86, -0.99),
+           size = font_size / 1.8, color = "#DDDDDD") +
+  annotate("text", x = -0.07, y = c(-0.19, -0.42, -0.86, -0.99), label = paste0("L", 1:4),
+           size = font_size / 4, color = "#333333", family = "Arial") +
+  scale_fill_identity(na.value = "#FFFFFF") +
+  scale_color_identity() +
+  scale_edge_colour_identity() +
+  scale_edge_width_identity() +
+  scale_continuous_identity(aesthetics = "label_size") +
+<span class="c">  # 等比例坐标（圆环不变形）+ 画布范围：外圈标签被裁时放大 xlim/ylim</span>
+  coord_fixed(xlim = c(-2.45, 2.45), ylim = c(-2.45, 2.45), clip = "off") +
+  theme_void(base_family = "Arial", base_size = font_size) +
+  theme(
+    legend.position = "none", plot.margin = margin(12, 12, 12, 12),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+<span class="c"># 6. 右下角迷你树图例（复用主图数据：细枝缩略树 + 色带 + 热图轨道 + 说明文字） ------</span>
+<span class="c"># 与主图同构但极简化：细枝 0.6 / alpha 0.7，无编号、无枝上文字</span>
+<span class="c"># ★ 想调迷你树内部比例：改 coord_fixed(xlim, ylim)；上下说明文字 y = ±1.7</span>
+guide_plot &lt;- ggraph(tree_layout_full) +
+<span class="c">  # 缩略树只保留细枝，不显示枝上文字</span>
+  geom_edge_diagonal(aes(edge_colour = color), edge_width = 0.6, alpha = 0.7) +
+<span class="c">  # 叶端分类色带</span>
+  geom_arc_bar(
+    data = tips,
+    aes(x0 = 0, y0 = 0, r0 = tip_r0, r = tip_r1, start = start, end = end, fill = tip_color),
+    inherit.aes = FALSE, color = NA
+  ) +
+<span class="c">  # 四条热图轨道</span>
+  geom_arc_bar(
+    data = ring_data,
+    aes(x0 = 0, y0 = 0, r0 = inner, r = outer, start = start, end = end, fill = fill),
+    inherit.aes = FALSE, color = NA
+  ) +
+<span class="c">  # 中心白底标题（label.size = 0 去边框）</span>
+  annotate("label", x = 0, y = 0, label = "Cell Annotation\nLineage",
+           size = font_size / 4, label.size = 0, fill = "white", family = "Arial") +
+<span class="c">  # 上方说明：内侧轨道组为性别，外侧为年龄</span>
+  annotate("text", x = 0, y = 1.7, label = "Inner: Sex | Outer: Age",
+           size = font_size / 4, family = "Arial") +
+<span class="c">  # 下方说明：每组 ATAC / RNA 顺序及外圈百分比含义</span>
+  annotate("text", x = 0, y = -1.7, label = "Each pair: ATAC / RNA\nOuter labels: scRNA proportion",
+           size = font_size / 4.3, family = "Arial", lineheight = 0.9) +
+  scale_fill_identity(na.value = "white") +
+  coord_fixed(xlim = c(-1.8, 1.8), ylim = c(-2, 2), clip = "off") +
+  theme_void()
+
+<span class="c"># 主图为画布，右下角叠放迷你树图例</span>
+<span class="c"># ★ x/y/width/height 为画布相对坐标（0-1）；与外圈标签重叠时可微调 x/y 或缩小</span>
+final_plot &lt;- ggdraw(p) +
+  draw_plot(guide_plot, x = 0.79, y = 0.008, width = 0.185, height = 0.185)
+
+<span class="c"># 7. 保存 ----------------------------------------------------------------------</span>
+ggsave("Figure1E.pdf", final_plot, width = 15, height = 15, device = cairo_pdf, bg = "white")
+png("Figure1E.png", width = 15, height = 15, units = "in", res = 150, type = "cairo", bg = "white")
+print(final_plot)
+dev.off()
+cat("Done: Figure1E.pdf / Figure1E.png\n")</code></pre>
+    <h4>circle_tree.py · Python 完整脚本（Python 3.10.9 · matplotlib 3.10.8 · pandas 2.2.3 · numpy 2.0.2）</h4>
+    <pre><code><span class="c"># Title: Circular cell annotation tree | 环形细胞注释树（Science Fig.1E 风格）Python 版</span>
+<span class="c"># 与 R 版 (circle_tree.R) 同一套数据与布局逻辑、逐段对应；注释含风格调参说明。</span>
+<span class="c"># ★ 风格速调索引：</span>
+<span class="c"># 全局字号 FONT 所有文字 = FONT / n * MM2PT</span>
+<span class="c"># 单位换算 MM2PT ggplot 尺寸(mm) → matplotlib 磅(pt)</span>
+<span class="c"># 谱系配色 lineage_colors L1 枝色 = 扇形底色基色</span>
+<span class="c"># 发散色系 RDBU / rdbu() 轨道热图色带（蓝↔红发散）</span>
+<span class="c"># 枝干粗细 edge_widths 磅（已乘 MM2PT）</span>
+<span class="c"># 轨道圈数/位置 tracks 加一项 = 多一圈；值为内半径</span>
+<span class="c"># L3 突出环带 l3_rows 段深浅看 mix_white(0.84)，外缘 r = 0.868</span>
+<span class="c"># 顶部图例文字/位置 "顶部 Age / Sex 图例" for 循环 y 需跟随 tracks 同步</span>
+<span class="c"># 迷你树位置/大小 fig.add_axes([...]) figure 相对坐标 0-1</span>
+<span class="c"># 画布范围 ax.set_xlim / ax.set_ylim 标签被裁时放大</span>
+import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib.patches import Wedge, Circle, PathPatch
+from matplotlib.path import Path
+plt.rcParams["font.family"] = ["Arial", "Helvetica", "sans-serif"]
+plt.rcParams["pdf.fonttype"] = 42  # PDF 内嵌 TrueType，文字可编辑
+FONT = 14.0    # ★ 全局字号基准：所有文字 = FONT / n * MM2PT，n 越大字越小
+MM2PT = 2.845  # ggplot 的 size 单位(mm) → matplotlib 磅值；两版观感一致的关键
+
+<span class="c"># ---------- 1. 读取数据 -------------------------------------------------------</span>
+<span class="c"># input.csv 列说明同 R 版：id / l1 / l2 / l3 / cell_type / percent / tip_color</span>
+<span class="c"># / sex_score / age_score / *_stars 四列星号</span>
+df = pd.read_csv("input.csv")
+df = df.sort_values("id").reset_index(drop=True)
+n = len(df)
+half_step = np.pi / n          # 每个叶端扇形单元的角度半宽（弧度）= π/n
+pad = 0.002                    # ★ 色块角向缝隙（弧度），调大缝隙更明显
+df["theta"] = (df.index + 0.5) * 2 * np.pi / n  # 均匀铺满 360°，顺时针自顶部
+df["root"] = "Cells"
+node_radius = {"root": 0, "l1": 0.19, "l2": 0.42, "l3": 0.86, "cell_type": 1}
+
+<span class="c"># ---------- 2. 配色 -----------------------------------------------------------</span>
+lineage_colors = {
+    "CD4 T": "#2F4B8F", "CD8 T": "#23809D", "ILC": "#8A3B96",
+    "B cells": "#E08A00", "Myeloid": "#7E9C3F",
+}
+<span class="c"># RdBu 发散色：深→浅→白→浅→深 11 档；换色系时保持左右对称即可</span>
+RDBU = ["#053061", "#2166AC", "#4393C3", "#92C5DE", "#D1E5F0", "#F2F2F2",
+        "#FDDBC7", "#F4A582", "#D6604D", "#B2182B", "#67001F"]
+RDBU_RGB = np.array([[int(c[i:i+2], 16) for i in (1, 3, 5)] for c in RDBU], float)
+
+def hex2rgb(h):
+    return np.array([int(h[i:i+2], 16) for i in (1, 3, 5)], float)
+
+def rgb2hex(c):
+    return "#{:02X}{:02X}{:02X}".format(*(int(round(v)) for v in np.clip(c, 0, 255)))
+
+def mix_white(h, f=0.74):  # ★ 向白色混合：f = 混白比例，越大越淡
+<span class="c">    # 本图用到三档：0.92 内圈扇形底（极淡）/ 0.84 L3 突出环带 / 0.74 ATAC 轨道淡化</span>
+    return rgb2hex(hex2rgb(h) * (1 - f) + 255 * f)
+
+def rdbu(x):  # RdBu 发散色：负=蓝（Female/Younger），正=红（Male/Elder）
+    x = np.clip(x, -1, 1)
+    x = np.sign(x) * np.abs(x) ** 0.55  # ★ gamma 压缩：&lt;1 提亮中小值；改 1 = 线性
+    t = (x + 1) / 2 * (len(RDBU) - 1)
+    lo = int(np.floor(t)); hi = min(lo + 1, len(RDBU) - 1); f = t - lo
+    return rgb2hex(RDBU_RGB[lo] * (1 - f) + RDBU_RGB[hi] * f)
+
+<span class="c"># ---------- 3. 节点 / 连线表 ---------------------------------------------------</span>
+<span class="c"># l3 越大 L3 越贴近叶端；改后需同步主图 L1-L4 标尺的 y 值</span>
+def leaf_path(row, upto):
+    """叶端路径的累积名（与 R 的 accumulate 一致），upto ∈ {root,l1,l2,l3,cell_type}"""
+    order = ["root", "l1", "l2", "l3", "cell_type"]
+    labels = {"root": row["root"], "l1": row["l1"], "l2": row["l2"],
+              "l3": row["l3"], "cell_type": f"{row['cell_type']} / {row['id']}"}
+    return " / ".join(labels[k] for k in order[: order.index(upto) + 1])
+
+<span class="c"># 收集每个节点的叶端 theta，取均值（同 R 版 summarise(mean(theta))）</span>
+theta_pool = {}
+for _, row in df.iterrows():
+    for lvl in ("root", "l1", "l2", "l3", "cell_type"):
+        theta_pool.setdefault((lvl, leaf_path(row, lvl)), []).append(row["theta"])
+nodes = {}
+for (lvl, name), ths in theta_pool.items():
+    th = float(np.mean(ths))
+    nodes[name] = dict(level=lvl, theta=th,
+                       x=node_radius[lvl] * np.sin(th), y=node_radius[lvl] * np.cos(th))
+
+<span class="c"># 连线：L1 用谱系主色，其余层级取该分支下第一个叶端颜色</span>
+<span class="c"># ★ edge_widths 磅值（R 的 mm × MM2PT）：l1 主干最粗、cell_type 连接枝最细；</span>
+<span class="c"># L3 胶囊在下面绘图循环里固定用 edge_widths["l3"]</span>
+edge_widths = {"l1": 7 * MM2PT, "l2": 3.2 * MM2PT, "l3": 5.1 * MM2PT, "cell_type": 0.8 * MM2PT}
+label_sizes = {"l1": FONT / 3.1 * MM2PT, "l2": FONT / 4.6 * MM2PT, "l3": FONT / 5.0 * MM2PT}
+edges = {}
+for _, row in df.iterrows():
+    seq = [(leaf_path(row, a), leaf_path(row, b))
+           for a, b in zip(("root", "l1", "l2", "l3"), ("l1", "l2", "l3", "cell_type"))]
+    for from_name, to_name in seq:
+        key = (from_name, to_name)
+        e = edges.setdefault(key, dict(proportion=0.0, ids=[]))
+        e["level"] = nodes[to_name]["level"]
+        e["proportion"] += row["percent"]
+        e["ids"].append(row["id"])
+for (from_name, to_name), e in edges.items():
+    e["from"], e["to"] = from_name, to_name
+    last = to_name.split(" / ")[-1]
+    e["color"] = lineage_colors[last] if e["level"] == "l1" else \
+        df.loc[df["id"] == e["ids"][0], "tip_color"].iloc[0]
+<span class="c">    # branch_label：cell_type 无标签；l2 在 l2==l3 全员重复时抑制；l3 显示"名称 占比%"</span>
+    if e["level"] == "cell_type":
+        e["branch_label"], e["label_size"] = "", 0
+    else:
+        sub = df[df["id"].isin(e["ids"])]
+        if e["level"] == "l2":
+            repeat = bool((sub["l2"] == sub["l3"]).all())
+            e["branch_label"] = "" if repeat else last
+        elif e["level"] == "l3":
+            e["branch_label"] = f"{last} {e['proportion']:.2f}%"
+        else:
+            e["branch_label"] = last
+        e["label_size"] = label_sizes[e["level"]]
+<span class="c">    # ★ 文字在枝上的位置（0 父端 → 1 子端）；L3 胶囊文字取 0.55</span>
+    e["label_pos"] = 0.55 if e["level"] == "l3" else 0.62
+
+<span class="c"># ---------- 4. 叶端、扇形底色与热图轨道 ----------------------------------------</span>
+<span class="c"># ★ tip_r1 - tip_r0 = 叶端方块厚度；ring_w = 轨道厚度</span>
+tip_r0, tip_r1, ring_w = 0.965, 1.015, 0.070
+tips = df.copy()
+tips["start"] = tips["theta"] - half_step + pad
+tips["end"] = tips["theta"] + half_step - pad
+tips["x"] = np.sin(tips["theta"]); tips["y"] = np.cos(tips["theta"])
+<span class="c"># 扇形底色两层：内圈（0.02-0.42，L1/L2 区）为很淡的谱系色（mix 0.92）；</span>
+<span class="c"># 外圈为 L3 突出环带（见下），按 L3 分支着色</span>
+sectors = (tips.groupby("l1")
+           .agg(start=("start", "min"), end=("end", "max")).reset_index())
+sectors["start"] -= 0.01; sectors["end"] += 0.01
+sectors["color"] = [mix_white(lineage_colors[l1], 0.92) for l1 in sectors["l1"]]
+sectors["r0"], sectors["r"] = 0.02, 0.42
+<span class="c"># L3 突出环带：mix_white 0.84 = 深浅（越大越淡）；±0.006 = 角向外扩（相邻环带近乎相接）</span>
+l3_rows = []
+for e in edges.values():
+    if e["level"] != "l3":
+        continue
+    th = df.loc[df["id"].isin(e["ids"]), "theta"]
+    l3_rows.append(dict(start=th.min() - half_step - 0.006, end=th.max() + half_step + 0.006,
+                        color=mix_white(e["color"], 0.84), r0=0.42, r=0.868))
+sectors = pd.concat([sectors, pd.DataFrame(l3_rows)], ignore_index=True)
+<span class="c"># ★ 4 条环形轨道：键 = 轨道名，值 = 内半径（outer = inner + ring_w）</span>
+<span class="c"># 加轨道：这里加一项 + 下面 ring_rows 循环自动套用（列名前缀对应即可）</span>
+tracks = {"sex_atac": 1.035, "sex_rna": 1.117, "age_atac": 1.199, "age_rna": 1.281}
+ring_rows = []
+for _, row in df.iterrows():
+    for track, inner in tracks.items():
+        mod = track.split("_")[1]
+        score_col = "sex_score" if track.startswith("sex") else "age_score"
+<span class="c">        # ATAC 圈 mix_white(f=0.74) 淡化，RNA 圈饱和 —— 两模组的视觉分工</span>
+        fill = mix_white(rdbu(row[score_col])) if mod == "atac" else rdbu(row[score_col])
+        ring_rows.append(dict(track=track, inner=inner, outer=inner + ring_w,
+                              start=row["theta"] - half_step + pad,
+                              end=row["theta"] + half_step - pad, fill=fill,
+                              stars=row[track + "_stars"], theta=row["theta"]))
+rings = pd.DataFrame(ring_rows)
+rings["radius"] = (rings["inner"] + rings["outer"]) / 2
+rings["x"] = rings["radius"] * np.sin(rings["theta"])
+rings["y"] = rings["radius"] * np.cos(rings["theta"])
+<span class="c"># 星号颜色：深色格白星、浅色格黑星（RGB 平均亮度阈值 130/255）</span>
+rings["text_color"] = np.where(
+    rings["fill"].map(lambda h: hex2rgb(h).mean()) &lt; 130, "white", "#202020")
+label_radius, outer_circle = 1.46, 1.42  # ★ 外标签径向位置 / 绿色参考圆半径
+
+<span class="c"># ---------- 5. 绘图 -----------------------------------------------------------</span>
+<span class="c"># 图层自下而上：扇形底色 → 树枝/L3 胶囊 → 轨道 → 参考圆 → 星号</span>
+<span class="c"># → 叶端方块/编号 → 外圈标签 → 顶部图例 → L1-L4 标尺</span>
+fig = plt.figure(figsize=(15, 15))  # ★ 15×15 英寸方形画布
+ax = fig.add_axes([0, 0, 1, 1])
+ax.set_xlim(-2.45, 2.45); ax.set_ylim(-2.45, 2.45)  # ★ 标签被裁时放大范围
+ax.set_aspect("equal"); ax.axis("off")
+fig.patch.set_facecolor("white")
+
+def mdeg(start, end):  # theta 自顶部顺时针 → matplotlib 角度逆时针自 +x
+    return 90 - np.rad2deg(end), 90 - np.rad2deg(start)
+
+for _, s in sectors.iterrows():
+    t1, t2 = mdeg(s["start"], s["end"])
+    ax.add_patch(Wedge((0, 0), s["r"], t1, t2, width=s["r"] - s["r0"],
+                       facecolor=s["color"], edgecolor="none", zorder=1))
+
+def bezier_edge(p0, p1, lw, color, zorder=4):
+<span class="c">    # 树枝：ggraph diagonal 风格三次贝塞尔（两端切线竖直 → 极坐标下为平滑弯枝）</span>
+    ym = (p0[1] + p1[1]) / 2
+    path = Path([p0, (p0[0], ym), (p1[0], ym), p1],
+                [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
+    ax.add_patch(PathPatch(path, fill=False, lw=lw, color=color,
+                           capstyle="round", zorder=zorder))
+    return path
+
+def bez_point_tangent(path, t):
+    """贝塞尔曲线上 t 处的坐标与切线角（用于白字沿枝排布）"""
+    p0, c1, c2, p1 = path.vertices
+    mt = 1 - t
+    pt = mt**3 * p0 + 3 * mt**2 * t * c1 + 3 * mt * t**2 * c2 + t**3 * p1
+    d = 3 * mt**2 * (c1 - p0) + 6 * mt * t * (c2 - c1) + 3 * t**2 * (p1 - c2)
+    return pt, np.degrees(np.arctan2(d[1], d[0]))
+
+for e in edges.values():
+    p0, p1 = nodes[e["from"]], nodes[e["to"]]
+    if e["level"] == "l3":
+<span class="c">        # L3 胶囊枝：L2 → L3 径向直线段（圆角矩形），白字在枝内中段</span>
+<span class="c">        # ★ solid_capstyle="round" = 圆角端；lw 由 edge_widths["l3"] 控制</span>
+        x0, y0, x1, y1 = p0["x"], p0["y"], p1["x"], p1["y"]
+        ax.plot([x0, x1], [y0, y1], lw=edge_widths["l3"], color=e["color"],
+                solid_capstyle="round", zorder=4)
+        ang = np.degrees(np.arctan2(y1 - y0, x1 - x0))
+        if ang &gt; 90: ang -= 180   # 角度归一化到 (-90, 90]，左半圆不倒置
+        if ang &lt; -90: ang += 180
+        ax.text(x0 + 0.55 * (x1 - x0), y0 + 0.55 * (y1 - y0), e["branch_label"],
+                rotation=ang, rotation_mode="anchor", ha="center", va="center",
+                color="white", fontsize=FONT / 5.0 * MM2PT, zorder=5)
+    else:
+        path = bezier_edge((p0["x"], p0["y"]), (p1["x"], p1["y"]),
+                           edge_widths[e["level"]], e["color"])
+        if e["branch_label"]:
+            pt, ang = bez_point_tangent(path, e["label_pos"])
+            if ang &gt; 90: ang -= 180
+            ax.text(pt[0], pt[1], e["branch_label"], rotation=ang, rotation_mode="anchor",
+                    ha="center", va="center", color="white",
+                    fontsize=e["label_size"],
+                    fontweight="bold" if e["level"] in ("l1", "l2") else "normal",
+                    zorder=5)
+
+for _, r in rings.iterrows():
+    t1, t2 = mdeg(r["start"], r["end"])
+    ax.add_patch(Wedge((0, 0), r["outer"], t1, t2, width=r["outer"] - r["inner"],
+                       facecolor=r["fill"], edgecolor="none", zorder=3))
+ax.add_patch(Circle((0, 0), outer_circle, fill=False, ec="#A3D39B", lw=0.5, zorder=8))
+<span class="c"># 星号（沿轨道切向；颜色取预先算好的黑/白）</span>
+stars = rings[rings["stars"].notna()]
+for _, s in stars.iterrows():
+    ax.text(s["x"], s["y"], s["stars"], rotation=-np.rad2deg(s["theta"]),
+            rotation_mode="anchor", ha="center", va="center", color=s["text_color"],
+            fontsize=FONT / 4.7 * MM2PT, fontweight="bold", zorder=9)
+<span class="c"># 叶端编号方块 + 编号 + 外圈「细胞名 (占比)」标签</span>
+for _, t in tips.iterrows():
+    t1, t2 = mdeg(t["start"], t["end"])
+    ax.add_patch(Wedge((0, 0), tip_r1, t1, t2, width=tip_r1 - tip_r0,
+                       facecolor=t["tip_color"], edgecolor="none", zorder=6))
+    ax.text(t["x"] * 0.99, t["y"] * 0.99, str(int(t["id"])), ha="center", va="center",
+            color="white", fontsize=FONT / 4.6 * MM2PT, zorder=7)
+    ang = 90 - np.rad2deg(t["theta"])
+    if t["x"] &lt; 0: ang += 180  # 左半圆翻转 180° 保证可读
+    ax.text(t["x"] * label_radius, t["y"] * label_radius,
+            f"{t['cell_type']}\n({t['percent']:.2f}%)",
+            rotation=ang, rotation_mode="anchor", linespacing=0.85,
+            ha="left", va="center",
+            color=t["tip_color"], fontsize=FONT / 3.7 * MM2PT, zorder=9)
+
+<span class="c"># ---- 顶部白底图例（直接盖在轨道上）----</span>
+<span class="c"># 改 tracks 后同步这两个 y（≈ 组内半径均值 + 0.04）；</span>
+<span class="c"># 字号 = FONT / 5.4 * MM2PT；boxstyle pad = 白底留白；ec="none" 无边框</span>
+for ly, lab in ((1.15, "Sex: cell proportion\nATAC / RNA"),
+                (1.31, "Age: cell proportion\nATAC / RNA")):
+    ax.text(0, ly, lab, ha="center", va="center", linespacing=1.1, zorder=13,
+            fontsize=FONT / 5.4 * MM2PT,
+            bbox=dict(boxstyle="round,pad=0.18", fc="white", ec="none"))
+<span class="c"># ---- 左下 L1-L4 层级标尺 ----</span>
+ax.plot([-0.07, -0.07], [-0.19, -0.99], lw=1.1, ls=(0, (2, 2)),
+        color="#CCCCCC", zorder=9)
+for i, y in enumerate((-0.19, -0.42, -0.86, -0.99), start=1):
+    ax.add_patch(Circle((-0.07, y), 0.05, facecolor="#DDDDDD", edgecolor="none", zorder=10))
+    ax.text(-0.07, y, f"L{i}", ha="center", va="center", color="#333333",
+            fontsize=FONT / 4 * MM2PT, zorder=11)
+
+<span class="c"># ---- 右下角迷你树图例（复用主图数据：细枝缩略树 + 色带 + 热图轨道 + 说明文字） ----</span>
+<span class="c"># 与主图同构但极简化：细枝 alpha 0.7，无编号、无枝上文字</span>
+<span class="c"># ★ 位置与大小由 add_axes([左, 下, 宽, 高]) 控制（figure 相对坐标 0-1）</span>
+axm = fig.add_axes([0.79, 0.008, 0.185, 0.185])
+axm.set_xlim(-1.8, 1.8); axm.set_ylim(-2, 2)  # ★ 迷你树内部比例
+axm.set_aspect("equal"); axm.axis("off")
+for e in edges.values():  # 细枝缩略树
+    p0, p1 = nodes[e["from"]], nodes[e["to"]]
+    ym = (p0["y"] + p1["y"]) / 2
+    mini_path = Path([(p0["x"], p0["y"]), (p0["x"], ym), (p1["x"], ym), (p1["x"], p1["y"])],
+                     [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
+    axm.add_patch(PathPatch(mini_path, fill=False, lw=1.7, color=e["color"],
+                            alpha=0.7, capstyle="round", zorder=2))
+for _, r in rings.iterrows():  # 四条热图轨道
+    t1, t2 = mdeg(r["start"], r["end"])
+    axm.add_patch(Wedge((0, 0), r["outer"], t1, t2, width=r["outer"] - r["inner"],
+                        facecolor=r["fill"], edgecolor="none", zorder=1))
+for _, t in tips.iterrows():  # 叶端分类色带
+    t1, t2 = mdeg(t["start"], t["end"])
+    axm.add_patch(Wedge((0, 0), tip_r1, t1, t2, width=tip_r1 - tip_r0,
+                        facecolor=t["tip_color"], edgecolor="none", zorder=3))
+axm.text(0, 0, "Cell Annotation\nLineage", ha="center", va="center", zorder=5,
+         fontsize=FONT / 4 * MM2PT,
+         bbox=dict(boxstyle="round,pad=0.35", fc="white", ec="black", lw=0.8))
+axm.text(0, 1.7, "Inner: Sex | Outer: Age", ha="center", va="center",  # 上说明
+         fontsize=FONT / 4 * MM2PT)
+axm.text(0, -1.7, "Each pair: ATAC / RNA\nOuter labels: scRNA proportion",  # 下说明
+         ha="center", va="center", fontsize=FONT / 4.3 * MM2PT, linespacing=0.9)
+
+<span class="c"># ---------- 6. 保存 ------------------------------------------------------------</span>
+fig.savefig("Figure1E_python.pdf", facecolor="white")
+fig.savefig("Figure1E_python.png", dpi=150, facecolor="white")  # ★ 印刷可提到 300
+print("Done: Figure1E_python.pdf / Figure1E_python.png")</code></pre>
+    <h4>input.csv · 数据模板（一行一个细胞亚型，72 行）</h4>
+    <pre><code>id,l1,l2,l3,cell_type,percent,tip_color,sex_score,age_score,sex_atac_stars,sex_rna_stars,age_atac_stars,age_rna_stars
+1,ILC,ILC2,ILC2C,ILC2C-IL12RB2,1.30,#B15CA8,-0.45,-0.10,**,***,**,*
+2,ILC,NK-T,NKT,NKT-IL12RA,1.02,#9B3F9B,-0.20,0.35,*,*,NA,*
+3,ILC,NK,NKbright,NKbright-XCL1,3.04,#7E2B86,-0.30,-0.55,**,**,***,**
+4,ILC,NK,Transit. NK,Transitional NK,0.86,#6E2568,0.10,0.15,NA,NA,NA,*
+5,ILC,NK,Mature NK,Mature NK-CD160,0.84,#8E4A9E,0.55,-0.20,*,***,NA,*
+6,ILC,NK,Mature NK,Mature NK-FCGR3A,4.54,#A05EB0,0.80,-0.30,***,***,**,*
+7,ILC,NK,Inflamed NK,Inflamed NK-IFIT1,0.03,#C08CCB,-0.15,0.60,*,NA,*,**
+8,ILC,NK,Prolif. NK,Proliferative NK-MKI67,0.03,#D0A5D8,-0.10,-0.70,*,*,**,***
+9,B cells,Naive B,Transit. B,Transitional B-MME,0.68,#F5E17E,-0.35,-0.45,*,*,**,*
+10,B cells,Naive B,Naive B,Naive B-TCL1A,2.18,#F3D96E,-0.40,-0.60,**,*,***,**
+11,B cells,Naive B,Naive B,Naive B-IL6,0.21,#F0C95C,-0.25,-0.30,NA,*,*,NA
+12,B cells,Memory B,Atypical Bm,Atypical Bm-ITGAX,0.44,#F2B04C,0.45,0.50,**,**,*,**
+13,B cells,Memory B,Unswi. Bm,Unswitched Bm-IL6,0.10,#F09A3E,-0.10,0.10,NA,NA,NA,NA
+14,B cells,Memory B,Unswi. Bm,Unswitched Bm-IFIT3,0.11,#EE8A32,-0.05,-0.05,NA,*,NA,*
+15,B cells,Memory B,pre-Swi. Bm,pre-Switched Bm-IFIT3,0.02,#EC7A2C,0.15,-0.10,NA,NA,NA,NA
+16,B cells,Memory B,pre-Swi. Bm,pre-Switched Bm-JAM3,0.28,#E96A28,-0.30,-0.25,*,*,NA,*
+17,B cells,Memory B,Swi. Bm,Switched Bm-IGHDneg,1.24,#E05A2E,0.20,0.30,*,**,NA,*
+18,B cells,Memory B,Swi. Bm,Switched Bm-IGHE,0.52,#D84A30,0.10,0.40,NA,*,*,**
+19,B cells,Memory B,Swi. Bm,Switched Act. Bm-CD86,0.50,#CE3A34,-0.60,-0.35,**,***,**,*
+20,B cells,Plasma,Plasmablast,Plasmablast,0.02,#C42E38,-0.15,0.55,NA,*,NA,*
+21,B cells,Plasma,Plasmablast,Plasmablast-MKI67,0.02,#BA283C,-0.10,0.60,*,NA,*,*
+22,B cells,Plasma,Plasma,Plasma-IGHA1,2.00,#B02440,-0.25,0.50,**,**,***,*
+23,B cells,Plasma,Plasma,Plasma-IGHG1,0.08,#A62044,-0.20,0.45,*,*,**,NA
+24,Myeloid,HSPC,HSPC,HSPC-CD34,0.28,#3FA05C,-0.30,-0.75,*,**,***,***
+25,Myeloid,HSPC,HSPC,HSPC-MKI67,0.08,#5CAE70,-0.20,-0.65,*,*,**,**
+26,Myeloid,HSPC,MK,MK-GP9,0.07,#7CB884,0.10,-0.35,NA,NA,*,*
+27,Myeloid,DC,DC1,DC1-CLEC9A,0.46,#3E8C7E,-0.15,0.10,*,*,NA,NA
+28,Myeloid,DC,DC2,DC2-CD1C,0.62,#4A9688,-0.10,0.25,NA,*,*,NA
+29,Myeloid,DC,pDC,pDC-LILRA4,0.25,#58A092,-0.35,-0.15,**,*,NA,*
+30,Myeloid,DC,AS DC,AS DC-IRF4,0.04,#6AAA9C,-0.05,0.05,NA,NA,NA,NA
+31,Myeloid,Mono,Clas. Mono,Mono-S100A8,4.44,#8FA33C,0.40,0.20,***,***,**,*
+32,Myeloid,Mono,Clas. Mono,Mono-CD14,2.53,#839638,0.35,0.15,**,**,*,**
+33,Myeloid,Mono,Intm. Mono,Interm. Mono,0.38,#99AC46,0.15,0.10,*,*,NA,NA
+34,Myeloid,Mono,Intm. Mono,Interm. Mono-IFI44L,0.09,#A3B452,-0.10,0.30,NA,*,NA,*
+35,Myeloid,Mono,Non-clas. Mono,Mono-FCGR3A,0.86,#8A9C40,0.55,-0.10,**,*,*,NA
+36,Myeloid,Masto,Mast,Mast-TPSAB1,0.54,#A8925E,-0.05,0.15,NA,NA,NA,*
+37,Myeloid,Masto,Mast,Mast-CPA3,0.21,#B09A68,-0.10,0.05,*,NA,NA,NA
+38,Myeloid,nRbc,nRbc Mono,nRbc Mono-S100A8,1.11,#7E9CC4,0.20,0.25,*,*,NA,*
+39,Myeloid,nRbc,nRbc Mono,nRbc Mono-FCGR3A,0.38,#8AA6CC,0.10,-0.15,NA,*,NA,NA
+40,Myeloid,nRbc,nRbc T,nRbc T-FCGR3A,0.03,#96B0D4,-0.15,-0.20,*,*,NA,NA
+41,Myeloid,nRbc,nRbc T,nRbc T-C1QA,0.38,#A2BADC,0.05,0.10,NA,NA,NA,NA
+42,CD4 T,Naive T,CD4 Naive,CD4 Naive T-CCR7,22.49,#2F4B8F,-0.30,-0.90,***,***,***,***
+43,CD4 T,Naive T,CD4 Naive,CD4 Naive T-SOX4,7.43,#3A5699,-0.25,-0.75,**,***,**,***
+44,CD4 T,Naive T,CD4 Naive,CD4 Naive T-LIMS1,0.65,#4661A3,-0.15,-0.40,*,*,**,*
+45,CD4 T,Naive T,CD4 Naive,CD4 Naive T-IL7R,1.05,#526CAD,-0.20,-0.50,*,**,*,***
+46,CD4 T,Memory T,CD4 Tem,CD4 Tem-S100A4,3.57,#2C4685,0.30,0.55,**,***,**,***
+47,CD4 T,Memory T,CD4 Tem,CD4 Tem-IFI44L,1.70,#33508F,0.25,0.60,*,***,**,***
+48,CD4 T,Memory T,CD4 Tem,CD4 Tem-CCR5,0.04,#3A5A99,0.10,0.20,NA,*,NA,*
+49,CD4 T,Memory T,Tfh-like,CD4 Tfh-like-CCR5,2.44,#2A4480,-0.35,-0.25,**,*,*,**
+50,CD4 T,Memory T,CD4 Th,CD4 Th-LMNA,0.84,#33508F,0.15,0.30,*,*,NA,*
+51,CD4 T,Memory T,CD4 Th,CD4 Th-CCR1,0.52,#3A5A99,0.10,0.15,NA,NA,NA,*
+52,CD4 T,Memory T,CD4 Th1,CD4 Th1-TNFRSF18,1.01,#2C4685,0.35,0.45,**,**,*,***
+53,CD4 T,Memory T,CD4 Th1,CD4 Th1-CCR4,0.28,#33508F,0.20,0.25,*,*,NA,*
+54,CD4 T,Memory T,CD4 Th17,CD4 Th17-GZMK,2.72,#2A4480,-0.20,-0.35,*,**,*,**
+55,CD4 T,Memory T,CD4 Th17,CD4 Th17-RORC,1.55,#33508F,-0.15,-0.30,*,*,*,*
+56,CD4 T,Memory T,CD4 Th22,CD4 Th22-CCR10,0.41,#3A5A99,-0.10,-0.15,NA,*,NA,NA
+57,CD4 T,Memory T,CD4 Tr1,CD4 Tr1-IL10,0.16,#2C4685,-0.25,0.10,*,*,NA,*
+58,CD4 T,Memory T,CD4 Treg,CD4 Treg-FCRL3,1.03,#33508F,-0.40,-0.20,**,**,*,*
+59,CD4 T,Memory T,CD4 Treg,CD4 Treg-FOXP3,0.37,#2A4480,-0.30,-0.15,*,*,*,NA
+60,CD4 T,Memory T,CD4 CTL,CD4 CTL-GZMH,1.93,#33508F,0.25,0.65,**,***,*,**
+61,CD8 T,Naive T,CD8 Naive,CD8 Naive T-CCR7,8.88,#2E86AE,-0.35,-0.85,***,***,***,***
+62,CD8 T,Naive T,CD8 Naive,CD8 Naive T-SOX4,1.22,#26789E,-0.25,-0.70,**,**,***,**
+63,CD8 T,Effector T,CD8 Tem,CD8 Tem-IL7R,4.19,#3590B8,-0.15,-0.35,*,**,*,**
+64,CD8 T,Effector T,CD8 Tem,CD8 Tem-CCR7,4.55,#2E86AE,-0.20,-0.45,**,***,*,**
+65,CD8 T,Effector T,CD8 Tem,CD8 Tem-CD7,0.60,#26789E,0.05,-0.10,NA,*,NA,NA
+66,CD8 T,Effector T,CD8 CTL,CD8 CTL-GZMH,3.54,#1F6A8E,0.40,0.50,***,***,*,**
+67,CD8 T,Effector T,CD8 CTL,CD8 CTL-GZMB,0.72,#1F6A8E,0.30,0.40,**,***,*,**
+68,CD8 T,Prolif. T,Immature T,Immature T-ASAP1,0.27,#46A0C4,-0.20,-0.55,*,*,**,*
+69,CD8 T,Prolif. T,Proliferative T,Proliferative T-MKI67,0.05,#52AACA,-0.10,-0.60,*,*,**,**
+70,CD8 T,MAIT,MAIT,MAIT-SLC4A10,0.61,#2E86AE,0.15,-0.20,*,*,NA,*
+71,CD8 T,Gamma Delta T,Vδ1,γδT-Vδ1-TRDV1,0.11,#3590B8,-0.10,-0.25,*,NA,NA,*
+72,CD8 T,Gamma Delta T,Vδ2,γδT-Vδ2-TRDV2,0.48,#26789E,0.05,-0.30,NA,*,*,*
+...</code></pre>
+    <div class="note note-tip"><p>数据模板共 72 行（五大谱系：CD4 T / CD8 T / ILC / B cells / Myeloid）。本页展示前 72 行中的前若干行与末行，完整 <code>input.csv</code> 随工具包分发。</p></div>
+    <h3 class="refs-title">延伸阅读与参考文献</h3>
+    <ol class="refs">
+      <li>Yin Y, et al. Chinese Immune Multi-omics Atlas. <em>Science</em>. 2026. Fig. 1E（环形细胞注释树原图）</li>
+      <li>Pedersen TL. ggraph: An Grammar of Graphics for Graphs and Networks. R package v2.1.0. <a href="https://ggraph.data-imaginist.com" target="_blank" rel="noopener">https://ggraph.data-imaginist.com</a></li>
+      <li>Wilke CO. cowplot: Streamlined Plot Theme and Plot Annotations for 'ggplot2'. R package, CRAN. <a href="https://CRAN.R-project.org/package=cowplot" target="_blank" rel="noopener">CRAN.R-project.org/package=cowplot</a></li>
+      <li>Hunter JD. Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>. 2007;9(3):90–95. doi:10.1109/MCSE.2007.55</li>
+    </ol>
+  </section>
+  </div>
+
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.033</span>
+    <span>2026-10-18</span>
+  </div>
+
+</article>
+
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
+<script>
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
+    });
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
+</script>
 </body>
 </html>

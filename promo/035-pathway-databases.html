@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="sciviz-promo" content="no=35;date=2026-10-26;id=035-pathway-databases">
+<title>No.035 · 通路数据库三剑客：GO · KEGG · Reactome</title>
+<style>
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
+
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
+
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
+
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
+
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
+
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
+
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
+
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
+
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
+}
+
+
+/* ---- 外链 ---- */
+.body a{color:var(--brand);text-decoration:none;border-bottom:1px solid var(--line);word-break:break-all}
+.body a:hover{color:var(--brand2);border-bottom-color:var(--brand2)}
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
+</style>
+</head>
+<body>
+<article class="post">
+
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.035</span>
+      <span>2026-10-26</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
+    </div>
+    <h1>通路数据库三剑客：GO · KEGG · Reactome</h1>
+    <p class="lede">GO 注释「是什么」，KEGG 给出「哪条路」，Reactome 拆开「具体怎么走」：三大数据库的分工与联合使用。</p>
+    <div class="chips"><span class="chip">GO</span><span class="chip">KEGG</span><span class="chip">Reactome</span><span class="chip">通路</span></div>
+  </header>
+
+  <div class="body">
+  <section>
+    <h2>GO：给基因一张「标准身份证」</h2>
+    <p>做转录组、蛋白组甚至表观组学分析时，几乎都会遇到同样的困惑：筛出一大堆差异基因，它们究竟在细胞内干什么？GO（Gene Ontology）<sup>1,2</sup>是国际标准化的基因功能注释体系，可以理解为一整套「基因功能词典」，从三个维度描述基因产物的功能：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>维度</th><th>回答的问题</th><th>示例</th></tr></thead>
+        <tbody>
+          <tr><td><strong>BP</strong> · 生物学过程</td><td>基因参与哪些「生命活动」？</td><td>有丝分裂、炎症反应、信号转导</td></tr>
+          <tr><td><strong>MF</strong> · 分子功能</td><td>基因产物本身有什么「技能」？</td><td>蛋白激酶活性、DNA 结合、转运活性</td></tr>
+          <tr><td><strong>CC</strong> · 细胞组分</td><td>基因产物位于细胞的哪个「位置」？</td><td>线粒体基质、核糖体、细胞膜</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>一句话概括：GO 告诉我们一个基因「是谁」「会什么」「在哪儿干活」。</p>
+  </section>
+
+  <section>
+    <h2>KEGG：一张生命的「信号通路地图」</h2>
+    <p>KEGG<sup>3</sup>侧重「通路」与「网络」：它把代谢、信号传导、疾病机制等生命活动整理成清晰的路径图，直观展示分子之间如何相互作用。你可以在 KEGG 中找到代谢通路（糖酵解、三羧酸循环）、信号通路（MAPK、mTOR）以及细胞过程与疾病相关通路（细胞凋亡、阿尔茨海默病通路）。</p>
+    <p>如果把细胞看作一座城市：GO 相当于给每个工人（基因/蛋白）发了一张「工种标签」；KEGG 则提供了整个城市的「交通地图」和「施工蓝图」，告诉你这些工人如何在不同的道路上协作完成一项大工程。</p>
+    <p>差异分析结束后，手里握着一长串基因名单，逐个查功能并不现实——GO/KEGG 富集分析就是那把「功能筛子」：快速识别哪些生物学过程最显著、发现哪些通路被共同激活或抑制、从海量基因中提炼出生物学故事。GO 回答「是什么」，KEGG 回答「怎么干」，两者结合才能系统地理解差异基因背后的生物学逻辑。</p>
+  </section>
+
+  <section>
+    <h2>Reactome：比 KEGG 更进一步的机制说明书</h2>
+    <p>一句话分工：KEGG 告诉你哪条路被激活了，Reactome 告诉你这条路具体发生了什么。Reactome<sup>4</sup>由专家审编、开放获取、同行评审，以生物反应（reaction）和信号事件为基本单位，把大通路拆解为连续的反应步骤，条目粒度更细、证据注释更完整，适合机制层面的解读与下游验证设计<sup>5</sup>。</p>
+    <figure><img src="assets/021-reactome/logo.jpg" alt="Reactome：以「生物反应」为核心的开放式通路数据库（reactome.org）" loading="lazy"><figcaption>Reactome：以「生物反应」为核心的开放式通路数据库（<a href="https://reactome.org" target="_blank" rel="noopener">reactome.org</a>）</figcaption></figure>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>维度</th><th>KEGG</th><th>Reactome</th></tr></thead>
+        <tbody>
+          <tr><td>定位</td><td>经典通路地图 · 宏观</td><td>生物反应说明书 · 微观</td></tr>
+          <tr><td>粒度</td><td>如：Wnt signaling pathway</td><td>如：β‑catenin degradation complex、TCF/LEF transcriptional activation</td></tr>
+          <tr><td>擅长回答</td><td>涉及哪条主要通路？</td><td>影响通路中的哪个具体环节？</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>核心洞察：两者不是替代关系，而是互补关系——<strong>KEGG 定方向，Reactome 定细节</strong>。论文写作上也是如此：先用 KEGG 提出假设，再用 Reactome 深化机制。</p>
+  </section>
+
+  <section>
+    <h2>层级示例 · Wnt 信号</h2>
+    <p>以 Wnt/β‑catenin 通路为例，Reactome 的父子层级把一个笼统的通路名拆成可独立分析的步骤链：</p>
+    <ul>
+      <li>Wnt signaling pathway
+        <ul>
+          <li>β‑catenin dependent signaling
+            <ul>
+              <li>β‑catenin degradation complex
+                <ul>
+                  <li>Phosphorylation by GSK3β</li>
+                  <li>Ubiquitination and proteasomal degradation</li>
+                  <li>Stabilization upon Wnt stimulation</li>
+                </ul>
+              </li>
+              <li>Nuclear translocation of β‑catenin</li>
+              <li>TCF/LEF transcription activation</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <p>KEGG 可能只显示「Wnt signaling」；Reactome 能告诉你具体哪个亚过程发生了改变——机制解释从「Wnt 通路异常」升级到「GSK3β 磷酸化失活导致 β‑catenin 降解受阻，核转位增加，激活 TCF/LEF 转录」。</p>
+  </section>
+
+  <section>
+    <h2>KEGG 没结果时，Reactome 往往是突破口</h2>
+    <p>富集不到通路 ≠ 没有机制，常见原因有三个：</p>
+    <ul>
+      <li><strong>通路划分方式不同：</strong>KEGG 大通路覆盖范围广，Reactome 把大通路拆成小反应单元——基因只集中在「β‑catenin 降解」环节时，KEGG 不显著而 Reactome 显著；</li>
+      <li><strong>注释覆盖不同：</strong>同一基因在 KEGG 可能未被注释到该通路，在 Reactome 却拥有更具体的反应注释（非编码 RNA、修饰等 KEGG 覆盖有限）；</li>
+      <li><strong>机制精细度：</strong>信号转导、细胞周期、代谢重编程等多步骤过程，Reactome 能拆解每个反应节点。</li>
+    </ul>
+    <p>关键结论：<em>KEGG 没有显著结果，不代表没有通路机制</em>——可能意味着你的基因信号集中在某个具体的生物反应步骤，而不是覆盖整条经典通路。</p>
+  </section>
+
+  <section>
+    <h2>适用方向与拓展应用</h2>
+    <p>Reactome 几乎适用于所有转录组研究，多步骤、多层级的调控过程尤其受益：信号转导（Wnt、TGF‑β、Hippo）、代谢（糖酵解、TCA、脂代谢）、免疫（NF‑κB、干扰素信号）、细胞周期（检查点与分裂调控）、DNA 修复（HR、NHEJ、错配修复）、细胞黏附（整合素、ECM 交互）。拓展场景包括：非模式物种用 Orthology 映射、单细胞转录组的细胞类型特异性反应、空间转录组的区域特异反应活性，以及蛋白–代谢–转录的多组学整合。</p>
+    <div class="note note-tip">
+      <p><strong>联合使用工作流：</strong>① 先做 KEGG 富集，获取宏观方向；② 再用 Reactome 做精细拆解；③ 两者结果交叉验证；④ 用 Reactome 子通路解释 KEGG 大通路。写作上先展示 KEGG 结果提出通路方向，再用 Reactome 定位具体反应环节——避免只写「通过 Wnt 通路」，而写成「通过抑制 GSK3β 稳定 β‑catenin 激活 TCF/LEF」。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>延伸阅读与参考文献</h2>
+    <ol class="refs">
+      <li>Gene Ontology Consortium. The Gene Ontology knowledgebase in 2023. <em>GENETICS</em>. 2023;224(1):iyad031. doi:10.1093/genetics/iyad031</li>
+      <li>Ashburner M, Ball CA, Blake JA, et al. Gene Ontology: tool for the unification of biology. <em>Nature Genetics</em>. 2000;25(1):25–29. doi:10.1038/75556</li>
+      <li>Kanehisa M, Furumichi M, Sato Y, Kawashima M, Ishiguro-Watanabe M. KEGG for taxonomy-based analysis of pathways and genomes. <em>Nucleic Acids Research</em>. 2023;51(D1):D587–D592. doi:10.1093/nar/gkac963</li>
+      <li>Jassal B, Matthews L, Viteri G, et al. The reactome pathway knowledgebase. <em>Nucleic Acids Research</em>. 2020;48(D1):D498–D503. doi:10.1093/nar/gkz1031</li>
+      <li>Gillespie M, Jassal B, Stephan R, et al. The reactome pathway knowledgebase 2022. <em>Nucleic Acids Research</em>. 2022;50(D1):D623–D632. doi:10.1093/nar/gkab1028</li>
+      <li>Fabregat A, Sidiropoulos K, Viteri G, et al. Reactome graph database: efficient access to complex pathway data. <em>PLOS Computational Biology</em>. 2018;14(1):e1005968. doi:10.1371/journal.pcbi.1005968</li>
+    </ol>
+  </section>
+  </div>
+
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.035</span>
+    <span>2026-10-26</span>
+  </div>
+
+</article>
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
+<script>
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
+    });
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,1025 +1,255 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="sciviz-promo" content="no=14;date=2026-05-31;id=014-log2fc">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>No.014 · Log2 Fold Change 到底怎么算</title>
+<title>No.014 · Log₂ Fold Change 到底怎么算</title>
 <style>
-:root {
-    --bg-deep: #0f0c1a;
-    --bg-card: rgba(255, 255, 255, 0.92);
-    --bg-glass: rgba(255, 255, 255, 0.08);
-    --purple-900: #1a103c;
-    --purple-700: #2d1b69;
-    --purple-500: #5b21b6;
-    --purple-400: #7c3aed;
-    --purple-300: #a78bfa;
-    --purple-200: #c4b5fd;
-    --purple-100: #ede9fe;
-    --accent-cyan: #06b6d4;
-    --accent-pink: #ec4899;
-    --text-primary: #1e1b2e;
-    --text-secondary: #4c4667;
-    --text-light: #f5f3ff;
-    --shadow-soft: 0 8px 32px rgba(91, 33, 182, 0.15);
-    --shadow-glow: 0 0 40px rgba(124, 58, 237, 0.3);
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
+
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
+
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
+
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
+
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
+
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
+
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
+
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
+
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-        /*justify-content: center;*/
-    /*align-items: center;*/
-}
-
-html, body {
-    width: 1280px;
-    height: 1920px;
-    overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif;
-    background: var(--bg-deep);
-    color: var(--text-primary);
-    position: relative;
-    overflow: auto;
-    transform: scale(0.65);
-    transform-origin: top left;
-    justify-content: center;
-    align-items: center;
-}
-
-/* 动态背景 */
-.bg-universe {
-    position: fixed;
-    inset: 0;
-    width: 1280px;
-    height: 1920px;
-    background: 
-        radial-gradient(ellipse at 20% 20%, rgba(91, 33, 182, 0.4) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.1) 0%, transparent 60%);
-    z-index: 0;
-    transform: scale(0.65);
-    transform-origin: top left;
-}
-
-.bg-particles {
-    position: fixed;
-    inset: 0;
-    width: 1280px;
-    height: 1920px;
-    z-index: 1;
-    opacity: 0.6;
-    pointer-events: none;
-    transform: scale(0.65);
-    transform-origin: top left;
-}
-
-.particle {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(167, 139, 250, 0.4);
-    animation: float 15s infinite ease-in-out;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
-    50% { transform: translateY(-30px) scale(1.2); opacity: 0.8; }
-}
-
-/* 主容器 - 竖屏尺寸 1280x1920 */
-.stage {
-    position: relative;
-    z-index: 10;
-    width: 1280px;
-    height: 1920px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 32px;
-    background: transparent;
-
-}
-
-.slides-frame {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 48px;
-    border: 1px solid rgba(167, 139, 250, 0.2);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), var(--shadow-glow);
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: var(--purple-400) transparent;
-}
-
-.slides-frame::-webkit-scrollbar {
-    width: 4px;
-}
-.slides-frame::-webkit-scrollbar-track {
-    background: transparent;
-}
-.slides-frame::-webkit-scrollbar-thumb {
-    background: var(--purple-400);
-    border-radius: 10px;
-}
-
-/* 页面 - 改为纵向单列滚动，不再使用绝对定位 */
-.page {
-    display: none;
-    flex-direction: column;
-    padding: 40px 36px 80px 36px;
-    width: 100%;
-    min-height: 100%;
-    opacity: 0;
-    transform: scale(0.98) translateY(15px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.page.active {
-    display: flex;
-    opacity: 1;
-    transform: scale(1) translateY(0);
-}
-
-/* 入场动画 */
-.page.active .anim-fade-up {
-    animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    opacity: 0;
-}
-.page.active .anim-fade-up:nth-child(1) { animation-delay: 0.05s; }
-.page.active .anim-fade-up:nth-child(2) { animation-delay: 0.15s; }
-.page.active .anim-fade-up:nth-child(3) { animation-delay: 0.25s; }
-.page.active .anim-fade-up:nth-child(4) { animation-delay: 0.35s; }
-.page.active .anim-fade-up:nth-child(5) { animation-delay: 0.45s; }
-.page.active .anim-scale-in {
-    animation: scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
-    opacity: 0;
-}
-
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(25px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.92); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-/* 标题系统 */
-.page-header {
-    margin-top: 34px;
-    margin-bottom: 34px;
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, rgba(91, 33, 182, 0.25), rgba(236, 72, 153, 0.15));
-    border: 1px solid rgba(167, 139, 250, 0.4);
-    color: var(--purple-200);
-    font-size: 45px;
-    font-weight: 600;
-    padding: 6px 16px;
-    border-radius: 100px;
-    margin-bottom: 18px;
-    backdrop-filter: blur(8px);
-    letter-spacing: 0.5px;
-}
-
-.section-title {
-    font-size: 54px;
-    font-weight: 800;
-    line-height: 1.2;
-    background: linear-gradient(135deg, #fff 0%, var(--purple-200) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    letter-spacing: -0.5px;
-}
-
-.section-title .accent {
-    background: linear-gradient(135deg, var(--accent-cyan), var(--purple-300));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-/* 卡片系统 - 单列布局 */
-.card {
-    background: var(--bg-card);
-    border-radius: 28px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
-    border: 1px solid rgba(167, 139, 250, 0.2);
-    box-shadow: var(--shadow-soft);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--purple-400), var(--accent-cyan));
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 16px 48px rgba(91, 33, 182, 0.2);
-}
-
-.card.glass {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(167, 139, 250, 0.3);
-    color: var(--text-light);
-}
-
-.card.glass .card-title,
-.card.glass .card-body {
-    color: var(--text-light);
-}
-
-.card-title {
-    font-size: 42px;
-    font-weight: 700;
-    color: var(--purple-700);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.card-body {
-    font-size: 38px;
-    line-height: 1.6;
-    color: var(--text-secondary);
-}
-
-.card-body strong {
-    color: var(--purple-500);
-}
-
-/* 公式盒子 */
-.equation-box {
-    background: linear-gradient(135deg, var(--purple-100), #fff);
-    border: 2px solid var(--purple-200);
-    border-radius: 20px;
-    padding: 14px 20px;
-    text-align: center;
-    margin: 16px 0;
-    font-family: 'Courier New', monospace;
-    font-size: 36px;
-    font-weight: 800;
-    color: var(--purple-700);
-}
-
-/* 表格 */
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 16px;
-    margin: 16px 0;
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-.data-table th {
-    background: linear-gradient(135deg, var(--purple-500), var(--purple-700));
-    color: white;
-    font-weight: 700;
-    padding: 12px 10px;
-    font-size: 15px;
-}
-
-.data-table td {
-    background: rgba(255, 255, 255, 0.85);
-    padding: 10px 8px;
-    text-align: center;
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--purple-100);
-    font-size: 15px;
-}
-
-.data-table tr:last-child td {
-    border-bottom: none;
-}
-
-/* 标签 */
-.tag {
-    display: inline-block;
-    line-height: 54px;
-    padding: 4px 12px;
-    border-radius: 100px;
-    font-size: 36px;
-    font-weight: 700;
-    margin: 0 4px;
-}
-
-.tag-purple {
-    background: var(--purple-100);
-    color: var(--purple-700);
-    border: 1px solid var(--purple-200);
-}
-
-.tag-cyan {
-    background: rgba(6, 182, 212, 0.15);
-    color: #0891b2;
-    border: 1px solid rgba(6, 182, 212, 0.3);
-}
-
-/* 列表（炫彩勾） */
-.fancy-list {
-    list-style: none;
-    padding: 0;
-}
-
-.fancy-list li {
-    font-size: 38px;
-    margin-bottom: 16px;
-    padding-left: 32px;
-    position: relative;
-    color: var(--text-secondary);
-    line-height: 1.5;
-}
-
-.fancy-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 4px;
-    width: 20px;
-    height: 20px;
-    background: linear-gradient(135deg, var(--purple-400), var(--accent-cyan));
-    border-radius: 8px;
-}
-
-.fancy-list li::after {
-    content: '✓';
-    position: absolute;
-    left: 5px;
-    top: 4px;
-    color: white;
-    font-size: 32px;
-    font-weight: 800;
-}
-
-/* 不对称演示容器 */
-.asym-demo {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 50px;
-    min-height: 180px;
-    margin: 20px 0;
-    position: relative;
-}
-
-.bar-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-}
-
-.bar {
-    width: 90px;
-    border-radius: 16px 16px 0 0;
-    transition: height 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-    position: relative;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-}
-
-.bar-label {
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--text-secondary);
-}
-
-.bar-value {
-    position: absolute;
-    top: -55px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--purple-700);
-    background: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    white-space: nowrap;
-}
-
-.center-line {
-    position: absolute;
-    bottom: 42px;
-    left: 15%;
-    right: 15%;
-    height: 2px;
-    background: repeating-linear-gradient(90deg, #ccc 0, #ccc 8px, transparent 8px, transparent 12px);
-    z-index: 0;
-}
-
-.center-label {
-    position: absolute;
-    bottom: 48px;
-    left: 25%;
-    transform: translateX(-50%);
-    font-size: 30px;
-    color: #aaa;
-    background: rgba(255,255,255,0.7);
-    padding: 2px 10px;
-    border-radius: 20px;
-}
-
-/* 图表容器 */
-.chart-wrap {
-    background: white;
-    border-radius: 24px;
-    padding: 20px;
-    margin: 16px 0;
-    border: 1px solid rgba(167, 139, 250, 0.2);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-}
-
-.chart-caption {
-    text-align: center;
-    font-size: 35px;
-    color: var(--purple-500);
-    margin-top: 14px;
-    font-weight: 600;
-}
-
-canvas {
-    width: 100%;
-    height: auto;
-    border-radius: 16px;
-}
-
-/* 导航条 */
-.nav-bar {
-    position: fixed;
-    bottom: 24px;
-    left: 40%;
-    transform: translateX(-40%);
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    background: rgba(15, 12, 26, 0.85);
-    backdrop-filter: blur(24px);
-    padding: 10px 24px;
-    border-radius: 60px;
-    border: 1px solid rgba(167, 139, 250, 0.4);
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-
-.nav-btn {
-    background: linear-gradient(135deg, var(--purple-500), var(--purple-700));
-    border: none;
-    color: white;
-    font-size: 36px;
-    font-weight: 600;
-    padding: 8px 20px;
-    border-radius: 40px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
-    box-shadow: 0 2px 10px rgba(91,33,182,0.4);
-}
-
-.nav-btn:active {
-    transform: scale(0.96);
-}
-
-.nav-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.page-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(167, 139, 250, 0.4);
-    transition: all 0.3s;
-    cursor: pointer;
-}
-
-.page-dot.active {
-    background: var(--purple-300);
-    box-shadow: 0 0 10px var(--purple-400);
-    width: 24px;
-    border-radius: 12px;
-}
-
-.page-num {
-    color: var(--purple-200);
-    font-size: 35px;
-    font-weight: 600;
-    min-width: 55px;
-    text-align: center;
-}
-
-/* 自动播放按钮 */
-.auto-play-btn {
-    position: fixed;
-    top: 28px;
-    right: 36px;
-    z-index: 100;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(167, 139, 250, 0.5);
-    color: var(--purple-200);
-    padding: 6px 14px;
-    border-radius: 40px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.auto-play-btn.playing {
-    background: rgba(236, 72, 153, 0.25);
-    border-color: var(--accent-pink);
-    color: var(--accent-pink);
-}
-
-/* 进度条 */
-.progress-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--purple-400), var(--accent-cyan));
-    transition: width 0.4s ease;
-    z-index: 200;
-    box-shadow: 0 0 6px var(--purple-400);
-}
-
-/* 辅助样式 */
-.highlight-gradient {
-    background: linear-gradient(135deg, var(--purple-500), var(--accent-cyan));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    font-weight: 800;
-}
-
-
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
 </style>
 </head>
 <body>
+<article class="post">
 
-<div class="bg-universe"></div>
-<div class="bg-particles" id="particles"></div>
-
-<div class="stage">
-    <div class="slides-frame">
-
-        <!-- 第1页：问题引入 -->
-        <div class="page active" id="page1">
-            <div class="page-header anim-fade-up">
-                <div class="badge">🧬 组学差异分析核心问题</div>
-                <h1 class="section-title">为什么 Fold Change 需要 <span class="accent">「对数化」</span> 处理？</h1>
-            </div>
-
-            <div class="card anim-fade-up">
-                <div class="card-title">🔍 现实困境</div>
-                <div class="card-body">
-                    在组学如转录组分析中，基因表达差异常以 <span class="tag tag-purple">Fold Change (FC)</span> 表示。<br><br>
-                    例如：处理组/对照组 = <strong>2</strong> (上调2倍) 或 <strong>0.5</strong> (下调2倍)。<br><br>
-                    <span style="color: var(--accent-pink); font-weight: 700;">❗ 但 2 和 0.5 在数值上并不对称</span>，可视化与统计分析易造成偏差。
-                </div>
-            </div>
-
-            <div class="card anim-fade-up">
-                <div class="card-title">📐 解决方案：log₂ 变换</div>
-                <div class="card-body">
-                    引入 Log₂ 转换，将倍数变化映射到<strong>对称坐标轴</strong>上：
-                    <div class="equation-box">log₂(FC) = log₂(实验组 / 对照组)</div>
-                    使得上调与下调具有数学对称性，且满足统计假设。
-                </div>
-            </div>
-
-<!--             <div class="card full-width anim-fade-up">
-                <div class="card-title">📊 实际数据中的不对称表现</div>
-                <div class="card-body">
-                    原始 FC 值分布呈现<strong>长尾右偏</strong>，log₂ 转换后分布对称，便于差异筛选。
-                </div>
-                <table class="data-table">
-                    <thead><tr><th>变化倍数</th><th>原始 FC</th><th>log₂(FC)</th><th>生物学解释</th></tr></thead>
-                    <tbody>
-                        <tr><td>上调 4 倍</td><td>4.0</td><td class="highlight-gradient">+2</td><td>显著上调</td></tr>
-                        <tr><td>上调 2 倍</td><td>2.0</td><td class="highlight-gradient">+1</td><td>中等上调</td></tr>
-                        <tr><td>无差异</td><td>1.0</td><td>0</td><td>表达不变</td></tr>
-                        <tr><td>下调 2 倍</td><td>0.5</td><td class="highlight-gradient">-1</td><td>中等下调</td></tr>
-                        <tr><td>下调 4 倍</td><td>0.25</td><td class="highlight-gradient">-2</td><td>显著下调</td></tr>
-                    </tbody>
-                </table>
-                <div class="card-body" style="margin-top: 6px; font-size: 15px;">
-                    💡 <strong>关键洞察：</strong>log₂(FC) 的正负号直接指示上/下调，绝对值大小代表变化强度，完全对称。
-                </div>
-            </div> -->
-
-            <div class="card glass full-width anim-fade-up">
-                <div class="card-title">🎯 核心结论</div>
-                <div class="card-body" style="line-height: 84px;">
-                    若不使用 log₂ 变换，上调基因和下调基因的权重不同，会<span class="tag tag-purple">严重</span><span class="tag tag-purple">误导差异筛选</span>。log₂ 变换是组学数据分析的<span class="tag tag-purple">标准预处理步骤</span>。
-                </div>
-            </div>
-        </div>
-
-        <!-- 第2页：FC不对称可视化 -->
-        <div class="page" id="page2">
-            <div class="page-header anim-fade-up">
-                <div class="badge">⚖️ 数学不对称性分析</div>
-                <h1 class="section-title">FC 原始尺度：<span class="accent">不对称的鸿沟</span></h1>
-            </div>
-
-            <div class="card anim-fade-up">
-                <div class="card-title">📈 具体实例</div>
-                <div class="card-body">
-                    假设 <strong>A 基因</strong>：对照组 100，实验组 200 → FC = <span class="tag tag-purple">2.0</span> (上调2倍)<br>
-                    <strong>B 基因</strong>：对照组 100，实验组 50 → FC = <span class="tag tag-purple">0.5</span> (下调2倍)<br><br>
-                    <div style="background: var(--purple-100); padding: 14px; border-radius: 16px; margin: 8px 0;">
-                        ➕ 数值上：2 和 0.5 距 1 的距离不等<br>
-                        <span style="color: var(--accent-pink); font-weight: 800;">+1 vs -0.5</span>，无法直接比较差异强度
-                    </div>
-                </div>
-            </div>
-
-            <div class="card anim-fade-up">
-                <div class="card-title">⚠️ 统计隐患</div>
-                <div class="card-body">
-                    FC 分布严重<strong>右偏</strong>，不满足正态性假设，t 检验等参数方法失效。<br><br>
-                    <!-- <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                        <span style="font-size: 28px;">❌</span> 原始 FC：偏度 +2.3，峰度 8.5
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 16px; margin-top: 10px;">
-                        <span style="font-size: 28px;">✅</span> <strong>log₂ 变换后：偏度 -0.1，峰度 3.0</strong>
-                    </div> -->
-                </div>
-            </div>
-
-            <div class="card full-width anim-scale-in">
-                <div class="card-title">📊 视觉不对称演示</div>
-                <div class="asym-demo" id="asymDemo">
-                    <div class="center-line"></div>
-                    <div class="center-label">参考线 FC = 1</div>
-                    <div class="bar-item">
-                        <div class="bar" style="height: 0; background: linear-gradient(180deg, #7c3aed, #a78bfa);" data-height="120">
-                            <div class="bar-value">FC = 2.0</div>
-                        </div>
-                        <div class="bar-label">上调 2 倍</div>
-                    </div>
-                    <div class="bar-item">
-                        <div class="bar" style="height: 0; background: linear-gradient(180deg, #ec4899, #f472b6);" data-height="30">
-                            <div class="bar-value">FC = 0.5</div>
-                        </div>
-                        <div class="bar-label">下调 2 倍</div>
-                    </div>
-                </div>
-                <div class="chart-caption">
-                    原始 FC 柱状图：上调柱远高于下调柱，但实际幅度相同 → 视觉误导
-                </div>
-            </div>
-
-            <div class="card glass full-width anim-fade-up">
-                <div class="card-title">🔬 模拟数据分布验证</div>
-                <div class="card-body">
-                    对 1000 个模拟基因的 FC 取 log₂ 前后，偏度从 <span class="tag tag-purple">+2.3</span> 降至 <span class="tag tag-purple">-0.1</span>，峰度从 <span class="tag tag-purple">8.5</span> 降至 <span class="tag tag-purple">3.0</span>，完美契合正态性假设，假阳性率显著降低。
-                </div>
-            </div>
-        </div>
-
-        <!-- 第3页：对称魔法 -->
-        <div class="page" id="page3">
-            <div class="page-header anim-fade-up">
-                <div class="badge">✨ 对称性与可解释性</div>
-                <h1 class="section-title">Log₂ 变换：<span class="accent">对称的魔法</span></h1>
-            </div>
-
-            <div class="card full-width anim-scale-in">
-                <div class="card-title">📊 Log₂ 对称可视化</div>
-                <div class="asym-demo" id="symDemo" style="min-height: 350px;">
-                    <div class="center-line" style="bottom: 145px;"></div>
-                    <div class="center-label" style="bottom: 88px;">零轴线 log₂FC = 0</div>
-                    <div class="bar-item">
-                        <div class="bar" style="height: 0; background: linear-gradient(180deg, #7c3aed, #a78bfa); border-radius: 12px 12px 0px 0px; margin-bottom: 80px;" data-dir="up" data-height="90">
-                            <div class="bar-value">log₂FC = +1</div>
-                        </div>
-                        <div class="bar-label">上调 2 倍</div>
-                    </div>
-                    <div class="bar-item">
-                        <div class="bar" style="height: 0; background: linear-gradient(180deg, #ec4899, #f472b6); border-radius: 0px 0px 12px 12px; padding-top: -1000px;" data-dir="down" data-height="90">
-                            <div class="bar-value">log₂FC = -1</div>
-                        </div>
-                        <div class="bar-label">下调 2 倍</div>
-                    </div>
-                </div>
-                <div class="chart-caption">
-                    Log₂(FC) 对称且等间距，以上下完美镜像呈现
-                </div>
-            </div>
-
-            <div class="card anim-fade-up">
-                <div class="card-title">🧙 数学之美</div>
-                <div class="card-body">
-                    <div class="equation-box" style="font-size: 34px; width: 50%; transform: translateX(50%);">log₂(2) = +1</div>
-                    <div class="equation-box" style="font-size: 34px; width: 50%; transform: translateX(50%);">log₂(0.5) = -1</div>
-                    绝对值相同，方向相反！上调 2 倍 → <strong>+1</strong>，下调 2 倍 → <strong>-1</strong>，完美对称。
-                </div>
-            </div>
-
-            <div class="card anim-fade-up">
-                <div class="card-title">💡 实际应用意义</div>
-                <div class="card-body">
-                    常用阈值 <span class="tag tag-cyan">|log₂FC| > 1</span> 作为显著差异筛选标准，直观且科学，被 DESeq2、limma 等工具广泛采用。
-                </div>
-            </div>
-
-            <!-- <div class="card full-width anim-fade-up">
-                <div class="card-title">📌 常见阈值对照表</div>
-                <table class="data-table">
-                    <thead><tr><th>log₂FC</th><th>对应 FC</th><th>差异强度</th><th>常用场景</th></tr></thead>
-                    <tbody>
-                        <tr><td>0.585</td><td>1.5</td><td>1.5 倍变化</td><td>宽松筛选</td></tr>
-                        <tr><td><strong>1</strong></td><td><strong>2</strong></td><td><strong>2 倍变化</strong></td><td><strong>标准阈值</strong></td></tr>
-                        <tr><td>1.585</td><td>3</td><td>3 倍变化</td><td>中等严格</td></tr>
-                        <tr><td><strong>2</strong></td><td><strong>4</strong></td><td><strong>4 倍变化</strong></td><td><strong>严格筛选</strong></td></tr>
-                        <tr><td>-1</td><td>0.5</td><td>下调 2 倍</td><td>标准阈值</td></tr>
-                        <tr><td>-2</td><td>0.25</td><td>下调 4 倍</td><td>严格筛选</td></tr>
-                    </tbody>
-                </table>
-            </div> -->
-        </div>
-
-        <!-- 第4页：案例对比 + 总结 -->
-        <div class="page" id="page4">
-            <div class="page-header anim-fade-up">
-                <div class="badge">📉 总结</div>
-                <h1 class="section-title">从原始 FC 到 <span class="accent">Log₂FC</span> 的蜕变</h1>
-            </div>
-
-            <!-- <div class="card anim-fade-up">
-                <div class="card-title">📌 模拟数据集对比</div>
-                <div class="card-body">
-                    五个基因：上调 2 倍、上调 4 倍、无差异、下调 2 倍、下调 4 倍。<br><br>
-                    <div style="background: #f0f9ff; padding: 12px; border-radius: 14px; margin-bottom: 10px; font-family: monospace; font-size: 36px;">
-                        原始 FC: [2, 4, 1, 0.5, 0.25]
-                    </div>
-                    <div style="background: var(--purple-100); padding: 12px; border-radius: 14px; font-family: monospace; font-size: 36px; color: var(--purple-700); font-weight: 700;">
-                        Log₂FC: [1, 2, 0, -1, -2]
-                    </div>
-                </div>
-                <div class="chart-wrap" style="margin-top: 18px;">
-                    <canvas id="compareCanvas" width="600" height="220"></canvas>
-                    <div class="chart-caption">原始 FC (蓝) vs Log₂FC (紫) — 后者完美对称</div>
-                </div>
-            </div> -->
-
-            <div class="card anim-fade-up">
-                <div class="card-title">🎓 核心总结</div>
-                <ul class="fancy-list">
-                    <li><strong style="color: var(--purple-500);">对称性</strong> — 上下调等幅度差异数值绝对值相等</li>
-                    <li><strong style="color: var(--purple-500);">统计稳健</strong> — 正态化、方差稳定，提升检验功效</li>
-                    <li><strong style="color: var(--purple-500);">可视化友好</strong> — 火山图、热图展示清晰，差异阈值直观</li>
-                    <li><strong style="color: var(--purple-500);">学术标准</strong> — Nature、Cell 等顶刊与生信工具默认要求 log₂ 转换</li>
-                </ul>
-                <div class="card-body" style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, var(--purple-100), #fff); border-radius: 18px; border-left: 4px solid var(--purple-400);">
-                    🧪 <strong>实践建议：</strong>分析差异表达时，始终报告 <span class="highlight-gradient">log₂FoldChange</span> 与原始 FC，并使用 log₂FC 进行统计与图形展示。
-                </div>
-            </div>
-
-            <div class="card glass full-width anim-fade-up">
-                <div class="card-title">📚 延伸阅读与参考文献</div>
-                <div class="card-body">
-                    • <span class="tag tag-purple">Love et al., 2014</span> — Moderated Estimation of Fold Change and Dispersion for RNA-Seq Data with DESeq2<br><br>
-                    • <span class="tag tag-purple">Ritchie et al., 2015</span> — <i>limma</i> powers differential expression analyses for RNA-sequencing and microarray studies<br><br>
-                    对数变换是组学数据<span class="tag tag-purple">标准化与差异分析</span>的基石之一，掌握其原理是生信分析的必修课。
-                </div>
-            </div>
-        </div>
-
-        <!-- 导航与进度 -->
-        <div class="progress-bar" id="progressBar" style="width: 25%; display: none;"></div>
-
-        <button class="auto-play-btn" id="autoPlayBtn" onclick="toggleAutoPlay()" style="display: none">
-            <span id="playIcon">▶</span> <span id="playText">自动播放</span>
-        </button>
-
-        <div class="nav-bar">
-            <button class="nav-btn" id="prevBtn" onclick="prevPage()">◀ 上一页</button>
-            <div class="page-num" id="pageNum">1 / 4</div>
-            <div class="page-dot active" onclick="goToPage(0)"></div>
-            <div class="page-dot" onclick="goToPage(1)"></div>
-            <div class="page-dot" onclick="goToPage(2)"></div>
-            <div class="page-dot" onclick="goToPage(3)"></div>
-            <button class="nav-btn" id="nextBtn" onclick="nextPage()">下一页 ▶</button>
-        </div>
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.014</span>
+      <span>2026-05-31</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
     </div>
-</div>
+    <h1>Log₂ Fold Change 到底怎么算</h1>
+    <p class="lede">从原始 counts 到 log₂FC：加不加伪计数、要不要标准化、符号怎么解释。</p>
+    <div class="chips"><span class="chip">log₂FC</span><span class="chip">差异分析</span><span class="chip">标准化</span></div>
+  </header>
 
+  <div class="body">
+  <section>
+    <h2>为什么 Fold Change 需要「对数化」处理？</h2>
+    <p>在转录组等组学分析中，基因表达差异通常以 <em>Fold Change（FC，倍数变化）</em>表示：处理组与对照组的表达量之比。FC = 2 表示上调 2 倍，FC = 0.5 表示下调 2 倍——两者的<strong>生物学幅度相同</strong>，数值却一高一低。以「无变化 = 1」为中点，上调与下调落在不对称的两侧，直接用原始 FC 做筛选、排序或画图，都会系统性地高估上调信号。</p>
+    <blockquote>
+      <p>log₂(FC) = log₂(实验组 / 对照组)</p>
+      <p>对数变换把「以 1 为中心的乘法尺度」改写成「以 0 为中心的加法尺度」：上调 2 倍 → log₂FC = +1，下调 2 倍 → log₂FC = −1，上下调在同一坐标系里完全对称。</p>
+    </blockquote>
+  </section>
+
+  <section>
+    <h2>FC 原始尺度：不对称的鸿沟</h2>
+    <p>用一个最小例子看清楚问题。A、B 两个基因的生物学变化幅度完全相同（都是 2 倍），但原始 FC 的数值距离相差很远：</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>基因</th><th>对照组</th><th>实验组</th><th>FC</th><th>log₂FC</th><th>生物学幅度</th></tr></thead>
+      <tbody>
+        <tr><td>A</td><td>100</td><td>200</td><td>2.0（上调）</td><td><strong>+1</strong></td><td rowspan="2">均为 2 倍</td></tr>
+        <tr><td>B</td><td>100</td><td>50</td><td>0.5（下调）</td><td><strong>−1</strong></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>在原始 FC 柱状图上，A 的柱子（2.0）是 B（0.5）的 4 倍高——视觉上「上调看起来远比下调剧烈」，而事实并非如此。这就是差异分析必须先做 log₂ 变换的第一个理由：<strong>可视化诚实</strong>。</p>
+    <p>统计层面还有第二个理由：原始 FC 的分布严重右偏（下限被 0 截断，且小 FC 密集堆积在 1 附近），不满足 <code>t</code> 检验等参数方法的正态性假设。取 log₂ 后分布近似对称、方差更稳定，后续检验的功效与假阳性控制都更好。对 1000 个模拟基因的演示中，取对数前后偏度从 +2.3 降至 −0.1，峰度从 8.5 降至 3.0。</p>
+  </section>
+
+  <section>
+    <h2>Log₂FC 的三条实操要点</h2>
+    <h3>① 阈值是惯例，不是定律</h3>
+    <p>常用 <code>|log₂FC| &gt; 1</code>（即 2 倍）作为显著差异筛选标准，直观且被 DESeq2、limma<sup>2</sup> 等工具广泛采用。但它只是<strong>领域惯例</strong>：低表达基因的真实 2 倍变化可能毫无意义，而高表达基因 0.5 倍（log₂FC = 0.58）的变化可能非常关键。结论应结合 FDR 与生物学背景，而非只看 log₂FC。</p>
+    <div class="note note-warn"><p><strong>常见误区</strong>：log₂FC 的显著性不能替代 p 值/FDR——火山图上 x 轴（log₂FC）与 y 轴（−log₁₀p）是两个独立维度，同时满足阈值才可称为「显著差异基因」（见 No.022 的讨论）。</p></div>
+    <h3>② 零计数与伪计数</h3>
+    <p>count 为 0 时 FC 无定义（除以 0），log₂ 也无法计算。Bulk RNA-seq 里标准做法是交给 <code>DESeq2</code><sup>1</sup> 这类负二项模型：它基于全部样本估计离散度并做 <em>shrinkage（效应量收缩）</em><sup>3</sup>，低表达基因的 log₂FC 会被自动压向 0，而不是手工加一个任意伪计数。</p>
+    <h3>③ 报告口径要一致</h3>
+    <p>论文中同时报告 log₂FC（统计与图形）与原始 FC（读者直觉），并注明变换方式与检验工具版本。只报其中一个，审稿人都会追问。</p>
+  </section>
+
+  <section>
+    <h2>小结</h2>
+    <ul>
+      <li><strong>对称性</strong>——上下调等幅度差异，log₂FC 绝对值相等；</li>
+      <li><strong>统计稳健</strong>——分布近似正态、方差稳定，检验更可靠；</li>
+      <li><strong>可视化友好</strong>——火山图、热图、MA plot 的对称阈值都建立在 log₂ 尺度上；</li>
+      <li><strong>学术标准</strong>——主流差异分析流程与顶刊图表默认采用 log₂ 尺度。</li>
+    </ul>
+    <p>对数变换是组学差异分析的基石之一：先换尺度，再谈显著。</p>
+    <h3 class="refs-title">延伸阅读与参考文献</h3>
+    <ol class="refs">
+      <li>Love MI, Huber W, Anders S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. <em>Genome Biology</em>. 2014;15:550. doi:10.1186/s13059-014-0550-8</li>
+      <li>Ritchie ME, Phipson B, Wu D, et al. limma powers differential expression analyses for RNA-sequencing and microarray studies. <em>Nucleic Acids Research</em>. 2015;43(7):e47. doi:10.1093/nar/gkv007</li>
+      <li>Zhu A, Ibrahim JG, Love MI. Heavy-tailed prior distributions for sequence count data: removing the noise and preserving large differences. <em>Bioinformatics</em>. 2019;35(12):2084–2092. doi:10.1093/bioinformatics/bty895</li>
+    </ol>
+  </section>
+  </div>
+
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.014</span>
+    <span>2026-05-31</span>
+  </div>
+
+</article>
+
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
 <script>
-// 粒子背景生成
-function createParticles() {
-    const container = document.getElementById('particles');
-    for (let i = 0; i < 40; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const size = Math.random() * 8 + 2;
-        p.style.width = size + 'px';
-        p.style.height = size + 'px';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.top = Math.random() * 100 + '%';
-        p.style.animationDelay = Math.random() * 15 + 's';
-        p.style.animationDuration = (10 + Math.random() * 25) + 's';
-        container.appendChild(p);
-    }
-}
-createParticles();
-
-let currentPage = 0;
-const totalPages = 4;
-let autoPlayInterval = null;
-
-function updatePage() {
-    document.querySelectorAll('.page').forEach((page, idx) => {
-        page.classList.toggle('active', idx === currentPage);
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
     });
-    document.querySelectorAll('.page-dot').forEach((dot, idx) => {
-        dot.classList.toggle('active', idx === currentPage);
-    });
-    document.getElementById('pageNum').innerText = `${currentPage + 1} / ${totalPages}`;
-    const progress = ((currentPage + 1) / totalPages) * 100;
-    document.getElementById('progressBar').style.width = `${progress}%`;
-    document.getElementById('prevBtn').disabled = currentPage === 0;
-    document.getElementById('nextBtn').disabled = currentPage === totalPages - 1;
-
-    setTimeout(() => {
-        animateBars();
-        if (currentPage === 3) drawCompareChart();
-    }, 100);
-}
-
-function nextPage() {
-    if (currentPage < totalPages - 1) {
-        currentPage++;
-        updatePage();
-    }
-}
-
-function prevPage() {
-    if (currentPage > 0) {
-        currentPage--;
-        updatePage();
-    }
-}
-
-function goToPage(n) {
-    currentPage = n;
-    updatePage();
-}
-
-// 键盘控制
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === ' ') nextPage();
-    if (e.key === 'ArrowLeft') prevPage();
-});
-
-function toggleAutoPlay() {
-    const btn = document.getElementById('autoPlayBtn');
-    const icon = document.getElementById('playIcon');
-    const text = document.getElementById('playText');
-    if (autoPlayInterval) {
-        clearInterval(autoPlayInterval);
-        autoPlayInterval = null;
-        btn.classList.remove('playing');
-        icon.textContent = '▶';
-        text.textContent = '自动播放';
-    } else {
-        btn.classList.add('playing');
-        icon.textContent = '⏸';
-        text.textContent = '播放中';
-        autoPlayInterval = setInterval(() => {
-            if (currentPage < totalPages - 1) {
-                nextPage();
-            } else {
-                currentPage = 0;
-                updatePage();
-            }
-        }, 7000);
-    }
-}
-
-function animateBars() {
-    document.querySelectorAll('.bar[data-height]').forEach(bar => {
-        const h = bar.dataset.height;
-        setTimeout(() => { bar.style.height = h + 'px'; }, 200);
-    });
-    document.querySelectorAll('.bar[data-dir="up"]').forEach(bar => {
-        const h = bar.dataset.height;
-        setTimeout(() => { bar.style.height = h + 'px'; }, 200);
-    });
-    document.querySelectorAll('.bar[data-dir="down"]').forEach(bar => {
-        const h = bar.dataset.height;
-        setTimeout(() => { bar.style.height = h + 'px'; }, 200);
-    });
-}
-
-function drawCompareChart() {
-    const canvas = document.getElementById('compareCanvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
-    canvas.width = w;
-    canvas.height = h;
-
-    ctx.clearRect(0, 0, w, h);
-    const genes = ['A(上2)', 'B(上4)', 'C(不变)', 'D(下2)', 'E(下4)'];
-    const fcRaw = [2, 4, 1, 0.5, 0.25];
-    const log2Vals = [1, 2, 0, -1, -2];
-    const barW = 38;
-    const gap = 70;
-    const startX = 40;
-    const baseY = h - 48;
-    const scaleRaw = 32;
-    const scaleLog = 36;
-
-    ctx.font = 'bold 14px sans-serif';
-    ctx.fillStyle = '#1e1b2e';
-    ctx.fillText('原始 FC vs Log₂FC 对比', w/2 - 80, 28);
-    // 图例
-    ctx.fillStyle = '#6c8fcd';
-    ctx.fillRect(startX, 38, 16, 16);
-    ctx.fillStyle = '#1e1b2e';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('原始 FC', startX + 24, 51);
-    ctx.fillStyle = '#a07dd9';
-    ctx.fillRect(startX + 110, 38, 16, 16);
-    ctx.fillStyle = '#1e1b2e';
-    ctx.fillText('Log₂FC', startX + 134, 51);
-
-    ctx.beginPath();
-    ctx.moveTo(startX - 10, baseY);
-    ctx.lineTo(w - 20, baseY);
-    ctx.strokeStyle = '#ccc';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.fillStyle = '#999';
-    ctx.font = '11px sans-serif';
-    ctx.fillText('FC=1 / log₂FC=0', w - 110, baseY - 6);
-
-    genes.forEach((gene, i) => {
-        const x = startX + i * (barW * 2 + gap);
-        const rawH = fcRaw[i] * scaleRaw;
-        ctx.fillStyle = '#6c8fcd';
-        ctx.fillRect(x, baseY - rawH, barW, rawH);
-        ctx.fillStyle = '#2c3e6d';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.fillText(fcRaw[i], x + 8, baseY - rawH - 5);
-        const logH = Math.abs(log2Vals[i]) * scaleLog;
-        const logY = log2Vals[i] >= 0 ? baseY - logH : baseY;
-        ctx.fillStyle = log2Vals[i] >= 0 ? '#7c3aed' : '#ec4899';
-        ctx.fillRect(x + barW + 6, logY, barW * 0.7, logH);
-        ctx.fillStyle = log2Vals[i] >= 0 ? '#5b21b6' : '#be185d';
-        ctx.font = 'bold 11px sans-serif';
-        const labelY = log2Vals[i] >= 0 ? logY - 6 : logY + logH + 15;
-        ctx.fillText(log2Vals[i], x + barW + 10, labelY);
-        ctx.fillStyle = '#1e1b2e';
-        ctx.font = '11px sans-serif';
-        ctx.fillText(gene, x + 6, baseY + 18);
-    });
-}
-
-window.addEventListener('load', () => {
-    updatePage();
-    window.addEventListener('resize', () => { if (currentPage === 3) drawCompareChart(); });
-});
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
 </script>
-
-<!-- SciViz 推文编号角标（scripts/buildPromoPack.js 注入；pointer-events:none，不挡翻页） -->
-<div class="sciviz-promo-no" aria-hidden="true">No.014 · 2026-05-31</div>
-<style>.sciviz-promo-no{position:fixed;left:10px;top:10px;z-index:2147483000;pointer-events:none;
-padding:3px 9px;border-radius:999px;background:rgba(8,12,26,.55);color:rgba(255,255,255,.85);
-border:1px solid rgba(255,255,255,.18);font:600 11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;
-letter-spacing:.02em;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}</style>
 </body>
 </html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="sciviz-promo" content="no=34;date=2026-10-26;id=034-enrichment-visualization">
+<title>No.034 · 富集结果可视化：从条形图到通路地图</title>
+<style>
+:root{
+  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
+  --line:#e7ecf4;--line2:#f1f4fa;
+  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fc;color:var(--ink);
+  font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+       "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
+  font-kerning:normal}
+.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 0 1px var(--line)}
+
+/* ---- 标题区 ---- */
+.hero{padding:40px 30px 28px;
+  background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);letter-spacing:.02em}
+.no{display:inline-block;padding:2px 10px;border-radius:999px;
+  background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
+.dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
+.hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
+  letter-spacing:-.01em}
+.lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
+  border-left:3px solid var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+  color:var(--ink2);font-size:12px}
+
+/* ---- 正文 ---- */
+.body{padding:8px 30px 40px}
+section{padding-top:6px}
+h2{position:relative;margin:34px 0 12px;padding-left:14px;
+  font-size:1.16rem;line-height:1.5}
+h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+  background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
+h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+  background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
+p{margin:0 0 15px;color:var(--ink2)}
+ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
+li{margin:0 0 7px}
+li::marker{color:var(--brand)}
+strong,b{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--ink);
+  background:linear-gradient(transparent 62%,var(--tint) 62%)}
+sup{font-size:.72em;color:var(--muted)}
+
+/* ---- 配图 ---- */
+figure{margin:22px 0 24px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
+  text-align:center}
+
+/* ---- 表格 ---- */
+.table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
+  border-radius:10px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
+  color:var(--ink2);background:#fff}
+thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
+  padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fafbff}
+td code{white-space:nowrap}
+
+/* ---- 行内代码与代码块 ---- */
+code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  padding:.1em .4em;color:#9d3b5d;word-break:break-word}
+pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
+  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  -webkit-overflow-scrolling:touch}
+pre code{display:block;background:none;border:0;padding:0;color:inherit;
+  font-size:inherit;white-space:pre;word-break:normal}
+pre .c{color:#6b7a9e}
+pre .k{color:#8fb4ff}
+pre .s{color:#9ad1a4}
+
+/* ---- 引言与提示框 ---- */
+blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
+  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+blockquote p{margin:0 0 6px;color:var(--ink)}
+blockquote p:last-child{margin:0}
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+  line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note-warn{border-color:#f3d9a4;background:#fdf8ee;color:#6b5618}
+.note-warn strong,.note-warn b{color:#8a6d1f}
+.note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
+.note-tip strong,.note-tip b{color:#2e5e41}
+
+/* ---- 参考文献 ---- */
+.refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
+  list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
+  line-height:1.7}
+.refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
+  color:var(--brand);font-weight:600;font-variant-numeric:tabular-nums}
+.refs em{background:none;color:inherit}
+
+/* ---- 其它 ---- */
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+
+/* ---- 页脚 ---- */
+.tail{margin:0 30px;padding:18px 0 40px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  body{font-size:16.5px}
+  .hero{padding:28px 18px 22px}
+  .hero h1{font-size:1.46rem}
+  .body{padding:6px 18px 32px}
+  .tail{margin:0 18px}
+}
+
+/* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
+.ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  font-size:12px;line-height:1.7;pointer-events:none!important;
+  opacity:0;visibility:hidden;transition:opacity .12s ease;
+  white-space:normal;word-break:break-word}
+.ref-tip.on{opacity:1;visibility:visible}
+sup.ref-cite{cursor:help;padding:0 1px}
+</style>
+</head>
+<body>
+<article class="post">
+
+  <header class="hero">
+    <div class="kicker">
+      <span class="no">No.034</span>
+      <span>2026-10-26</span>
+      <span class="dot"></span>
+      <span>SciViz Kit · 推文与教程</span>
+    </div>
+    <h1>富集结果可视化：从条形图到通路地图</h1>
+    <p class="lede">GO / KEGG 富集结果怎么画：四种总览图型、pathview 通路地图、多组交集花瓣图，附 clusterProfiler R 示例脚本。</p>
+    <div class="chips"><span class="chip">富集</span><span class="chip">可视化</span><span class="chip">clusterProfiler</span><span class="chip">R</span></div>
+  </header>
+
+  <div class="body">
+  <section>
+    <h2>选图逻辑：同一份结果，图型决定读者带走什么</h2>
+    <p>富集分析的输出是一张通路排名表，直接甩给读者等于没分析。可视化要回答的是「你最想让读者记住哪一件事」：是哪几条通路显著，是通路里有多少基因支撑，还是通路之间的功能关联。下表是四种常用总览图型的分工，先选对图，再谈画法。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>图型</th><th>回答的问题</th><th>一句话场景</th></tr></thead>
+        <tbody>
+          <tr><td>barplot</td><td>哪几条通路显著？</td><td>最稳的入门图，适合汇报与组会</td></tr>
+          <tr><td>dotplot</td><td>显著性、基因数、富集倍数各多大？</td><td>三个量压进一张图，论文主图首选</td></tr>
+          <tr><td>cnetplot</td><td>基因落在哪些通路里？</td><td>展示通路–基因归属关系</td></tr>
+          <tr><td>enrichmap（emapplot）</td><td>通路之间有多相似？</td><td>按重叠度聚类，看模块不看排名</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>GO 富集：四种总览画法</h2>
+    <p>同一份 GO 富集结果（clusterProfiler<sup>1</sup> 输出），四种画法各取一面：barplot 回答「哪几条 BP/MF/CC 条目显著」；dotplot 把基因数、显著性与富集倍数压进一张图；cnetplot 展示通路与基因的归属网络；enrichmap 按基因间重叠度自动聚类，看模块不看排名<sup>2</sup>。</p>
+    <figure><img src="assets/003-go-kegg-introduction/01_GO_barplot.jpg" alt="barplot：最稳的入门图，适合汇报「哪几条通路显著」" loading="lazy"><figcaption>barplot：最稳的入门图，适合汇报「哪几条通路显著」</figcaption></figure>
+    <figure><img src="assets/003-go-kegg-introduction/02_GO_dotplot.jpg" alt="dotplot：基因数 × 显著性 × 富集倍数三个量压在一张图上" loading="lazy"><figcaption>dotplot：基因数 × 显著性 × 富集倍数三个量压在一张图上</figcaption></figure>
+    <figure><img src="assets/003-go-kegg-introduction/03_GO_cnetplot.jpg" alt="cnetplot：把富集通路和落在里面的基因连成一张网络" loading="lazy"><figcaption>cnetplot：把富集通路和落在里面的基因连成一张网络</figcaption></figure>
+    <figure><img src="assets/003-go-kegg-introduction/04_GO_enrichmap.jpg" alt="enrichmap：按基因间重叠度自动聚类的通路地图，看模块不看待排名" loading="lazy"><figcaption>enrichmap：按基因间重叠度自动聚类的通路地图，看模块不看待排名</figcaption></figure>
+  </section>
+
+  <section>
+    <h2>KEGG 富集：四层下钻，从全貌到机制</h2>
+    <p>KEGG 结果不止一张气泡图。从总览条形图，到同时编码显著性与基因数的 dot 图，再到通路–基因归属网络，最后用 pathview 把表达方向直接叠加回 KEGG 通路地图<sup>4</sup>——四张图是一层层的下钻：先看全貌，再定位，最后落到机制解释。图中下调基因的示例也提醒：<em>富集图要分方向出</em>（参见 No.013/016 方向性富集）。</p>
+    <figure><img src="assets/004-kegg-visualization/KEGG_Downregulated-01.jpg" alt="下调基因的 KEGG 富集总览" loading="lazy"><figcaption>下调基因的 KEGG 富集总览</figcaption></figure>
+    <figure><img src="assets/004-kegg-visualization/KEGG_Downregulated_dot-01.jpg" alt="dot 图：把 -log10(p) 与基因数同时编码" loading="lazy"><figcaption>dot 图：把 −log₁₀(p) 与基因数同时编码</figcaption></figure>
+    <figure><img src="assets/004-kegg-visualization/KEGG_Downregulated_network-01.jpg" alt="cnet 网络版：通路与基因的归属关系一眼可见" loading="lazy"><figcaption>cnet 网络版：通路与基因的归属关系一眼可见</figcaption></figure>
+    <figure><img src="assets/004-kegg-visualization/mmu01200.Downregulated_pathview.jpg" alt="pathview 叠加到 mmu01200 通路上，颜色即表达方向" loading="lazy"><figcaption>pathview 叠加到 mmu01200 通路上，颜色即表达方向</figcaption></figure>
+  </section>
+
+  <section>
+    <h2>多组交集：Venn 画不下了怎么办</h2>
+    <p>比较多个方向的富集结果时，集合交集图是常用入口：两组三组用 Venn 图足够直观；组数一多（五组以上），Venn 就会糊成一片，此时花瓣图（flower plot）更合适——花心是所有组共有的条目，每一片花瓣是该组独有的条目，用固定的花瓣排布把「谁独有、谁共有」数清，特别适合多组富集结果的概览页：先给读者一张全景图，再进各组明细。</p>
+    <figure><img src="assets/005-ccgraph-flower-plot/fig-1.jpg" alt="花瓣图封面：中心是所有组共有，每一瓣是该组独有" loading="lazy"><figcaption>花瓣图：中心是所有组共有，每一瓣是该组独有</figcaption></figure>
+  </section>
+
+  <section>
+    <h2>R 示例代码：从差异表到全套富集图</h2>
+    <p>下面的脚本把这条流水线串起来：方向拆分 → 方向性 ORA → 四种总览图 → pathview 叠加。物种以小鼠（<code>org.Mm.eg.db</code>）为例，换成人类改用 <code>org.Hs.eg.db</code> 与 <code>organism = "hsa"</code> 即可。</p>
+    <pre><code><span class="k">library</span>(clusterProfiler)
+<span class="k">library</span>(org.Mm.eg.db)   <span class="c"># 小鼠注释库；人用 org.Hs.eg.db</span>
+<span class="k">library</span>(pathview)
+
+<span class="c">## ① 差异基因按方向拆分（示例：DESeq2 结果 res；padj &lt; 0.05 且 |log2FC| &gt; 1）</span>
+sig &lt;- subset(as.data.frame(res), padj &lt; <span class="s">0.05</span> &amp; abs(log2FoldChange) &gt; <span class="s">1</span>)
+up   &lt;- bitr(rownames(subset(sig, log2FoldChange &gt; <span class="s">0</span>)), fromType = <span class="s">"ENSEMBL"</span>,
+             toType = <span class="s">"ENTREZID"</span>, OrgDb = org.Mm.eg.db)$ENTREZID
+down &lt;- bitr(rownames(subset(sig, log2FoldChange &lt; <span class="s">0</span>)), fromType = <span class="s">"ENSEMBL"</span>,
+             toType = <span class="s">"ENTREZID"</span>, OrgDb = org.Mm.eg.db)$ENTREZID
+
+<span class="c">## ② 方向性 ORA：上调 / 下调各做一遍，不要混在一起</span>
+ego_up   &lt;- enrichGO(up, OrgDb = org.Mm.eg.db, keyType = <span class="s">"ENTREZID"</span>,
+                     ont = <span class="s">"BP"</span>, pAdjustMethod = <span class="s">"BH"</span>,
+                     pvalueCutoff = <span class="s">0.05</span>, readable = <span class="k">TRUE</span>)
+ekegg_dn &lt;- enrichKEGG(down, organism = <span class="s">"mmu"</span>, pAdjustMethod = <span class="s">"BH"</span>,
+                       pvalueCutoff = <span class="s">0.05</span>)
+
+<span class="c">## ③ 四种总览图：选图前先想清楚要让读者记住哪一件事</span>
+barplot(ego_up,   showCategory = <span class="s">10</span>)    <span class="c"># 哪几条通路显著（最稳的入门图）</span>
+dotplot(ekegg_dn, showCategory = <span class="s">10</span>)    <span class="c"># 显著性 × 基因数 × 富集倍数一图三用</span>
+cnetplot(ego_up,  showCategory = <span class="s">5</span>)     <span class="c"># 通路–基因归属网络</span>
+emapplot(ego_up,  showCategory = <span class="s">30</span>)    <span class="c"># 按通路重叠度聚类的地图，看模块不看排名</span>
+
+<span class="c">## ④ pathview：把表达方向叠回 KEGG 通路地图（颜色 = log2FC）</span>
+gene_list &lt;- sig$log2FoldChange
+names(gene_list) &lt;- bitr(rownames(sig), fromType = <span class="s">"ENSEMBL"</span>,
+                         toType = <span class="s">"ENTREZID"</span>, OrgDb = org.Mm.eg.db)$ENTREZID
+pathview(gene.data = gene_list, pathway.id = <span class="s">"mmu01200"</span>,
+         species = <span class="s">"mmu"</span>, low = <span class="s">"#66b2ff"</span>, high = <span class="s">"#ff6b6b"</span>)</code></pre>
+    <div class="note note-warn"><p><strong>两个提醒：</strong>① 上调与下调分别富集，混在一起会让相反方向的通路互相抵消；② 富集图给的是「参与程度」的证据，不是活性变化的证据，机制结论仍需回到表达方向与实验验证。</p></div>
+    <div class="note note-tip"><p><strong>选图建议：</strong>论文主图一般一张 dotplot 就够；cnetplot 基因多时容易糊，先限定 showCategory；emapplot 适合放进补充材料展示通路聚类细节。</p></div>
+  </section>
+
+  <section>
+    <h2>延伸阅读与参考文献</h2>
+    <ol class="refs">
+      <li>Yu G, Wang LG, Han Y, He QY. clusterProfiler: an R package for comparing biological themes among gene clusters. <em>OMICS</em>. 2012;16(5):284–287. doi:10.1089/omi.2011.0118</li>
+      <li>Gene Ontology Consortium. The Gene Ontology knowledgebase in 2023. <em>GENETICS</em>. 2023;224(1):iyad031. doi:10.1093/genetics/iyad031</li>
+      <li>Kanehisa M, Furumichi M, Sato Y, Kawashima M, Ishiguro-Watanabe M. KEGG for taxonomy-based analysis of pathways and genomes. <em>Nucleic Acids Research</em>. 2023;51(D1):D587–D592. doi:10.1093/nar/gkac963</li>
+      <li>Luo W, Pant G, Bhavnasi YK, Blanchard SG, Brouwer C. Pathview Web: user friendly pathway visualization and data integration. <em>Nucleic Acids Research</em>. 2017;45(W1):W501–W508. doi:10.1093/nar/gkx372</li>
+    </ol>
+  </section>
+  </div>
+
+  <div class="tail">
+    <span>SciViz Kit · 推文 No.034</span>
+    <span>2026-10-26</span>
+  </div>
+
+</article>
+<!-- 参考文献悬浮提示：hover 正文 sup 角标 → 按 index.html 规定的 .tooltip 样式复现参考文献详情 -->
+<script>
+(function(){
+  'use strict';
+  var refs = document.querySelectorAll('ol.refs > li');
+  if (!refs.length) return;
+  var tip = document.createElement('div');
+  tip.className = 'ref-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+  function move(e){
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = e.clientX + 14, y = e.clientY + 16;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hide(){ tip.classList.remove('on'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.body sup, .post sup'), function (s) {
+    var n = parseInt(s.textContent, 10);
+    if (!(n >= 1 && n <= refs.length)) return;
+    s.classList.add('ref-cite');
+    s.addEventListener('mouseenter', function (e) {
+      tip.textContent = '[' + n + '] ' + (refs[n-1].textContent || '').replace(/\s+/g, ' ').trim();
+      tip.classList.add('on');
+      move(e);
+    });
+    s.addEventListener('mousemove', move);
+    s.addEventListener('mouseleave', hide);
+  });
+})();
+</script>
+</body>
+</html>
