@@ -5,19 +5,6 @@
   "generatedAt": "2026-10-26T12:00:00.000Z",
   "items": [
     {
-      "id": "000-promo-rules",
-      "title": "推文排版规范（Promo Style Rules）",
-      "summary": "全部推文共用的学术风排版契约：标题层级、正文、图注、表格、代码区、提示框与参考文献的标准写法。",
-      "date": "2026-10-26",
-      "tags": [
-        "排版规范",
-        "学术风",
-        "模板",
-        "内部文档"
-      ],
-      "path": "000-promo-rules.html"
-    },
-    {
       "id": "003-deseq2-de",
       "title": "DESeq2 差异表达：从 Count 到结果表",
       "summary": "design 公式、预过滤、结果列逐项解读、LFC 收缩与多组比较——DESeq2 全流程实战代码。",
