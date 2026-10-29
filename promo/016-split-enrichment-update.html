@@ -6,33 +6,72 @@
 <meta name="sciviz-promo" content="no=16;date=2026-06-14;id=016-split-enrichment-update">
 <title>No.016 · 方向性富集（更新版）：通路瘦身策略</title>
 <style>
+/* ============================================================
+ * SciViz Kit —— 推文正文皮肤（assets/css/promo-article.css）
+ *
+ * 这不是一份运行时加载的样式表：推文正文是**单文件自包含 HTML**（正文经
+ * 沙箱 iframe 以 srcdoc 渲染，必须独立可渲染，见 No.000 §1），所以它的
+ * <style> 只能是内嵌的。
+ *
+ * 这份文件的角色是**那 27 份内嵌样式的唯一来源**：
+ *   node scripts/syncPromoSkin.js          # 写入全部正文（含 No.000 规范页）
+ *   node scripts/syncPromoSkin.js --check  # 只比对，不一致就 exit 1
+ * tests/promo.integrity.test.js 第 13 项逐字比对「正文 style == 本文件」，
+ * 任何一篇单独改样式都会被测试拦下。
+ *
+ * 为什么不各篇自己写：历史上已经漂成两版（6110B / 6305B，差的正是链接
+ * 样式，于是 20 篇里 <a> 是浏览器默认的深蓝下划线，7 篇是品牌色）——
+ * 与 §5.9 五类着色、§6.12.1 对齐按钮组同一个教训：同一份规格只要有多份
+ * 副本，就一定会漏。
+ *
+ * 与 kit 的关系（RULES §2.6.1g）：
+ *   · 圆角只用 style.css 的 6 档阶梯（--r-xs/sm/md/lg/xl/pill），
+ *     早期正文里的 10px / 4px / 2px 都是阶梯外的裸 px，已全部归位；
+ *   · 品牌色取 promo.css 的交互蓝 #4f73c9（= style.css --accent），
+ *     渐变端点取 style.css --primary #845EC2：从推文列表点进正文时，
+ *     链接色、标题装饰条、表头底色不会换一套色系；
+ *   · 正文是一张卡片（--r-lg + 柔阴影），与 Hub 的 .hub-shell 同一语言。
+ * ============================================================ */
+
 :root{
-  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
-  --line:#e7ecf4;--line2:#f1f4fa;
-  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+  /* ---- 圆角：与 style.css §1 同一套阶梯，正文里不写阶梯外的 px ---- */
+  --r-xs:6px;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-pill:999px;
+
+  /* ---- 墨色与线：取 promo.css 的中性色，列表页与正文同一套灰阶 ---- */
+  --ink:#1f2b3d;--ink2:#3d4c66;--muted:#6b7c99;
+  --line:#e6ebf2;--line2:#f1f4f8;
+
+  /* ---- 品牌色：交互蓝（style.css --accent）+ 品牌紫（style.css --primary） ---- */
+  --brand:#4568bd;--brand2:#845EC2;--tint:#eef2ff;
 }
 *{box-sizing:border-box}
-body{margin:0;background:#f6f8fc;color:var(--ink);
+body{margin:0;background:#f2f5fa;color:var(--ink);
   font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
        "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
-  font-kerning:normal}
-.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
-  box-shadow:0 0 0 1px var(--line)}
+  font-kerning:normal;padding:24px 16px 32px}
+/* 正文 = 一张白卡：与 Hub 的 .hub-shell 同一语言（--r-lg + 柔阴影 + 1px 描边）。
+   早期是 min-height:100vh 的满屏白条：圆角看不见、左右留白等于 0，
+   在 46px 深色查看器条下面像一张纸直接铺到屏幕边缘。 */
+.post{max-width:768px;margin:0 auto;background:#fff;border-radius:var(--r-lg);
+  box-shadow:0 10px 30px rgba(31,43,61,.07),0 0 0 1px var(--line);
+  overflow:hidden}
 
 /* ---- 标题区 ---- */
-.hero{padding:40px 30px 28px;
+.hero{padding:40px 30px 24px;
   background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
 .kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
   font-size:12px;color:var(--muted);letter-spacing:.02em}
-.no{display:inline-block;padding:2px 10px;border-radius:999px;
+.no{display:inline-block;padding:2px 10px;border-radius:var(--r-pill);
   background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
 .dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
 .hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
   letter-spacing:-.01em}
+/* 导语：左侧竖线与 h2 装饰条同一色系（品牌紫）。早期写的是 var(--tint)，
+   而 hero 渐变起点就是 --tint —— 等于白线描白底，截图里几乎看不见。 */
 .lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
-  border-left:3px solid var(--tint)}
+  border-left:3px solid var(--brand2)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
-.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+.chip{padding:2px 10px;border-radius:var(--r-pill);background:var(--line2);
   color:var(--ink2);font-size:12px}
 
 /* ---- 正文 ---- */
@@ -40,13 +79,18 @@ body{margin:0;background:#f6f8fc;color:var(--ink);
 section{padding-top:6px}
 h2{position:relative;margin:34px 0 12px;padding-left:14px;
   font-size:1.16rem;line-height:1.5}
+/* 首个 h2 紧接 hero：34px 上边距叠在 hero 的下内边距上，看起来像断层 ——
+   首节收到 14px，节间节奏保持 34px */
+.body > h2:first-child,
+.body > section:first-child > h2:first-child{margin-top:14px}
+/* 装饰条 4px 宽 → 用 pill 取圆角（等价于半宽 2px，且不留裸 px） */
 h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
-  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+  border-radius:var(--r-pill);background:linear-gradient(180deg,var(--brand),var(--brand2))}
 h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
-h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:var(--r-pill);
   background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
 h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
-h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:var(--r-pill);
   background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
 p{margin:0 0 15px;color:var(--ink2)}
 ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
@@ -57,31 +101,49 @@ em{font-style:normal;color:var(--ink);
   background:linear-gradient(transparent 62%,var(--tint) 62%)}
 sup{font-size:.72em;color:var(--muted)}
 
+/* ---- 外链：正文里的网址一律是链接（No.000 §9），形态与 promo.css 的
+   .promo-link 一致：品牌色 + 淡下划线，悬停加深，长 URL 允许折行 ---- */
+.body a{color:var(--brand);text-decoration:none;border-bottom:1px solid var(--line);
+  word-break:break-all}
+.body a:hover{color:var(--brand2);border-bottom-color:var(--brand2)}
+.body a:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
 /* ---- 配图 ---- */
 figure{margin:22px 0 24px}
 figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
-  border-radius:10px;background:#fff}
+  border-radius:var(--r-md);background:#fff}
 figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
   text-align:center}
 
 /* ---- 表格 ---- */
 .table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
-  border-radius:10px;-webkit-overflow-scrolling:touch}
+  border-radius:var(--r-md);-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
   color:var(--ink2);background:#fff}
 thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
   padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
 td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+/* 首列多是「口径 / 闸门 / 步骤」这类短标签，被 content 更宽的列挤成
+   「背景基因 / 集」很难看 —— 让它们不折行（表宽不够时由 .table-wrap 横向滚动） */
+td:first-child{white-space:nowrap}
 tbody tr:last-child td{border-bottom:0}
 tbody tr:nth-child(even){background:#fafbff}
 td code{white-space:nowrap}
 
+
+/* 键值对照表（No.019 那七张「数据库 / 用途 / 网址」）：首列收窄、末列给足
+   网址宽度。这些宽度原先写成 <th style="width:22%"> 散在正文里，七处各改一遍，
+   所以收回皮肤：正文只留 class，改宽度改这一处。 */
+.table-wrap table.table-kv{table-layout:fixed}
+.table-kv th:first-child,.table-kv td:first-child{width:24%}
+.table-kv th:last-child,.table-kv td:last-child{width:30%}
+.table-kv td:last-child{word-break:break-all}
 /* ---- 行内代码与代码块 ---- */
 code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
-  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:var(--r-xs);
   padding:.1em .4em;color:#9d3b5d;word-break:break-word}
 pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
-  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  border-radius:var(--r-md);overflow-x:auto;font-size:13px;line-height:1.75;
   font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
   -webkit-overflow-scrolling:touch}
 pre code{display:block;background:none;border:0;padding:0;color:inherit;
@@ -92,10 +154,10 @@ pre .s{color:#9ad1a4}
 
 /* ---- 引言与提示框 ---- */
 blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
-  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+  background:var(--tint);border-radius:0 var(--r-md) var(--r-md) 0;color:var(--ink)}
 blockquote p{margin:0 0 6px;color:var(--ink)}
 blockquote p:last-child{margin:0}
-.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:var(--r-md);font-size:.92rem;
   line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
 .note p{margin:0 0 6px}
 .note p:last-child{margin:0}
@@ -104,9 +166,17 @@ blockquote p:last-child{margin:0}
 .note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
 .note-tip strong,.note-tip b{color:#2e5e41}
 
-/* ---- 参考文献 ---- */
+/* ---- 参考文献 ----
+   规范（No.000 §9）要求「h3.refs-title + ol.refs」成对出现。早期只有 9 篇
+   带标题，另 18 篇直接从列表开始 —— 而「虚线分隔 + 18px 上边距」又挂在列表
+   自己身上，于是没有标题时这段留白无处安放。这里把分隔线交给标题，并用
+   相邻选择器让「已有标题」的列表不再重复画线：两种形态都成立。 */
+.refs-title{margin:34px 0 0;padding-top:18px;border-top:1px dashed var(--line);
+  font-size:.94rem;color:var(--ink)}
+.refs-title::before{background:var(--brand2)}
 .refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
   list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs-title + .refs{margin-top:10px;padding-top:0;border-top:0}
 .refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
   line-height:1.7}
 .refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
@@ -122,7 +192,9 @@ hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
   font-size:12px;color:var(--muted)}
 
 @media (max-width:640px){
-  body{font-size:16.5px}
+  body{font-size:16.5px;padding:0}
+  /* 窄屏铺满：卡片圆角与左右留白只会吃掉本就紧张的行宽 */
+  .post{border-radius:0;box-shadow:0 0 0 1px var(--line)}
   .hero{padding:28px 18px 22px}
   .hero h1{font-size:1.46rem}
   .body{padding:6px 18px 32px}
@@ -131,7 +203,7 @@ hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
 
 /* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
 .ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
-  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:var(--r-xs);
   font-size:12px;line-height:1.7;pointer-events:none!important;
   opacity:0;visibility:hidden;transition:opacity .12s ease;
   white-space:normal;word-break:break-word}
@@ -150,117 +222,107 @@ sup.ref-cite{cursor:help;padding:0 1px}
       <span>SciViz Kit · 推文与教程</span>
     </div>
     <h1>方向性富集（更新版）：通路瘦身策略</h1>
-    <p class="lede">上一期的补充：阈值怎么定，通路太胖时先砍哪一层。</p>
+    <p class="lede">把差异基因按方向拆成两张表，再用四道闸门把上百条通路收敛到可读的 3–8 条。</p>
     <div class="chips"><span class="chip">富集</span><span class="chip">上下调</span><span class="chip">通路瘦身</span></div>
   </header>
 
   <div class="body">
   <section>
-    <h2>方向性富集：上下调分离的三部曲</h2>
-    <p>本文是 No.013 的更新版，把方向性富集拆成三步：① 上调、下调基因分别做 ORA，避免正负调控互相抵消；② 对每个方向按「基因数过滤 + FDR + 富集倍数 + 生物学审查」瘦身，保留 3–8 条核心通路；③ 输出带方向标签的结论。混合富集会让「活化 vs 抑制」无法区分，是差异分析最常见的失分点。</p>
+    <h2>为什么必须拆开上下调</h2>
+    <p>方向性富集的做法很朴素：把差异基因按 <code>log₂FC</code> 的正负分成两张表，各自做一次 ORA（过表达分析），最后分别解读。理由同样朴素——一次 ORA 只能回答「这批基因在功能上偏向哪」，而把活化与抑制的基因混在一张表里，两股相反的信号会互相稀释：p 值被抬高、富集倍数被压平，最后只剩「免疫相关」这类谁都不得罪的结论。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>做法</th><th>能回答的问题</th><th>典型丢失</th></tr></thead>
+        <tbody>
+          <tr><td>混合 ORA（上下调合并）</td><td>整体功能偏向</td><td>活化 vs 抑制的方向、被相互抵销的代谢改变</td></tr>
+          <tr><td>方向性 ORA（上下调分开）</td><td>哪一支被启动、哪一支被关闭</td><td>无（代价是结果表翻倍，需要人工收敛）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>所以方向性富集不是「更花哨的玩法」，而是把一次模糊的功能描述拆成两条可验证的假设：上调表指向被启动的程序，下调表指向被关闭的程序。</p>
   </section>
   <section>
-    <h3>混合富集陷阱</h3>
+    <h2>第一步：把基因分成两张表</h2>
+    <p>分流本身不难，难在几个口径必须一次定死，否则上下调两张表的结果无法并列比较：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>口径</th><th>写法</th><th>注意</th></tr></thead>
+        <tbody>
+          <tr><td>上调</td><td><code>log₂FC &gt; 1</code> 且 <code>padj &lt; 0.05</code></td><td rowspan="2">阈值必须左右对称；<code>log₂FC = 1</code> 即 2 倍（见 No.014）</td></tr>
+          <tr><td>下调</td><td><code>log₂FC &lt; −1</code> 且 <code>padj &lt; 0.05</code></td></tr>
+          <tr><td>背景基因集</td><td>本次实验<strong>实际检出并参与检验</strong>的全部基因</td><td>不是全基因组注释：低表达被过滤的基因不进背景，否则 p 值会系统性偏保守</td></tr>
+          <tr><td>检验与校正</td><td>两张表各自做超几何检验 + BH 校正</td><td>分开做，各自得到独立的 q 值列</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>排序指标统一用富集倍数 <code>Fold Enrichment = GeneRatio / BgRatio</code>：它不受通路大小影响，比单看 p 值更能挑出「小而锐」的信号。</p>
+    <pre><code><span class="c"># DESeq2 结果 → 按方向拆表（示意）</span>
+res &lt;- results(dds, contrast = c(<span class="s">"condition"</span>, <span class="s">"JA"</span>, <span class="s">"mock"</span>))
+res &lt;- res[!is.na(res$padj), ]
+
+up   &lt;- rownames(res)[res$log2FoldChange &gt;  <span class="k">1</span> &amp; res$padj &lt; <span class="k">0.05</span>]
+down &lt;- rownames(res)[res$log2FoldChange &lt; <span class="k">-1</span> &amp; res$padj &lt; <span class="k">0.05</span>]
+universe &lt;- rownames(res)   <span class="c"># 背景 = 检验过的基因，不是全基因组注释</span></code></pre>
+  </section>
+  <section>
+    <h2>第二步：四道闸门做通路瘦身</h2>
+    <p>一次 ORA 常吐出几十到上百条通路，直接读等于没读。下面的顺序不能随意调换：每一步只解决一个问题，前一道闸的结果才决定后一道闸看什么。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>闸门</th><th>做法</th><th>拿掉什么</th></tr></thead>
+        <tbody>
+          <tr><td>基因数过滤</td><td>命中基因数落在 <strong>10–200</strong></td><td>只有两三个基因的「过窄」通路，与塞进数百个基因的「过泛」通路</td></tr>
+          <tr><td>FDR 门槛</td><td><code>q &lt; 0.05</code>（BH 校正）</td><td>校正后仍不显著的噪声</td></tr>
+          <tr><td>富集倍数排序</td><td>按 <code>GeneRatio / BgRatio</code> 降序</td><td>大而钝、靠基因数堆出来的通路</td></tr>
+          <tr><td>生物学审查</td><td>人工判读与表型、处理条件是否自洽</td><td>统计显著但与本课题无关的通路</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note note-tip"><p><strong>下限为什么取 10：</strong>与 <code>clusterProfiler</code> 的默认 <code>minGSSize = 10</code> 对齐；上限 200 是人为收紧的<em>可调值</em>（其默认 <code>maxGSSize = 500</code>）。通路上限放得越宽，泛通路越容易挤进前排——这一步没有普适数字，只有与本课题匹配的尺度。</p></div>
+    <p>四道闸走完，每个方向通常剩十几条。最后按生物学主线收敛到 <strong>3–8 条</strong>：再多也读不过来，反而淹掉主要结论。</p>
+  </section>
+  <section>
+    <h2>案例：茉莉酸处理番茄叶片，两种读法差在哪</h2>
+    <p>同一批差异基因（<code>|log₂FC| &gt; 1</code> 且 <code>padj &lt; 0.05</code>，上调 547、下调 412），分别用混合 ORA 与方向性 ORA 跑一遍，得到的结论并不等价：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>分析策略</th><th>前排通路（命中基因数）</th><th>能读出的方向</th></tr></thead>
+        <tbody>
+          <tr><td>混合 ORA</td><td>植物激素信号转导、MAPK signaling</td><td>只知道「激素与信号转导被扰动」，激活还是抑制说不清</td></tr>
+          <tr><td>上调 ORA</td><td>植物激素信号转导（38）、MAPK signaling（29）、次生代谢合成</td><td>防御与激素通路被<strong>启动</strong></td></tr>
+          <tr><td>下调 ORA</td><td>光合作用-天线蛋白（21）、淀粉与蔗糖代谢（17）、卟啉代谢</td><td>光合与能量代谢被<strong>关闭</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><p><strong>模拟数据：</strong>上表数值用于演示两种读法的差异，非真实实验结果。可用的结论须四项同向：方向、通路、命中基因数、与表型自洽——本案例里防御通路升高与光合通路下降合起来，才构成植物典型的防御—生长权衡。</p></div>
+  </section>
+  <section>
+    <h2>四个常见误区</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>误区</th><th>后果</th><th>改法</th></tr></thead>
+        <tbody>
+          <tr><td>上下调合并做一次 ORA</td><td>方向性信息被抵销</td><td>按 <code>log₂FC</code> 正负拆成两张表</td></tr>
+          <tr><td>按原始 p 值取 Top10</td><td>假阳性，且系统性偏向大通路</td><td>用 BH 校正后的 q 值 + 富集倍数排序</td></tr>
+          <tr><td>背景集写成全基因组注释</td><td>p 值系统性偏保守，真信号被压掉</td><td>背景 = 本次检出并参与检验的基因</td></tr>
+          <tr><td>只报通路名，不报命中基因数</td><td>读者无法判断这条通路是否「撑得住」</td><td>表格里带上命中基因数与 <code>GeneRatio</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>还有一步常被跳过：把上下调通路放进同一张网络图，看两支是否指向同一个调控枢纽。方向性富集的终点是可验证的机制假设，不是一张通路清单。</p>
+  </section>
+
+  <section>
+    <h2>小结</h2>
     <ul>
-      <li>上/下调基因相互稀释，p值失真</li>
-      <li>完全丢失功能方向性（活化 vs 抑制）</li>
-      <li>真实机制被掩盖，误导下游验证</li>
+      <li><strong>先分流</strong>——按 <code>log₂FC</code> 正负拆表，背景集锚定本次检出基因；</li>
+      <li><strong>再瘦身</strong>——基因数 10–200 → FDR → 富集倍数 → 生物学审查，四道闸缺一不可；</li>
+      <li><strong>后收敛</strong>——每个方向留 3–8 条主线通路，带方向标签与命中基因数输出；</li>
+      <li><strong>终落点</strong>——把两条方向的路谱并到一张网络图上，提出可验证的机制假设。</li>
     </ul>
   </section>
+
   <section>
-    <h3>分离富集优势</h3>
-    <ul>
-      <li>上调ORA → 揭示激活的炎症/信号转导</li>
-      <li>下调ORA → 代谢抑制/凋亡抵抗/分化受阻</li>
-      <li>直接匹配表型，高影响力期刊规范</li>
-    </ul>
-    <p>核心原则：依据 log₂FC 方向分割上调/下调基因，分别进行超几何检验</p>
-    <p>混合富集 = 生物学信号的“中和反应”</p>
-    <p>方向性ORA · 标准流程</p>
-  </section>
-  <section>
-    <h3>上调列表： log₂FC &gt; 阈值 (如 &gt;1)，adj.p &lt; 0.05</h3>
-  </section>
-  <section>
-    <h3>下调列表：log₂FC &lt; -阈值 (如 &lt;1)，adj.p &lt; 0.05</h3>
-    <ul>
-      <li>背景基因集：同一参考基因组注释（Ensembl/Entrez）</li>
-      <li>独立超几何检验 + Benjamini‑Hochberg (BH) 校正</li>
-      <li>多重假设校正后 FDR (q‑value) &lt; 0.05</li>
-      <li>富集倍数 = GeneRatio / BackgroundRatio，用于排序筛选</li>
-      <li>后续瘦身：基因数过滤 (10~200) + 生物学相关性审查</li>
-    </ul>
-    <p>独立ORA → 分别输出上调/下调富集表，保留方向性</p>
-    <p>通路瘦身 · 精选核心机制</p>
-  </section>
-  <section>
-    <h3>严格过滤标准</h3>
-    <ul>
-      <li>基因数过滤：10～200 (排除过窄/过泛通路)</li>
-      <li>FDR (q‑value) &lt; 0.05</li>
-      <li>按富集倍数 (Fold Enrichment) 降序排列</li>
-      <li>人工审查，剔除功能冗余通路</li>
-    </ul>
-  </section>
-  <section>
-    <h3>最终核心通路池</h3>
-    <ul>
-      <li>上调方向保留 3～5 条 (激活/炎症/增殖)</li>
-      <li>下调方向保留 3～4 条 (代谢抑制/凋亡抵抗)</li>
-      <li>选取富集倍数最高且与表型密切相关的通路</li>
-    </ul>
-    <p>瘦身前: 86条通路（含冗余噪音）</p>
-    <p>→ 瘦身后: 上调4条 + 下调4条 → 清晰指导验证</p>
-    <p>GeneRatio排序</p>
-    <p>FDR&lt;0.05</p>
-    <p>生物学精选</p>
-    <p>目标：每个方向3～8条高置信通路，避免冗余干扰</p>
-    <p>案例对比 · 方向性揭示真相</p>
-    <p>茉莉酸处理番茄叶片 | 上调547 / 下调412 (|log₂FC|&gt;1, adj.p&lt;0.05)</p>
-    <p>分析策略Top通路示例q‑value (FDR)生物学方向</p>
-    <p>混合富集</p>
-    <p>植物激素信号转导</p>
-    <p>MAPK signaling</p>
-    <p>1.2e-05</p>
-    <p>3.1e-04</p>
-    <p>无法区分激活/抑制，丢失代谢表型</p>
-    <p>上调独立ORA</p>
-    <p>植物激素信号转导 (38)</p>
-    <p>MAPK signaling (29)</p>
-    <p>次生代谢合成</p>
-    <p>2.1e-05</p>
-    <p>防御/激素通路强激活</p>
-    <p>下调独立ORA</p>
-    <p>光合作用-天线蛋白 (21)</p>
-    <p>淀粉蔗糖代谢 (17)</p>
-    <p>卟啉代谢</p>
-    <p>1.2e-04</p>
-    <p>光合/能量代谢被抑制，防御‑生长权衡</p>
-    <p>生物学结论：混合富集仅见激素信号，丢失“光合抑制”；分离富集同时捕获防御激活与代谢抑制，完整诠释植物防御—生长权衡机制。此原理同样适用于肿瘤、免疫、神经科学等领域。</p>
-    <p>方向性ORA是避免“信号抵消”的黄金标准</p>
-    <p>误区纠正 · 核心清单</p>
-  </section>
-  <section>
-    <h3>常见误区</h3>
-    <ul>
-      <li>合并上下调直接ORA → 丢失方向</li>
-      <li>仅凭原始p值取top10 → 假阳性/无生物学支持</li>
-      <li>忽视上下调协同网络 → 机制割裂</li>
-    </ul>
-  </section>
-  <section>
-    <h3>正确策略</h3>
-    <ul>
-      <li>上调/下调独立ORA，综合解读</li>
-      <li>基因数过滤 + FDR校正 + 富集倍数排序 + 人工审核</li>
-      <li>绘制上下调通路网络图，分层阐释</li>
-    </ul>
-    <p>核心通路池构建清单（精简版）</p>
-    <p>① FDR &lt; 0.05 且基因数 ≥ 10；② 按富集倍数降序排列；③ 剔除冗余及与表型无关的通路；④ 每个方向保留3～8条最终通路。</p>
-    <p>clusterProfiler</p>
-    <p>Metascape</p>
-    <p>DAVID</p>
-    <p>规范：方向性ORA + 通路瘦身 = 精准生物学解读</p>
     <h3 class="refs-title">延伸阅读与参考文献</h3>
     <ol class="refs">
       <li>Yu G, Wang LG, Han Y, He QY. clusterProfiler: an R package for comparing biological themes among gene clusters. <em>OMICS</em>. 2012;16(5):284–287. doi:10.1089/omi.2011.0118</li>

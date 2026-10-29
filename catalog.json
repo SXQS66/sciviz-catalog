@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "version": "1.0.0",
-  "updatedAt": "2026-10-21",
+  "updatedAt": "2026-10-23",
   "pkg": {
     "version": "",
     "url": "",
@@ -9,47 +9,16 @@
   },
   "tools": [
     {
-      "id": "line",
-      "addedAt": "2026-10-21",
-      "group": "dist",
-      "glyph": "line",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/line.png?v=1.0.0",
-      "price": "",
-      "buyUrl": "https://www.xiaohongshu.com/goods-detail/6895940302d7b00001661a80",
-      "version": "1.0.0",
-      "cn": {
-        "name": "折线 / 趋势图",
-        "scope": "时间序列、剂量响应、重复测量趋势；多系列对比",
-        "tags": [
-          "折线",
-          "趋势",
-          "时间序列",
-          "line",
-          "多系列"
-        ]
-      },
-      "en": {
-        "name": "Line & Trend",
-        "scope": "Time series, dose-response, repeated measures; multi-series",
-        "tags": [
-          "line",
-          "trend",
-          "time series",
-          "multi-series"
-        ]
-      }
-    },
-    {
       "id": "heatmap",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "matrix",
       "glyph": "heatmap",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/heatmap.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/heatmap.png?v=31e13adb",
       "price": "",
       "buyUrl": "https://xhslink.com/m/71f8ozIhzfJ",
       "version": "7.1.0",
       "cn": {
-        "name": "表达热图",
+        "name": "热图",
         "scope": "转录组 / 蛋白组表达矩阵；聚类、标准化、色标可调",
         "tags": [
           "热图",
@@ -60,7 +29,7 @@
         ]
       },
       "en": {
-        "name": "Expression Heatmap",
+        "name": "Heatmap",
         "scope": "Transcriptome / proteome matrices; clustering, scaling, colorbar",
         "tags": [
           "heatmap",
@@ -68,16 +37,22 @@
           "transcriptome",
           "clustering"
         ]
+      },
+      "download": {
+        "version": "7.5.0",
+        "file": "15_heatmap_visualizer_v7.5.0.zip",
+        "size": 13959815,
+        "sha256": "241d8932dcae11272edb80ac66eda60f9751e23bdd0cfe8da7ca130c7c7ae9c5"
       }
     },
     {
       "id": "volcano",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "deg",
       "glyph": "volcano",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/volcano.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/volcano.png?v=ced09e80",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://www.xiaohongshu.com/goods-detail/6895940302d7b00001661a80",
       "version": "6.1.0",
       "cn": {
         "name": "差异表达火山图",
@@ -99,16 +74,22 @@
           "volcano",
           "proteomics"
         ]
+      },
+      "download": {
+        "version": "6.5.0",
+        "file": "01_volcano_visualizer_v6.5.0.zip",
+        "size": 10249449,
+        "sha256": "9de0266b77eb03a3e0e859bed3da3c4b928860efae2f6fc697209043c45f6f3c"
       }
     },
     {
       "id": "meta-volcano",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "deg",
       "glyph": "volcano",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/meta-volcano.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/meta-volcano.png?v=cfb3333f",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/3YpS4GjsuP1",
       "version": "4.0.0",
       "cn": {
         "name": "代谢组火山图",
@@ -132,12 +113,12 @@
     },
     {
       "id": "degs-volcano",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "deg",
       "glyph": "volcano",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/degs-volcano.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/degs-volcano.png?v=4cabc8d7",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/61yDDGTYMgG",
       "version": "7.0.0",
       "cn": {
         "name": "多组差异火山图",
@@ -162,12 +143,12 @@
     },
     {
       "id": "enrich-bar",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "hbar",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-bar.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-bar.png?v=3f881dcc",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/AlE76Fprnul",
       "version": "6.0.0",
       "cn": {
         "name": "富集气泡条形图",
@@ -193,12 +174,12 @@
     },
     {
       "id": "enrich-lollipop",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "lollipop",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-lollipop.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-lollipop.png?v=92383e23",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/AnWujsWji1w",
       "version": "8.5.0",
       "cn": {
         "name": "富集棒棒糖图",
@@ -219,16 +200,22 @@
           "GO",
           "KEGG"
         ]
+      },
+      "download": {
+        "version": "8.5.0",
+        "file": "05_enrich-lollipop_visualizer_v8.5.0.zip",
+        "size": 12399647,
+        "sha256": "e19254c7f1d04f3d76a040b6a54eedfb0f496016b637f8bda683d91d15b2ca2b"
       }
     },
     {
       "id": "gsea-bubble",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "bubble",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-bubble.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-bubble.png?v=ed6f39a2",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/1EdB2lxvuSy",
       "version": "5.0.0",
       "cn": {
         "name": "GSEA 气泡图",
@@ -254,12 +241,12 @@
     },
     {
       "id": "gsea-lollipop",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "lollipop",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-lollipop.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-lollipop.png?v=c595a05d",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/8JS9E3Nc7hL",
       "version": "6.0.0",
       "cn": {
         "name": "GSEA 棒棒糖图",
@@ -283,12 +270,12 @@
     },
     {
       "id": "go-center-bar",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "hbar",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/go-center-bar.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/go-center-bar.png?v=e0e496e9",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/1eTwzMuDItM",
       "version": "2.0.0",
       "cn": {
         "name": "GO 分组居中条形图",
@@ -316,10 +303,10 @@
     },
     {
       "id": "gsea-ridge",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "ridge",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-ridge.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-ridge.png?v=6225baeb",
       "price": "",
       "buyUrl": "https://xhslink.com/m/ENYDAZcaTW",
       "version": "5.0.0",
@@ -346,12 +333,12 @@
     },
     {
       "id": "enrich-sankey",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "sankey",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-sankey.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-sankey.png?v=4119ef37",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/AulWUUv5zvv",
       "version": "6.0.0",
       "cn": {
         "name": "富集桑基气泡图",
@@ -376,12 +363,12 @@
     },
     {
       "id": "enrich-chord",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "chord",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-chord.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-chord.png?v=61b43556",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/62jr8IObW8a",
       "version": "2.0.0",
       "cn": {
         "name": "富集弦图",
@@ -405,12 +392,12 @@
     },
     {
       "id": "dot-pie",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "dotpie",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/dot-pie.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/dot-pie.png?v=13bea886",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/26AyG4tQSdu",
       "version": "1.0.0",
       "cn": {
         "name": "点饼组合图",
@@ -435,12 +422,12 @@
     },
     {
       "id": "bubble",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "bubble",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/bubble.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/bubble.png?v=384d2bcf",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/2gmr3zv598l",
       "version": "6.0.0",
       "cn": {
         "name": "通用气泡图",
@@ -464,12 +451,12 @@
     },
     {
       "id": "grouped-dot",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "enrich",
       "glyph": "dot",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/grouped-dot.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/grouped-dot.png?v=0ea524c8",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/4H9SDPltkce",
       "version": "4.0.0",
       "cn": {
         "name": "分组点图",
@@ -495,12 +482,12 @@
     },
     {
       "id": "cor-heatmap",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "matrix",
       "glyph": "heatmap",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cor-heatmap.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cor-heatmap.png?v=601cabb7",
       "price": "",
-      "buyUrl": "https://www.xiaohongshu.com/goods-detail/69da661a8ca4f400013aa554",
+      "buyUrl": "https://xhslink.com/m/8ocnYAtnRoK",
       "version": "2.0.0",
       "cn": {
         "name": "相关性热图",
@@ -525,12 +512,12 @@
     },
     {
       "id": "circular-heatmap",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "matrix",
       "glyph": "ring",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circular-heatmap.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circular-heatmap.png?v=bcdfb0ca",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/3h3fLkhQQe3",
       "version": "2.0.0",
       "cn": {
         "name": "环状热图",
@@ -555,10 +542,10 @@
     },
     {
       "id": "cluster-enrich",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "matrix",
       "glyph": "cluster",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cluster-enrich.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cluster-enrich.png?v=587e6309",
       "price": "",
       "buyUrl": "",
       "version": "1.0.0",
@@ -586,12 +573,12 @@
     },
     {
       "id": "mantel",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "matrix",
       "glyph": "corr",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/mantel.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/mantel.png?v=65d0925d",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/HHcp4m4Bcy",
       "version": "1.1.0",
       "cn": {
         "name": "Mantel 检验相关图",
@@ -617,12 +604,12 @@
     },
     {
       "id": "matrix-cor",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "matrix",
       "glyph": "corr",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/matrix-cor.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/matrix-cor.png?v=76efe283",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/1FfxGFOdPgG",
       "version": "1.0.0",
       "cn": {
         "name": "两组矩阵相关",
@@ -648,12 +635,12 @@
     },
     {
       "id": "venn",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "set",
       "glyph": "venn",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/venn.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/venn.png?v=8abf9f53",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/8c5qKX87Cnb",
       "version": "1.0.0",
       "cn": {
         "name": "韦恩图",
@@ -679,12 +666,12 @@
     },
     {
       "id": "upset",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "set",
       "glyph": "upset",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/upset.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/upset.png?v=2ae7fcfc",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/7BYOOSvoY2Z",
       "version": "5.0.0",
       "cn": {
         "name": "UpSet 图",
@@ -708,12 +695,12 @@
     },
     {
       "id": "stacked-bar",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "comp",
       "glyph": "stacked",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/stacked-bar.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/stacked-bar.png?v=a1b2aedd",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/3ioAISG2RCh",
       "version": "5.1.0",
       "cn": {
         "name": "堆叠柱状图",
@@ -739,12 +726,12 @@
     },
     {
       "id": "pie",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "comp",
       "glyph": "pie",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/pie.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/pie.png?v=29fe8478",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/4Nr6ZrioyeV",
       "version": "1.0.0",
       "cn": {
         "name": "饼图 / 环形图",
@@ -768,12 +755,12 @@
     },
     {
       "id": "sunburst",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "comp",
       "glyph": "sunburst",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sunburst.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sunburst.png?v=9d3d5661",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/4wuOWAI7fze",
       "version": "1.0.0",
       "cn": {
         "name": "旭日图",
@@ -797,12 +784,12 @@
     },
     {
       "id": "flower",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "comp",
       "glyph": "flower",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/flower.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/flower.png?v=6e7b1da8",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/4mLdgYrJLo0",
       "version": "1.0.0",
       "cn": {
         "name": "花瓣图",
@@ -828,12 +815,12 @@
     },
     {
       "id": "network",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "relation",
       "glyph": "net",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/network.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/network.png?v=7a3042b1",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/1RKmBtMTszG",
       "version": "5.0.0",
       "cn": {
         "name": "互作网络图",
@@ -859,12 +846,12 @@
     },
     {
       "id": "chord",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "relation",
       "glyph": "chord",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/chord.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/chord.png?v=8fd46aa2",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/RgKRXFiKte",
       "version": "1.0.0",
       "cn": {
         "name": "弦图",
@@ -888,12 +875,12 @@
     },
     {
       "id": "sankey",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "relation",
       "glyph": "sankey",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sankey.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sankey.png?v=6584f30c",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/AL54L4XGrTk",
       "version": "3.0.0",
       "cn": {
         "name": "桑基图",
@@ -917,12 +904,12 @@
     },
     {
       "id": "path-net",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "relation",
       "glyph": "net",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/path-net.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/path-net.png?v=610a01b3",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/1MXmxSdm1qB",
       "version": "2.0.0",
       "cn": {
         "name": "通路相似性网络",
@@ -948,10 +935,10 @@
     },
     {
       "id": "zi-pi",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "relation",
       "glyph": "net",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/zi-pi.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/zi-pi.png?v=5a4d10cd",
       "price": "",
       "buyUrl": "",
       "version": "1.0.0",
@@ -979,10 +966,10 @@
     },
     {
       "id": "circle-packing",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "relation",
       "glyph": "packing",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circle-packing.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circle-packing.png?v=0bad38d7",
       "price": "",
       "buyUrl": "",
       "version": "2.0.0",
@@ -1008,12 +995,12 @@
     },
     {
       "id": "scatter",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "dist",
       "glyph": "scatter",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/scatter.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/scatter.png?v=2d5157f9",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/2YKt14rWtn3",
       "version": "4.0.0",
       "cn": {
         "name": "散点图",
@@ -1037,12 +1024,12 @@
     },
     {
       "id": "four-quadrant",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "dist",
       "glyph": "quadrant",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/four-quadrant.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/four-quadrant.png?v=38ece8b8",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/AHZbTEf0TSI",
       "version": "1.0.0",
       "cn": {
         "name": "四象限散点图",
@@ -1067,12 +1054,12 @@
     },
     {
       "id": "nine-quadrant",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "dist",
       "glyph": "nine",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/nine-quadrant.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/nine-quadrant.png?v=39b8c143",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/A2xnnpEcOh0",
       "version": "1.0.0",
       "cn": {
         "name": "九象限图",
@@ -1096,12 +1083,12 @@
     },
     {
       "id": "ternary",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "dist",
       "glyph": "ternary",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/ternary.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/ternary.png?v=8a921080",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/6f5NUVGZFhF",
       "version": "1.0.0",
       "cn": {
         "name": "三元图",
@@ -1126,10 +1113,10 @@
     },
     {
       "id": "box-violin",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "dist",
       "glyph": "box",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/box-violin.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/box-violin.png?v=3972ba30",
       "price": "",
       "buyUrl": "",
       "version": "2.0.0",
@@ -1155,12 +1142,12 @@
     },
     {
       "id": "survival",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "dist",
       "glyph": "survival",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/survival.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/survival.png?v=ae142ed1",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/5sKACdC4i7R",
       "version": "2.0.0",
       "cn": {
         "name": "生存曲线",
@@ -1186,10 +1173,10 @@
     },
     {
       "id": "forest",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "dist",
       "glyph": "forest",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/forest.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/forest.png?v=e8a4b3fc",
       "price": "",
       "buyUrl": "",
       "version": "1.0.0",
@@ -1216,7 +1203,7 @@
     },
     {
       "id": "bump",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "dist",
       "glyph": "bump",
       "thumb": "",
@@ -1245,12 +1232,12 @@
     },
     {
       "id": "radar",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "shape",
       "glyph": "radar",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radar.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radar.png?v=4e0ef89b",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/9U9wzDV6aDw",
       "version": "3.0.0",
       "cn": {
         "name": "雷达图",
@@ -1274,12 +1261,12 @@
     },
     {
       "id": "polar-bar",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "shape",
       "glyph": "polar",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/polar-bar.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/polar-bar.png?v=8614e8c9",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/8LUbg0siLI3",
       "version": "1.0.0",
       "cn": {
         "name": "极坐标柱状图",
@@ -1304,12 +1291,12 @@
     },
     {
       "id": "radial-bar",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "shape",
       "glyph": "radial",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radial-bar.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radial-bar.png?v=b6dea96b",
       "price": "",
-      "buyUrl": "",
+      "buyUrl": "https://xhslink.com/m/8ccVF2n9rut",
       "version": "1.0.0",
       "cn": {
         "name": "径向条形图",
@@ -1333,10 +1320,10 @@
     },
     {
       "id": "rose",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "shape",
       "glyph": "rose",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/rose.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/rose.png?v=08fc099a",
       "price": "",
       "buyUrl": "",
       "version": "1.0.0",
@@ -1362,10 +1349,10 @@
     },
     {
       "id": "panel-forge",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "shape",
       "glyph": "panel",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/panel-forge.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/panel-forge.png?v=0a526fcd",
       "price": "",
       "buyUrl": "",
       "version": "2.0.0",
@@ -1393,10 +1380,10 @@
     },
     {
       "id": "as-te",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "omics",
       "glyph": "genome",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/as-te.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/as-te.png?v=087c1dbd",
       "price": "",
       "buyUrl": "",
       "version": "1.0.0",
@@ -1423,10 +1410,10 @@
     },
     {
       "id": "synteny",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "omics",
       "glyph": "synteny",
-      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/synteny.png?v=1.0.0",
+      "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/synteny.png?v=0c6d7576",
       "price": "",
       "buyUrl": "",
       "version": "1.0.0",
@@ -1452,7 +1439,7 @@
     },
     {
       "id": "map",
-      "addedAt": "2026-10-21",
+      "addedAt": "2026-10-23",
       "group": "omics",
       "glyph": "map",
       "thumb": "",
@@ -1480,5 +1467,10 @@
         ]
       }
     }
-  ]
+  ],
+  "split": {
+    "generatedAt": "2026-10-23",
+    "count": 3,
+    "dir": "SciViz_split"
+  }
 }

@@ -1,13 +1,105 @@
 {
   "schema": 1,
-  "version": "1.5.0",
-  "updatedAt": "2026-10-27",
-  "generatedAt": "2026-10-26T12:00:00.000Z",
+  "version": "1.7.0",
+  "updatedAt": "2026-10-29",
+  "generatedAt": "2026-10-29T14:38:43.993Z",
   "items": [
+    {
+      "id": "026-de-enrichment-wgcna",
+      "title": "转录组故事线：差异 · 富集 · WGCNA",
+      "summary": "三块分析怎么串成一条能讲的故事线，而不是三张互不相干的图。",
+      "date": "2026-08-22",
+      "tags": [
+        "转录组",
+        "差异分析",
+        "富集",
+        "WGCNA"
+      ],
+      "path": "026-de-enrichment-wgcna.html"
+    },
+    {
+      "id": "019-common-databases",
+      "title": "生信常用数据库全景",
+      "summary": "从通用（NCBI / Ensembl / UniProt）到特异（GEO / TCGA / 单细胞）一张图定位。",
+      "date": "2026-07-04",
+      "tags": [
+        "数据库",
+        "NCBI",
+        "Ensembl",
+        "GEO"
+      ],
+      "path": "019-common-databases.html"
+    },
+    {
+      "id": "020-gene-id-intro",
+      "title": "基因 ID，你真的分清了吗",
+      "summary": "Ensembl / Entrez / Symbol / RefSeq 互转时的坑：版本号、别名、大小写。",
+      "date": "2026-07-11",
+      "tags": [
+        "基因ID",
+        "Ensembl",
+        "Entrez",
+        "ID转换"
+      ],
+      "path": "020-gene-id-intro.html"
+    },
+    {
+      "id": "011-naming-rules",
+      "title": "基因 · 蛋白命名权威指南",
+      "summary": "人 / 小鼠 / 模式生物五页规范：大小写、斜体、别名与旧名，投稿前逐条对。",
+      "date": "2026-04-06",
+      "tags": [
+        "命名规范",
+        "基因",
+        "蛋白",
+        "投稿"
+      ],
+      "path": "011-naming-rules.html"
+    },
+    {
+      "id": "001-rnaseq-upstream",
+      "title": "RNA-seq 上游分析：从 NCBI 到 Count 矩阵",
+      "summary": "从 SRA 下载数据到基因 Count 矩阵的完整上游流程：文件格式速查、质控、STAR 比对与 featureCounts 定量，附全套可运行命令。",
+      "date": "2026-10-26",
+      "tags": [
+        "RNA-seq",
+        "SRA",
+        "质控",
+        "STAR",
+        "上游分析"
+      ],
+      "path": "001-rnaseq-upstream.html"
+    },
+    {
+      "id": "002-aligners",
+      "title": "比对软件三强：STAR · HISAT2 · Bowtie2 怎么选",
+      "summary": "后缀数组还是 FM 索引？为什么 Bowtie2 不能拿来跑常规 RNA-seq？三款比对软件的原理、命令与选型对照。",
+      "date": "2025-12-12",
+      "tags": [
+        "STAR",
+        "HISAT2",
+        "Bowtie2",
+        "比对",
+        "RNA-seq"
+      ],
+      "path": "002-aligners.html"
+    },
+    {
+      "id": "015-rnaseq-quantification-update",
+      "title": "RNA-seq 定量指南（更新版）",
+      "summary": "Count → RPKM → FPKM → TPM 的换算链条更新，以及最常见的几种错误换算。",
+      "date": "2026-06-06",
+      "tags": [
+        "RNA-seq",
+        "定量",
+        "更新"
+      ],
+      "path": "015-rnaseq-quantification-update.html"
+    },
     {
       "id": "003-deseq2-de",
       "title": "DESeq2 差异表达：从 Count 到结果表",
-      "summary": "design 公式、预过滤、结果列逐项解读、LFC 收缩与多组比较——DESeq2 全流程实战代码。",
+      "summary": "承接 No.001 的 Count 矩阵：design 公式、预过滤、结果列逐项解读、LFC 收缩与多组比较，全套可运行代码。",
       "date": "2025-12-19",
       "tags": [
         "DESeq2",
@@ -16,6 +108,31 @@
         "RNA-seq"
       ],
       "path": "003-deseq2-de.html"
+    },
+    {
+      "id": "014-log2fc",
+      "title": "Log₂ Fold Change 到底怎么算",
+      "summary": "从原始 counts 到 log₂FC：加不加伪计数、要不要标准化、符号怎么解释。",
+      "date": "2026-05-31",
+      "tags": [
+        "log₂FC",
+        "差异分析",
+        "标准化"
+      ],
+      "path": "014-log2fc.html"
+    },
+    {
+      "id": "022-p-value-vs-log2fc",
+      "title": "差异分析：p 值 vs log₂FC",
+      "summary": "统计显著不等于生物学重要；双重阈值怎么定，火山图四个角分别是什么。",
+      "date": "2026-07-17",
+      "tags": [
+        "p值",
+        "log₂FC",
+        "差异分析",
+        "火山图"
+      ],
+      "path": "022-p-value-vs-log2fc.html"
     },
     {
       "id": "004-de-visualization",
@@ -31,22 +148,9 @@
       "path": "004-de-visualization.html"
     },
     {
-      "id": "005-gsea-enrichment",
-      "title": "富集分析实战：ORA 与 GSEA 双引擎",
-      "summary": "从差异表到富集结果：rank 列表怎么排、背景怎么设、NES 与 leading edge 怎么读。",
-      "date": "2026-01-02",
-      "tags": [
-        "富集",
-        "GSEA",
-        "ORA",
-        "fgsea"
-      ],
-      "path": "005-gsea-enrichment.html"
-    },
-    {
       "id": "006-batch-effects",
       "title": "批次效应：别让它毁掉你的差异分析",
-      "summary": "怎么发现（PCA 双标注）、怎么处理（混淆程度决策表）、为什么校正只能画图不能检验。",
+      "summary": "怎么发现（PCA 双标注）、怎么处理（混淆程度决策表）、为什么校正只能画图不能检验——预防重于补救的完整清单。",
       "date": "2026-01-09",
       "tags": [
         "批次效应",
@@ -55,34 +159,6 @@
         "ComBat"
       ],
       "path": "006-batch-effects.html"
-    },
-    {
-      "id": "002-aligners",
-      "title": "比对软件三强：STAR · HISAT2 · Bowtie2 怎么选",
-      "summary": "后缀数组还是 FM 索引？为什么 Bowtie2 不能跑常规 RNA-seq？三款比对器的原理、完整命令与选型对照。",
-      "date": "2025-12-12",
-      "tags": [
-        "STAR",
-        "HISAT2",
-        "Bowtie2",
-        "比对",
-        "RNA-seq"
-      ],
-      "path": "002-aligners.html"
-    },
-    {
-      "id": "001-rnaseq-upstream",
-      "title": "RNA-seq 上游分析：从 NCBI 到 Count 矩阵",
-      "summary": "从 SRA 下载数据到基因 Count 矩阵的完整上游流程：文件格式速查、质控、STAR 比对与 featureCounts 定量，附全套可运行命令。",
-      "date": "2026-10-26",
-      "tags": [
-        "RNA-seq",
-        "SRA",
-        "质控",
-        "STAR",
-        "上游分析"
-      ],
-      "path": "001-rnaseq-upstream.html"
     },
     {
       "id": "035-pathway-databases",
@@ -111,48 +187,60 @@
       "path": "036-go-practical.html"
     },
     {
-      "id": "037-wgcna-essentials",
-      "title": "WGCNA 入门与样本量陷阱",
-      "summary": "共表达模块怎么建、什么时候不能建：三步流程、官方样本量门槛、相关性虚高与稳定性检验，附 R 流水线。",
-      "date": "2026-10-26",
+      "id": "005-gsea-enrichment",
+      "title": "富集分析实战：ORA 与 GSEA 双引擎",
+      "summary": "从差异表到富集结果：rank 列表怎么排、背景怎么设、NES 与 leading edge 怎么读，clusterProfiler + fgsea 全套代码。",
+      "date": "2026-01-02",
       "tags": [
-        "WGCNA",
-        "共表达",
-        "样本量",
-        "R"
+        "富集",
+        "GSEA",
+        "ORA",
+        "fgsea"
       ],
-      "path": "037-wgcna-essentials.html"
+      "path": "005-gsea-enrichment.html"
     },
     {
-      "id": "038-chart-selection",
-      "title": "先选对图，再谈画法：决策树与导航站",
-      "summary": "From Data to Viz 按数据形状定图型，plottie 按图型找模板：选图困难症的两条出路。",
-      "date": "2026-10-26",
+      "id": "010-ora-gsea-combined",
+      "title": "ORA + GSEA 联合富集策略",
+      "summary": "超几何检验回答「有没有」，GSEA 回答「趋势在不在」，两套结果怎么合起来读。",
+      "date": "2026-03-31",
       "tags": [
-        "选图",
-        "决策树",
-        "data-to-viz",
-        "plottie"
+        "ORA",
+        "GSEA",
+        "富集",
+        "联合分析"
       ],
-      "path": "038-chart-selection.html"
+      "path": "010-ora-gsea-combined.html"
     },
     {
-      "id": "039-rust-open-source-suite",
-      "title": "Rust 开源生产力三件套：VectorCraft · WordCraft · PhotoCraft",
-      "summary": "三款 Rust 重写的开源「Adobe 平替」实测：共同架构、各自的真实边界与选型建议。",
-      "date": "2026-10-26",
+      "id": "016-split-enrichment-update",
+      "title": "方向性富集（更新版）：通路瘦身策略",
+      "summary": "把差异基因按方向拆成两张表，再用四道闸门把上百条通路收敛到可读的 3–8 条。",
+      "date": "2026-06-14",
       "tags": [
-        "Rust",
-        "开源",
-        "MCP",
-        "工具评测"
+        "富集",
+        "上下调",
+        "通路瘦身"
       ],
-      "path": "039-rust-open-source-suite.html"
+      "path": "016-split-enrichment-update.html"
+    },
+    {
+      "id": "025-enrichment-taxonomy",
+      "title": "富集分析完整十法",
+      "summary": "ORA / GSEA / ssGSEA / GSVA … 十种方法的适用前提与选择路径。",
+      "date": "2026-08-16",
+      "tags": [
+        "富集",
+        "ORA",
+        "GSEA",
+        "方法学"
+      ],
+      "path": "025-enrichment-taxonomy.html"
     },
     {
       "id": "034-enrichment-visualization",
       "title": "富集结果可视化：从条形图到通路地图",
-      "summary": "GO / KEGG 富集结果怎么画：四种总览图型、pathview 通路地图、多组交集花瓣图，附 R 示例脚本。",
+      "summary": "GO / KEGG 富集结果怎么画：四种总览图型、pathview 通路地图、多组交集花瓣图，附 clusterProfiler R 示例脚本。",
       "date": "2026-10-26",
       "tags": [
         "富集",
@@ -162,6 +250,70 @@
         "R"
       ],
       "path": "034-enrichment-visualization.html"
+    },
+    {
+      "id": "037-wgcna-essentials",
+      "title": "WGCNA 完整实战：从软阈值到模块-性状解读",
+      "summary": "一篇讲完共表达网络：软阈值怎么定、模块怎么验、模块-性状热图怎么读、hub gene 怎么筛——附可复现 R 代码与全流程图解。",
+      "date": "2026-10-27",
+      "tags": [
+        "WGCNA",
+        "共表达模块",
+        "软阈值",
+        "hub gene",
+        "R"
+      ],
+      "path": "037-wgcna-essentials.html"
+    },
+    {
+      "id": "029-ip-coip",
+      "title": "互作实验五兄弟：IP / CoIP / ChIP / pull-down / BiFC",
+      "summary": "五种互作验证实验的适用边界，以及各自最常见的假阳性来源。",
+      "date": "2026-09-12",
+      "tags": [
+        "IP",
+        "CoIP",
+        "ChIP",
+        "互作"
+      ],
+      "path": "029-ip-coip.html"
+    },
+    {
+      "id": "007-color-palettes",
+      "title": "配色三件套：ColorBrewer / colorspace / Coolors",
+      "summary": "离散与连续怎么挑色板、色盲安全怎么保证、临时配色去哪里找现成的。",
+      "date": "2026-01-18",
+      "tags": [
+        "配色",
+        "色盲安全",
+        "ColorBrewer"
+      ],
+      "path": "007-color-palettes.html"
+    },
+    {
+      "id": "038-chart-selection",
+      "title": "先选对图，再谈画法：决策树与导航站",
+      "summary": "From Data to Viz 按数据形状定图型，plottie 按图型找模板：选图困难症的两条出路。",
+      "date": "2026-10-26",
+      "tags": [
+        "选图",
+        "data-to-viz",
+        "plottie",
+        "决策树"
+      ],
+      "path": "038-chart-selection.html"
+    },
+    {
+      "id": "027-grafify",
+      "title": "grafify online：绘图 + 统计一体",
+      "summary": "选图、跑统计检验、标显著性一次做完，适合不想写 R 的人。",
+      "date": "2026-08-30",
+      "tags": [
+        "grafify",
+        "统计检验",
+        "绘图"
+      ],
+      "path": "027-grafify.html"
     },
     {
       "id": "033-circular-tree",
@@ -178,57 +330,6 @@
       "path": "033-circular-tree.html"
     },
     {
-      "id": "029-ip-coip",
-      "title": "互作实验五兄弟：IP / CoIP / ChIP / pull-down / BiFC",
-      "summary": "五种互作验证实验的适用边界，以及各自最常见的假阳性来源。",
-      "date": "2026-09-12",
-      "tags": [
-        "IP",
-        "CoIP",
-        "ChIP",
-        "互作"
-      ],
-      "path": "029-ip-coip.html"
-    },
-    {
-      "id": "027-grafify",
-      "title": "grafify online：绘图 + 统计一体",
-      "summary": "选图、跑统计检验、标显著性一次做完，适合不想写 R 的人。",
-      "date": "2026-08-30",
-      "tags": [
-        "grafify",
-        "统计检验",
-        "绘图"
-      ],
-      "path": "027-grafify.html"
-    },
-    {
-      "id": "026-de-enrichment-wgcna",
-      "title": "转录组故事线：差异 · 富集 · WGCNA",
-      "summary": "三块分析怎么串成一条能讲的故事线，而不是三张互不相干的图。",
-      "date": "2026-08-22",
-      "tags": [
-        "转录组",
-        "差异分析",
-        "富集",
-        "WGCNA"
-      ],
-      "path": "026-de-enrichment-wgcna.html"
-    },
-    {
-      "id": "025-enrichment-taxonomy",
-      "title": "富集分析完整十法",
-      "summary": "ORA / GSEA / ssGSEA / GSVA … 十种方法的适用前提与选择路径。",
-      "date": "2026-08-16",
-      "tags": [
-        "富集",
-        "ORA",
-        "GSEA",
-        "方法学"
-      ],
-      "path": "025-enrichment-taxonomy.html"
-    },
-    {
       "id": "024-sequence-display",
       "title": "序列展示可视化工具全景",
       "summary": "十六张实拍对比：蛋白结构域、基因结构、多序列比对各该用哪个工具。",
@@ -242,143 +343,30 @@
       "path": "024-sequence-display.html"
     },
     {
-      "id": "022-p-value-vs-log2fc",
-      "title": "差异分析：p 值 vs log2FC",
-      "summary": "统计显著不等于生物学重要；双重阈值怎么定，火山图四个角分别是什么。",
-      "date": "2026-07-17",
+      "id": "039-rust-open-source-suite",
+      "title": "Rust 开源生产力三件套：VectorCraft · WordCraft · PhotoCraft",
+      "summary": "三款 Rust 重写的开源「Adobe 平替」实测：共同的架构底色、各自的真实边界，以及该不该现在换过去的选型建议。",
+      "date": "2026-10-26",
       "tags": [
-        "p值",
-        "log2FC",
-        "差异分析",
-        "火山图"
+        "Rust",
+        "开源",
+        "MCP",
+        "工具评测"
       ],
-      "path": "022-p-value-vs-log2fc.html"
+      "path": "039-rust-open-source-suite.html"
     },
     {
-      "id": "020-gene-id-intro",
-      "title": "基因 ID，你真的分清了吗",
-      "summary": "Ensembl / Entrez / Symbol / RefSeq 互转时的坑：版本号、别名、大小写。",
-      "date": "2026-07-11",
+      "id": "040-install-svz-zip",
+      "title": "装一次，之后只管加购：SciViz 的安装与更新",
+      "summary": "拿到 zip 和 svz 不知道该先点哪个？这篇只讲一件事——第一次怎么装、以后怎么加装和更新，每一步都配实拍图。",
+      "date": "2026-10-29",
       "tags": [
-        "基因ID",
-        "Ensembl",
-        "Entrez",
-        "ID转换"
+        "安装",
+        "更新",
+        "svz",
+        "zip"
       ],
-      "path": "020-gene-id-intro.html"
-    },
-    {
-      "id": "019-common-databases",
-      "title": "生信常用数据库全景",
-      "summary": "从通用（NCBI / Ensembl / UniProt）到特异（GEO / TCGA / 单细胞）一张图定位。",
-      "date": "2026-07-04",
-      "tags": [
-        "数据库",
-        "NCBI",
-        "Ensembl",
-        "GEO"
-      ],
-      "path": "019-common-databases.html"
-    },
-    {
-      "id": "018-wgcna-advanced",
-      "title": "WGCNA 进阶：模块-性状热图怎么读",
-      "summary": "从聚类树到模块-性状相关性：颜色块、相关系数、p 值三者怎么一起看。",
-      "date": "2026-06-27",
-      "tags": [
-        "WGCNA",
-        "模块",
-        "性状",
-        "聚类树"
-      ],
-      "path": "018-wgcna-advanced.html"
-    },
-    {
-      "id": "016-split-enrichment-update",
-      "title": "方向性富集（更新版）：通路瘦身策略",
-      "summary": "上一期的补充：阈值怎么定，通路太胖时先砍哪一层。",
-      "date": "2026-06-14",
-      "tags": [
-        "富集",
-        "上下调",
-        "通路瘦身"
-      ],
-      "path": "016-split-enrichment-update.html"
-    },
-    {
-      "id": "015-rnaseq-quantification-update",
-      "title": "RNA-seq 定量指南（更新版）",
-      "summary": "Count → RPKM → FPKM → TPM 的换算链条更新，以及最常见的几种错误换算。",
-      "date": "2026-06-06",
-      "tags": [
-        "RNA-seq",
-        "定量",
-        "更新"
-      ],
-      "path": "015-rnaseq-quantification-update.html"
-    },
-    {
-      "id": "014-log2fc",
-      "title": "Log2 Fold Change 到底怎么算",
-      "summary": "从原始 counts 到 log2FC：加不加伪计数、要不要标准化、符号怎么解释。",
-      "date": "2026-05-31",
-      "tags": [
-        "log2FC",
-        "差异分析",
-        "标准化"
-      ],
-      "path": "014-log2fc.html"
-    },
-    {
-      "id": "012-data-to-viz",
-      "title": "Data to Viz：先选对图，再谈画法",
-      "summary": "按数据结构倒推图型的决策树，R / Python / D3 三条实现路径都给了。",
-      "date": "2026-04-13",
-      "tags": [
-        "选图",
-        "决策树",
-        "R",
-        "Python"
-      ],
-      "path": "012-data-to-viz.html"
-    },
-    {
-      "id": "011-naming-rules",
-      "title": "基因 · 蛋白命名权威指南",
-      "summary": "人 / 小鼠 / 模式生物五页规范：大小写、斜体、别名与旧名，投稿前逐条对。",
-      "date": "2026-04-06",
-      "tags": [
-        "命名规范",
-        "基因",
-        "蛋白",
-        "投稿"
-      ],
-      "path": "011-naming-rules.html"
-    },
-    {
-      "id": "010-ora-gsea-combined",
-      "title": "ORA + GSEA 联合富集策略",
-      "summary": "超几何检验回答「有没有」，GSEA 回答「趋势在不在」，两套结果怎么合起来读。",
-      "date": "2026-03-31",
-      "tags": [
-        "ORA",
-        "GSEA",
-        "富集",
-        "联合分析"
-      ],
-      "path": "010-ora-gsea-combined.html"
-    },
-    {
-      "id": "007-color-palettes",
-      "title": "配色三件套：ColorBrewer / colorspace / Coolors",
-      "summary": "离散与连续怎么挑色板、色盲安全怎么保证、临时配色去哪里找现成的。",
-      "date": "2026-01-18",
-      "tags": [
-        "配色",
-        "色盲安全",
-        "ColorBrewer"
-      ],
-      "path": "007-color-palettes.html"
+      "path": "040-install-svz-zip.html"
     }
   ]
 }

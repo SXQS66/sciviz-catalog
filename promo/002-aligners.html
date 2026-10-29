@@ -6,33 +6,72 @@
 <meta name="sciviz-promo" content="no=2;date=2025-12-12;id=002-aligners">
 <title>No.002 · 比对软件三强：STAR · HISAT2 · Bowtie2 怎么选</title>
 <style>
+/* ============================================================
+ * SciViz Kit —— 推文正文皮肤（assets/css/promo-article.css）
+ *
+ * 这不是一份运行时加载的样式表：推文正文是**单文件自包含 HTML**（正文经
+ * 沙箱 iframe 以 srcdoc 渲染，必须独立可渲染，见 No.000 §1），所以它的
+ * <style> 只能是内嵌的。
+ *
+ * 这份文件的角色是**那 27 份内嵌样式的唯一来源**：
+ *   node scripts/syncPromoSkin.js          # 写入全部正文（含 No.000 规范页）
+ *   node scripts/syncPromoSkin.js --check  # 只比对，不一致就 exit 1
+ * tests/promo.integrity.test.js 第 13 项逐字比对「正文 style == 本文件」，
+ * 任何一篇单独改样式都会被测试拦下。
+ *
+ * 为什么不各篇自己写：历史上已经漂成两版（6110B / 6305B，差的正是链接
+ * 样式，于是 20 篇里 <a> 是浏览器默认的深蓝下划线，7 篇是品牌色）——
+ * 与 §5.9 五类着色、§6.12.1 对齐按钮组同一个教训：同一份规格只要有多份
+ * 副本，就一定会漏。
+ *
+ * 与 kit 的关系（RULES §2.6.1g）：
+ *   · 圆角只用 style.css 的 6 档阶梯（--r-xs/sm/md/lg/xl/pill），
+ *     早期正文里的 10px / 4px / 2px 都是阶梯外的裸 px，已全部归位；
+ *   · 品牌色取 promo.css 的交互蓝 #4f73c9（= style.css --accent），
+ *     渐变端点取 style.css --primary #845EC2：从推文列表点进正文时，
+ *     链接色、标题装饰条、表头底色不会换一套色系；
+ *   · 正文是一张卡片（--r-lg + 柔阴影），与 Hub 的 .hub-shell 同一语言。
+ * ============================================================ */
+
 :root{
-  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
-  --line:#e7ecf4;--line2:#f1f4fa;
-  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+  /* ---- 圆角：与 style.css §1 同一套阶梯，正文里不写阶梯外的 px ---- */
+  --r-xs:6px;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-pill:999px;
+
+  /* ---- 墨色与线：取 promo.css 的中性色，列表页与正文同一套灰阶 ---- */
+  --ink:#1f2b3d;--ink2:#3d4c66;--muted:#6b7c99;
+  --line:#e6ebf2;--line2:#f1f4f8;
+
+  /* ---- 品牌色：交互蓝（style.css --accent）+ 品牌紫（style.css --primary） ---- */
+  --brand:#4568bd;--brand2:#845EC2;--tint:#eef2ff;
 }
 *{box-sizing:border-box}
-body{margin:0;background:#f6f8fc;color:var(--ink);
+body{margin:0;background:#f2f5fa;color:var(--ink);
   font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
        "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
-  font-kerning:normal}
-.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
-  box-shadow:0 0 0 1px var(--line)}
+  font-kerning:normal;padding:24px 16px 32px}
+/* 正文 = 一张白卡：与 Hub 的 .hub-shell 同一语言（--r-lg + 柔阴影 + 1px 描边）。
+   早期是 min-height:100vh 的满屏白条：圆角看不见、左右留白等于 0，
+   在 46px 深色查看器条下面像一张纸直接铺到屏幕边缘。 */
+.post{max-width:768px;margin:0 auto;background:#fff;border-radius:var(--r-lg);
+  box-shadow:0 10px 30px rgba(31,43,61,.07),0 0 0 1px var(--line);
+  overflow:hidden}
 
 /* ---- 标题区 ---- */
-.hero{padding:40px 30px 28px;
+.hero{padding:40px 30px 24px;
   background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
 .kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
   font-size:12px;color:var(--muted);letter-spacing:.02em}
-.no{display:inline-block;padding:2px 10px;border-radius:999px;
+.no{display:inline-block;padding:2px 10px;border-radius:var(--r-pill);
   background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
 .dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
 .hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
   letter-spacing:-.01em}
+/* 导语：左侧竖线与 h2 装饰条同一色系（品牌紫）。早期写的是 var(--tint)，
+   而 hero 渐变起点就是 --tint —— 等于白线描白底，截图里几乎看不见。 */
 .lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
-  border-left:3px solid var(--tint)}
+  border-left:3px solid var(--brand2)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
-.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+.chip{padding:2px 10px;border-radius:var(--r-pill);background:var(--line2);
   color:var(--ink2);font-size:12px}
 
 /* ---- 正文 ---- */
@@ -40,13 +79,18 @@ body{margin:0;background:#f6f8fc;color:var(--ink);
 section{padding-top:6px}
 h2{position:relative;margin:34px 0 12px;padding-left:14px;
   font-size:1.16rem;line-height:1.5}
+/* 首个 h2 紧接 hero：34px 上边距叠在 hero 的下内边距上，看起来像断层 ——
+   首节收到 14px，节间节奏保持 34px */
+.body > h2:first-child,
+.body > section:first-child > h2:first-child{margin-top:14px}
+/* 装饰条 4px 宽 → 用 pill 取圆角（等价于半宽 2px，且不留裸 px） */
 h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
-  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+  border-radius:var(--r-pill);background:linear-gradient(180deg,var(--brand),var(--brand2))}
 h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
-h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:var(--r-pill);
   background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
 h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
-h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:var(--r-pill);
   background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
 p{margin:0 0 15px;color:var(--ink2)}
 ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
@@ -57,31 +101,49 @@ em{font-style:normal;color:var(--ink);
   background:linear-gradient(transparent 62%,var(--tint) 62%)}
 sup{font-size:.72em;color:var(--muted)}
 
+/* ---- 外链：正文里的网址一律是链接（No.000 §9），形态与 promo.css 的
+   .promo-link 一致：品牌色 + 淡下划线，悬停加深，长 URL 允许折行 ---- */
+.body a{color:var(--brand);text-decoration:none;border-bottom:1px solid var(--line);
+  word-break:break-all}
+.body a:hover{color:var(--brand2);border-bottom-color:var(--brand2)}
+.body a:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
 /* ---- 配图 ---- */
 figure{margin:22px 0 24px}
 figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
-  border-radius:10px;background:#fff}
+  border-radius:var(--r-md);background:#fff}
 figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
   text-align:center}
 
 /* ---- 表格 ---- */
 .table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
-  border-radius:10px;-webkit-overflow-scrolling:touch}
+  border-radius:var(--r-md);-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
   color:var(--ink2);background:#fff}
 thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
   padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
 td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+/* 首列多是「口径 / 闸门 / 步骤」这类短标签，被 content 更宽的列挤成
+   「背景基因 / 集」很难看 —— 让它们不折行（表宽不够时由 .table-wrap 横向滚动） */
+td:first-child{white-space:nowrap}
 tbody tr:last-child td{border-bottom:0}
 tbody tr:nth-child(even){background:#fafbff}
 td code{white-space:nowrap}
 
+
+/* 键值对照表（No.019 那七张「数据库 / 用途 / 网址」）：首列收窄、末列给足
+   网址宽度。这些宽度原先写成 <th style="width:22%"> 散在正文里，七处各改一遍，
+   所以收回皮肤：正文只留 class，改宽度改这一处。 */
+.table-wrap table.table-kv{table-layout:fixed}
+.table-kv th:first-child,.table-kv td:first-child{width:24%}
+.table-kv th:last-child,.table-kv td:last-child{width:30%}
+.table-kv td:last-child{word-break:break-all}
 /* ---- 行内代码与代码块 ---- */
 code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
-  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:var(--r-xs);
   padding:.1em .4em;color:#9d3b5d;word-break:break-word}
 pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
-  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  border-radius:var(--r-md);overflow-x:auto;font-size:13px;line-height:1.75;
   font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
   -webkit-overflow-scrolling:touch}
 pre code{display:block;background:none;border:0;padding:0;color:inherit;
@@ -92,10 +154,10 @@ pre .s{color:#9ad1a4}
 
 /* ---- 引言与提示框 ---- */
 blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
-  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+  background:var(--tint);border-radius:0 var(--r-md) var(--r-md) 0;color:var(--ink)}
 blockquote p{margin:0 0 6px;color:var(--ink)}
 blockquote p:last-child{margin:0}
-.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:var(--r-md);font-size:.92rem;
   line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
 .note p{margin:0 0 6px}
 .note p:last-child{margin:0}
@@ -104,9 +166,17 @@ blockquote p:last-child{margin:0}
 .note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
 .note-tip strong,.note-tip b{color:#2e5e41}
 
-/* ---- 参考文献 ---- */
+/* ---- 参考文献 ----
+   规范（No.000 §9）要求「h3.refs-title + ol.refs」成对出现。早期只有 9 篇
+   带标题，另 18 篇直接从列表开始 —— 而「虚线分隔 + 18px 上边距」又挂在列表
+   自己身上，于是没有标题时这段留白无处安放。这里把分隔线交给标题，并用
+   相邻选择器让「已有标题」的列表不再重复画线：两种形态都成立。 */
+.refs-title{margin:34px 0 0;padding-top:18px;border-top:1px dashed var(--line);
+  font-size:.94rem;color:var(--ink)}
+.refs-title::before{background:var(--brand2)}
 .refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
   list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs-title + .refs{margin-top:10px;padding-top:0;border-top:0}
 .refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
   line-height:1.7}
 .refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
@@ -122,7 +192,9 @@ hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
   font-size:12px;color:var(--muted)}
 
 @media (max-width:640px){
-  body{font-size:16.5px}
+  body{font-size:16.5px;padding:0}
+  /* 窄屏铺满：卡片圆角与左右留白只会吃掉本就紧张的行宽 */
+  .post{border-radius:0;box-shadow:0 0 0 1px var(--line)}
   .hero{padding:28px 18px 22px}
   .hero h1{font-size:1.46rem}
   .body{padding:6px 18px 32px}
@@ -131,7 +203,7 @@ hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
 
 /* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
 .ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
-  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:var(--r-xs);
   font-size:12px;line-height:1.7;pointer-events:none!important;
   opacity:0;visibility:hidden;transition:opacity .12s ease;
   white-space:normal;word-break:break-word}
@@ -150,19 +222,19 @@ sup.ref-cite{cursor:help;padding:0 1px}
       <span>SciViz Kit · 推文与教程</span>
     </div>
     <h1>比对软件三强：STAR · HISAT2 · Bowtie2 怎么选</h1>
-    <p class="lede">后缀数组还是 FM 索引？为什么 Bowtie2 不能拿来跑常规 RNA-seq？三款比对器的原理、命令与选型对照。</p>
+    <p class="lede">后缀数组还是 FM 索引？为什么 Bowtie2 不能拿来跑常规 RNA-seq？三款比对软件的原理、命令与选型对照。</p>
     <div class="chips"><span class="chip">STAR</span><span class="chip">HISAT2</span><span class="chip">Bowtie2</span><span class="chip">比对</span><span class="chip">RNA-seq</span></div>
   </header>
 
   <div class="body">
   <section>
     <h2>为什么会有「能不能比对 RNA-seq」的区别</h2>
-    <p>比对器的核心任务一样：把一段几十到几百 bp 的 read 放回参考基因组的正确位置。区别出在<strong>剪接比对（spliced alignment）</strong>：mRNA 成熟时内含子被剪掉，RNA-seq 的 read 跨越剪接点后，在基因组上会被切成两段、中间隔着几万 bp——比对器必须主动允许「大缺口、且缺口边界符合 GT-AG 规则」的比对方式。能否处理这种缺口，直接把常用软件分成两派：</p>
+    <p>比对软件的核心任务一样：把一段几十到几百 bp 的 read 放回参考基因组的正确位置。区别出在<strong>剪接比对（spliced alignment）</strong>：mRNA 成熟时内含子被剪掉，RNA-seq 的 read 跨越剪接点后，在基因组上会被切成两段、中间隔着几万到几十万 bp——比对软件必须主动允许「大缺口、且缺口边界符合 GT-AG 规则」的比对方式。能否处理这种缺口，直接把常用软件分成两派：</p>
     <div class="table-wrap">
       <table>
         <thead><tr><th>软件</th><th>索引原理</th><th>剪接比对</th><th>人类基因组内存</th><th>典型用途</th></tr></thead>
         <tbody>
-          <tr><td><strong>STAR</strong></td><td>非压缩后缀数组（MPRF）</td><td>✅ 原生</td><td>约 30 GB</td><td>常规 RNA-seq 首选，新剪接点发现</td></tr>
+          <tr><td><strong>STAR</strong></td><td>非压缩后缀数组（SA）</td><td>✅ 原生</td><td>约 30 GB</td><td>常规 RNA-seq 首选，新剪接点发现</td></tr>
           <tr><td><strong>HISAT2</strong></td><td>层次化 FM 索引（图基因组）</td><td>✅ 原生</td><td>约 8 GB</td><td>低内存环境、大样本量 RNA-seq</td></tr>
           <tr><td><strong>Bowtie2</strong></td><td>FM 索引（BWT）</td><td>❌ 不支持</td><td>约 4 GB</td><td>小 RNA-seq、ChIP-seq、DNA 重测序</td></tr>
           <tr><td>BWA-MEM<sup>4</sup></td><td>FM 索引（BWT）</td><td>❌（不适合）</td><td>约 15 GB</td><td>DNA-seq 事实标准，WGS/WES 比对</td></tr>
@@ -174,7 +246,7 @@ sup.ref-cite{cursor:help;padding:0 1px}
 
   <section>
     <h2>STAR：速度换内存的「全能型」</h2>
-    <p>STAR<sup>1</sup>用非压缩后缀数组做种子定位，搜索 unparalleled 的速度与高唯一比对率（人类样本常见 75–90%），且能<strong>发现未知剪接点</strong>——这也是它成为 ENCODE 官方流水线比对器的原因。代价是建索引与比对都需要大内存（人类基因组约 30 GB），建议在 64 GB 内存机器或 HPC 上运行。完整命令在 No.001 已给过，这里补一个进阶选项：</p>
+    <p>STAR<sup>1</sup>用非压缩后缀数组（uncompressed suffix array）做种子定位，以「最大可映射前缀（MMP）」逐段扩展，换来极快的搜索速度与高唯一比对率（人类样本常见 75–90%），且能<strong>发现未知剪接点</strong>——这也是它成为 ENCODE 官方流水线比对软件的原因。代价是建索引与比对都需要大内存（人类基因组约 30 GB），建议在 64 GB 内存机器或 HPC 上运行。完整命令在 No.001 已给过，这里补一个进阶选项：</p>
     <pre><code><span class="c"># 常规比对（详见 No.001）</span>
 STAR --runThreadN 12 --genomeDir star_index \
   --readFilesIn clean/SRR_1.fq.gz clean/SRR_2.fq.gz \
@@ -197,7 +269,7 @@ STAR --twopassMode Basic --runThreadN 12 --genomeDir star_index \
     <h2>HISAT2：内存友好、图索引的「轻骑兵」</h2>
     <p>HISAT2<sup>2</sup>用一组「全局 FM 索引 + 大量局部小索引」的层次化设计，把人类基因组索引内存压到 8 GB 左右，普通工作站就能跑；其图基因组设计还能区分常见 SNP 位点，减少个人参考序列造成的错配。比对的 read 会被送到 StringTie 等组装器时，记得加 <code>--dta</code>：</p>
     <pre><code><span class="c"># 建索引：把 GTF 里的剪接点/外显子喂给 hisat2-build</span>
-extract_splice_sites.py gencode.vM36.annotation.gtf   # 随 HISAT2 附带的脚本 &gt; ss.txt
+extract_splice_sites.py gencode.vM36.annotation.gtf &gt; ss.txt   <span class="c"># 脚本随 HISAT2 一并安装</span>
 extract_exons.py gencode.vM36.annotation.gtf &gt; exon.txt
 hisat2-build -p 12 --ss ss.txt --exon exon.txt Genome.fa hisat2_index/genome
 
@@ -210,7 +282,7 @@ hisat2 -p 12 -x hisat2_index/genome \
 <span class="c"># 输出是 SAM，转 BAM 并排序索引</span>
 samtools sort -@ 8 -o SRR.bam SRR.sam
 samtools index SRR.bam</code></pre>
-    <div class="note note-tip"><p><strong>省事路线：</strong>HISAT2 官网（<a href="https://daehwankimlab.github.io/hisat2/" target="_blank" rel="noopener">daehwankimlab.github.io/hisat2</a>）提供人类等常用物种的<em>预建索引</em>直接下载，跳过建索引步骤；预建索引与自建索引要锁定同一版本，别混用。其 <code>lib_format_counts.json</code> 式的链型自检没有 Salmon 直接，判断链型仍建议看 STAR 列或 RSeQC。</p></div>
+    <div class="note note-tip"><p><strong>省事路线：</strong>HISAT2 官网（<a href="https://daehwankimlab.github.io/hisat2/" target="_blank" rel="noopener">daehwankimlab.github.io/hisat2</a>）提供人类等常用物种的<em>预建索引</em>直接下载，跳过建索引步骤；预建索引与自建索引要锁定同一版本，别混用。HISAT2 自身不输出链型自检报告（那是 Salmon 的 <code>aux_info/lib_format_counts.json</code>），判断链型仍建议看 STAR 的 ReadsPerGene 列或 RSeQC。</p></div>
   </section>
 
   <section>
@@ -245,11 +317,11 @@ bowtie2 --very-sensitive -p 12 -x bt2_index/genome \
       </table>
     </div>
     <p>无论选谁，下游都一样：<code>samtools index<sup>5</sup></code> 建 BAM 索引 → <code>featureCounts</code> 定量 → Count 矩阵交给 DESeq2（整套命令见 No.001）。链特异性参数对照也列在上表——<em>TruSeq 反向链数据对应 STAR 第 4 列 / HISAT2 RF / featureCounts <code>-s 2</code></em>。</p>
-    <div class="note note-warn"><p><strong>一项目一软件：</strong>不同比对器的 counts 结果存在系统性差异，同一项目的所有样本必须用同一软件、同一索引版本、同一参数跑完。换软件 = 重跑全部分析，并在方法学里写明版本。</p></div>
+    <div class="note note-warn"><p><strong>一项目一软件：</strong>不同比对软件的 counts 结果存在系统性差异，同一项目的所有样本必须用同一软件、同一索引版本、同一参数跑完。换软件 = 重跑全部分析，并在方法学里写明版本。</p></div>
   </section>
 
   <section>
-    <h2>延伸阅读与参考文献</h2>
+    <h3 class="refs-title">延伸阅读与参考文献</h3>
     <ol class="refs">
       <li>Dobin A, Davis CA, Schlesinger F, et al. STAR: ultrafast universal RNA-seq aligner. <em>Bioinformatics</em>. 2013;29(1):15–21. doi:10.1093/bioinformatics/bts635</li>
       <li>Kim D, Paggi JM, Park C, Bennett C, Salzberg SL. Graph-based genome alignment and genotyping with HISAT2 and HISAT-genotype. <em>Nature Biotechnology</em>. 2019;37(8):907–915. doi:10.1038/s41587-019-0201-4</li>

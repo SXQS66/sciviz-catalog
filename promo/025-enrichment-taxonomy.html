@@ -6,33 +6,72 @@
 <meta name="sciviz-promo" content="no=25;date=2026-08-16;id=025-enrichment-taxonomy">
 <title>No.025 · 富集分析完整十法</title>
 <style>
+/* ============================================================
+ * SciViz Kit —— 推文正文皮肤（assets/css/promo-article.css）
+ *
+ * 这不是一份运行时加载的样式表：推文正文是**单文件自包含 HTML**（正文经
+ * 沙箱 iframe 以 srcdoc 渲染，必须独立可渲染，见 No.000 §1），所以它的
+ * <style> 只能是内嵌的。
+ *
+ * 这份文件的角色是**那 27 份内嵌样式的唯一来源**：
+ *   node scripts/syncPromoSkin.js          # 写入全部正文（含 No.000 规范页）
+ *   node scripts/syncPromoSkin.js --check  # 只比对，不一致就 exit 1
+ * tests/promo.integrity.test.js 第 13 项逐字比对「正文 style == 本文件」，
+ * 任何一篇单独改样式都会被测试拦下。
+ *
+ * 为什么不各篇自己写：历史上已经漂成两版（6110B / 6305B，差的正是链接
+ * 样式，于是 20 篇里 <a> 是浏览器默认的深蓝下划线，7 篇是品牌色）——
+ * 与 §5.9 五类着色、§6.12.1 对齐按钮组同一个教训：同一份规格只要有多份
+ * 副本，就一定会漏。
+ *
+ * 与 kit 的关系（RULES §2.6.1g）：
+ *   · 圆角只用 style.css 的 6 档阶梯（--r-xs/sm/md/lg/xl/pill），
+ *     早期正文里的 10px / 4px / 2px 都是阶梯外的裸 px，已全部归位；
+ *   · 品牌色取 promo.css 的交互蓝 #4f73c9（= style.css --accent），
+ *     渐变端点取 style.css --primary #845EC2：从推文列表点进正文时，
+ *     链接色、标题装饰条、表头底色不会换一套色系；
+ *   · 正文是一张卡片（--r-lg + 柔阴影），与 Hub 的 .hub-shell 同一语言。
+ * ============================================================ */
+
 :root{
-  --ink:#16202f;--ink2:#3d4c66;--muted:#6b7a94;
-  --line:#e7ecf4;--line2:#f1f4fa;
-  --brand:#5a6fe0;--brand2:#8a5ae0;--tint:#eef1ff;
+  /* ---- 圆角：与 style.css §1 同一套阶梯，正文里不写阶梯外的 px ---- */
+  --r-xs:6px;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-pill:999px;
+
+  /* ---- 墨色与线：取 promo.css 的中性色，列表页与正文同一套灰阶 ---- */
+  --ink:#1f2b3d;--ink2:#3d4c66;--muted:#6b7c99;
+  --line:#e6ebf2;--line2:#f1f4f8;
+
+  /* ---- 品牌色：交互蓝（style.css --accent）+ 品牌紫（style.css --primary） ---- */
+  --brand:#4568bd;--brand2:#845EC2;--tint:#eef2ff;
 }
 *{box-sizing:border-box}
-body{margin:0;background:#f6f8fc;color:var(--ink);
+body{margin:0;background:#f2f5fa;color:var(--ink);
   font:17px/1.9 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
        "Microsoft YaHei",system-ui,sans-serif;-webkit-text-size-adjust:100%;
-  font-kerning:normal}
-.post{max-width:768px;margin:0 auto;background:#fff;min-height:100vh;
-  box-shadow:0 0 0 1px var(--line)}
+  font-kerning:normal;padding:24px 16px 32px}
+/* 正文 = 一张白卡：与 Hub 的 .hub-shell 同一语言（--r-lg + 柔阴影 + 1px 描边）。
+   早期是 min-height:100vh 的满屏白条：圆角看不见、左右留白等于 0，
+   在 46px 深色查看器条下面像一张纸直接铺到屏幕边缘。 */
+.post{max-width:768px;margin:0 auto;background:#fff;border-radius:var(--r-lg);
+  box-shadow:0 10px 30px rgba(31,43,61,.07),0 0 0 1px var(--line);
+  overflow:hidden}
 
 /* ---- 标题区 ---- */
-.hero{padding:40px 30px 28px;
+.hero{padding:40px 30px 24px;
   background:linear-gradient(165deg,var(--tint) 0%,#fff 70%)}
 .kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
   font-size:12px;color:var(--muted);letter-spacing:.02em}
-.no{display:inline-block;padding:2px 10px;border-radius:999px;
+.no{display:inline-block;padding:2px 10px;border-radius:var(--r-pill);
   background:var(--brand);color:#fff;font-weight:700;letter-spacing:.06em}
 .dot{width:3px;height:3px;border-radius:50%;background:#c3cddf}
 .hero h1{margin:16px 0 12px;font-size:1.78rem;line-height:1.4;
   letter-spacing:-.01em}
+/* 导语：左侧竖线与 h2 装饰条同一色系（品牌紫）。早期写的是 var(--tint)，
+   而 hero 渐变起点就是 --tint —— 等于白线描白底，截图里几乎看不见。 */
 .lede{margin:0;color:var(--ink2);font-size:.98rem;padding-left:13px;
-  border-left:3px solid var(--tint)}
+  border-left:3px solid var(--brand2)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
-.chip{padding:2px 10px;border-radius:999px;background:var(--line2);
+.chip{padding:2px 10px;border-radius:var(--r-pill);background:var(--line2);
   color:var(--ink2);font-size:12px}
 
 /* ---- 正文 ---- */
@@ -40,13 +79,18 @@ body{margin:0;background:#f6f8fc;color:var(--ink);
 section{padding-top:6px}
 h2{position:relative;margin:34px 0 12px;padding-left:14px;
   font-size:1.16rem;line-height:1.5}
+/* 首个 h2 紧接 hero：34px 上边距叠在 hero 的下内边距上，看起来像断层 ——
+   首节收到 14px，节间节奏保持 34px */
+.body > h2:first-child,
+.body > section:first-child > h2:first-child{margin-top:14px}
+/* 装饰条 4px 宽 → 用 pill 取圆角（等价于半宽 2px，且不留裸 px） */
 h2::before{content:"";position:absolute;left:0;top:.45em;bottom:.45em;width:4px;
-  border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+  border-radius:var(--r-pill);background:linear-gradient(180deg,var(--brand),var(--brand2))}
 h3{margin:24px 0 9px;font-size:1.01rem;line-height:1.6;color:var(--ink)}
-h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;
+h3::before{content:"";display:inline-block;width:6px;height:6px;border-radius:var(--r-pill);
   background:var(--brand);margin-right:9px;vertical-align:2px;opacity:.75}
 h4{margin:20px 0 8px;font-size:.94rem;line-height:1.6;color:var(--ink)}
-h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:1px;
+h4::before{content:"";display:inline-block;width:5px;height:5px;border-radius:var(--r-pill);
   background:var(--brand2);margin-right:8px;vertical-align:2.5px;opacity:.6}
 p{margin:0 0 15px;color:var(--ink2)}
 ul{margin:0 0 15px;padding-left:22px;color:var(--ink2)}
@@ -57,31 +101,49 @@ em{font-style:normal;color:var(--ink);
   background:linear-gradient(transparent 62%,var(--tint) 62%)}
 sup{font-size:.72em;color:var(--muted)}
 
+/* ---- 外链：正文里的网址一律是链接（No.000 §9），形态与 promo.css 的
+   .promo-link 一致：品牌色 + 淡下划线，悬停加深，长 URL 允许折行 ---- */
+.body a{color:var(--brand);text-decoration:none;border-bottom:1px solid var(--line);
+  word-break:break-all}
+.body a:hover{color:var(--brand2);border-bottom-color:var(--brand2)}
+.body a:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
 /* ---- 配图 ---- */
 figure{margin:22px 0 24px}
 figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
-  border-radius:10px;background:#fff}
+  border-radius:var(--r-md);background:#fff}
 figcaption{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);
   text-align:center}
 
 /* ---- 表格 ---- */
 .table-wrap{overflow-x:auto;margin:18px 0 20px;border:1px solid var(--line);
-  border-radius:10px;-webkit-overflow-scrolling:touch}
+  border-radius:var(--r-md);-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.65;
   color:var(--ink2);background:#fff}
 thead th{background:var(--tint);color:var(--ink);font-weight:600;text-align:left;
   padding:9px 14px;border-bottom:2px solid var(--brand);white-space:nowrap}
 td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+/* 首列多是「口径 / 闸门 / 步骤」这类短标签，被 content 更宽的列挤成
+   「背景基因 / 集」很难看 —— 让它们不折行（表宽不够时由 .table-wrap 横向滚动） */
+td:first-child{white-space:nowrap}
 tbody tr:last-child td{border-bottom:0}
 tbody tr:nth-child(even){background:#fafbff}
 td code{white-space:nowrap}
 
+
+/* 键值对照表（No.019 那七张「数据库 / 用途 / 网址」）：首列收窄、末列给足
+   网址宽度。这些宽度原先写成 <th style="width:22%"> 散在正文里，七处各改一遍，
+   所以收回皮肤：正文只留 class，改宽度改这一处。 */
+.table-wrap table.table-kv{table-layout:fixed}
+.table-kv th:first-child,.table-kv td:first-child{width:24%}
+.table-kv th:last-child,.table-kv td:last-child{width:30%}
+.table-kv td:last-child{word-break:break-all}
 /* ---- 行内代码与代码块 ---- */
 code{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
-  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:4px;
+  font-size:.82em;background:var(--line2);border:1px solid var(--line);border-radius:var(--r-xs);
   padding:.1em .4em;color:#9d3b5d;word-break:break-word}
 pre{margin:18px 0 20px;padding:15px 18px;background:#141a2e;color:#d9e2f5;
-  border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.75;
+  border-radius:var(--r-md);overflow-x:auto;font-size:13px;line-height:1.75;
   font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
   -webkit-overflow-scrolling:touch}
 pre code{display:block;background:none;border:0;padding:0;color:inherit;
@@ -92,10 +154,10 @@ pre .s{color:#9ad1a4}
 
 /* ---- 引言与提示框 ---- */
 blockquote{margin:16px 0 18px;padding:12px 16px;border-left:4px solid var(--brand);
-  background:var(--tint);border-radius:0 10px 10px 0;color:var(--ink)}
+  background:var(--tint);border-radius:0 var(--r-md) var(--r-md) 0;color:var(--ink)}
 blockquote p{margin:0 0 6px;color:var(--ink)}
 blockquote p:last-child{margin:0}
-.note{margin:16px 0 18px;padding:12px 16px;border-radius:10px;font-size:.92rem;
+.note{margin:16px 0 18px;padding:12px 16px;border-radius:var(--r-md);font-size:.92rem;
   line-height:1.8;border:1px solid var(--line);background:#fafbff;color:var(--ink2)}
 .note p{margin:0 0 6px}
 .note p:last-child{margin:0}
@@ -104,9 +166,17 @@ blockquote p:last-child{margin:0}
 .note-tip{border-color:#cfe8d8;background:#f2faf5;color:#2e5e41}
 .note-tip strong,.note-tip b{color:#2e5e41}
 
-/* ---- 参考文献 ---- */
+/* ---- 参考文献 ----
+   规范（No.000 §9）要求「h3.refs-title + ol.refs」成对出现。早期只有 9 篇
+   带标题，另 18 篇直接从列表开始 —— 而「虚线分隔 + 18px 上边距」又挂在列表
+   自己身上，于是没有标题时这段留白无处安放。这里把分隔线交给标题，并用
+   相邻选择器让「已有标题」的列表不再重复画线：两种形态都成立。 */
+.refs-title{margin:34px 0 0;padding-top:18px;border-top:1px dashed var(--line);
+  font-size:.94rem;color:var(--ink)}
+.refs-title::before{background:var(--brand2)}
 .refs{margin:18px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);
   list-style:none;counter-reset:ref;font-size:.82rem;color:var(--muted)}
+.refs-title + .refs{margin-top:10px;padding-top:0;border-top:0}
 .refs li{counter-increment:ref;margin:0 0 9px;padding-left:30px;position:relative;
   line-height:1.7}
 .refs li::before{content:"["counter(ref)"]";position:absolute;left:0;top:0;
@@ -122,7 +192,9 @@ hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
   font-size:12px;color:var(--muted)}
 
 @media (max-width:640px){
-  body{font-size:16.5px}
+  body{font-size:16.5px;padding:0}
+  /* 窄屏铺满：卡片圆角与左右留白只会吃掉本就紧张的行宽 */
+  .post{border-radius:0;box-shadow:0 0 0 1px var(--line)}
   .hero{padding:28px 18px 22px}
   .hero h1{font-size:1.46rem}
   .body{padding:6px 18px 32px}
@@ -131,7 +203,7 @@ hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
 
 /* ---- 参考文献悬浮提示（样式源：index.html → assets/css/style.css 的 .tooltip：黑底白字/圆角6px/12px字号） ---- */
 .ref-tip{position:fixed;z-index:1000;max-width:380px;padding:8px 12px;
-  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:6px;
+  background:rgba(0,0,0,0.8);color:#ffffff;border-radius:var(--r-xs);
   font-size:12px;line-height:1.7;pointer-events:none!important;
   opacity:0;visibility:hidden;transition:opacity .12s ease;
   white-space:normal;word-break:break-word}
@@ -156,198 +228,95 @@ sup.ref-cite{cursor:help;padding:0 1px}
 
   <div class="body">
   <section>
-    <h2>富集分析的十种方法</h2>
-    <p>富集分析的本质，是把零散的分子变化翻译成可理解的生物学功能。按统计思路可分三大范式：<strong>ORA</strong>（过表征分析）、<strong>FCS</strong>（功能集打分，如 GSEA<sup>1</sup> / ssGSEA / GSVA<sup>2</sup>）、<strong>PT</strong>（通路拓扑分析，如 SPIA<sup>3</sup> / Clipper / DEGraph）。本文把十种常用方法放进同一张地图：每种方法回答什么问题、输入是什么、什么时候该换。</p>
+    <h2>三种范式：回答的问题不同</h2>
+    <p>富集分析的本质，是把零散的分子变化翻译成可理解的生物学功能。按统计思路分成三代：<strong>ORA</strong>（过表征分析）、<strong>FCS</strong>（功能集打分，如 GSEA<sup>1</sup> / ssGSEA / GSVA<sup>2</sup>）、<strong>PT</strong>（通路拓扑分析，如 SPIA<sup>3</sup> / NetGSA / Clipper / DEGraph）。三者不是替代关系：ORA 问「有没有」，FCS 问「有多少」，PT 问「在哪里」。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>范式</th><th>输入</th><th>统计思路</th><th>代表方法</th><th>局限</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ORA</strong><br>过表征分析</td><td>已按阈值筛过的差异基因列表</td><td>超几何 / Fisher 精确检验，比较命中比例与背景比例</td><td>GO、KEGG、Reactome</td><td>结论随阈值变化；忽略基因间关系与排序</td></tr>
+          <tr><td><strong>FCS</strong><br>功能集打分</td><td>全基因排序列表或表达矩阵</td><td>Kolmogorov–Smirnov 类统计量，看基因集是否整体偏移</td><td>GSEA、ssGSEA、GSVA</td><td>仍把通路当作无序基因集合</td></tr>
+          <tr><td><strong>PT</strong><br>通路拓扑分析</td><td>表达数据 + 通路拓扑结构</td><td>把基因在通路中的位置、上下游关系加权进统计量</td><td>SPIA、NetGSA、Clipper、DEGraph</td><td>依赖高质量通路注释，复现门槛高</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>选方法的顺序应该是「数据能提供什么输入 → 我想回答哪一层问题 → 需要多深的机制证据」，而不是「哪个方法更高级」。</p>
   </section>
+
   <section>
-    <h3>三大范式</h3>
-    <ul>
-      <li>ORA · 过表征分析</li>
-      <li>FCS · 功能集打分</li>
-      <li>PT · 通路拓扑分析</li>
-    </ul>
+    <h2>ORA 三剑客：GO / KEGG / Reactome</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>数据库</th><th>组织方式</th><th>强项</th><th>典型问法</th></tr></thead>
+        <tbody>
+          <tr><td><strong>GO</strong></td><td>三个正交维度：BP / CC / MF</td><td>覆盖面最广、条目最细，适合无偏扫描</td><td>这批基因和哪些生物学功能有关？</td></tr>
+          <tr><td><strong>KEGG</strong></td><td>手工绘制的通路地图</td><td>一张图看清上下游，读者友好</td><td>差异基因集中在哪些经典通路？</td></tr>
+          <tr><td><strong>Reactome</strong></td><td>以「反应」为单位、层级嵌套</td><td>粒度最细，可定位到具体反应步骤</td><td>变化发生在哪个反应环节？</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note note-tip"><p><strong>互补而非替代：</strong>KEGG 无显著通路时，常见原因是信号集中在某个细分反应、还没汇成「经典通路」——此时换 Reactome 往往能打开局面（数据库分工见 No.035）。</p></div>
   </section>
+
   <section>
-    <h3>十种方法</h3>
-    <ul>
-      <li>GO · KEGG · Reactome</li>
-      <li>GSEA · ssGSEA · GSVA</li>
-      <li>SPIA · NetGSA · Clipper · DEGraph</li>
-    </ul>
-    <p>选对方法 = 问对问题 · 十种工具对应十种分析场景</p>
-    <h2>富集分析的三大范式</h2>
-    <p>ORA · FCS · PT — 三代方法的演进</p>
-    <p>第一代 · ORA</p>
-    <p>过表征分析</p>
-    <ul>
-      <li>输入：差异基因列表</li>
-      <li>统计：超几何检验 / Fisher 精确检验</li>
-      <li>代表：GO、KEGG、Reactome</li>
-      <li>优点：直观、易解释</li>
-      <li>局限：依赖人为阈值、忽略基因间关系</li>
-    </ul>
-    <p>第二代 · FCS</p>
-    <p>功能集打分</p>
-    <ul>
-      <li>输入：全基因排序列表</li>
-      <li>统计：Kolmogorov-Smirnov 类统计量</li>
-      <li>代表：GSEA、ssGSEA、GSVA</li>
-      <li>优点：不设阈值、发现微弱协调信号</li>
-      <li>局限：仍忽略通路内部结构</li>
-    </ul>
-    <p>第三代 · PT</p>
-    <p>通路拓扑分析</p>
-    <ul>
-      <li>输入：差异表达 + 通路结构</li>
-      <li>统计：整合拓扑位置、相互作用</li>
-      <li>代表：SPIA、NetGSA、Clipper、DEGraph</li>
-      <li>优点：考虑基因在通路中的位置权重</li>
-      <li>局限：依赖高质量通路注释</li>
-    </ul>
-    <p>三者不是替代关系，而是层层递进 — 从“有没有”到“有多少”再到“在哪里”</p>
-    <p>ORA 三剑客 · GO / KEGG / Reactome</p>
-    <p>差异基因列表 → 功能/通路富集</p>
-    <p>GO</p>
-    <p>Gene Ontology</p>
-    <ul>
-      <li>三大维度：BP / CC / MF</li>
-      <li>覆盖面最广（~42.3% 人类基因注释）</li>
-      <li>适合回答：这批基因跟哪些生物学功能有关？</li>
-    </ul>
-    <p>KEGG</p>
-    <p>Kyoto Encyclopedia</p>
-    <ul>
-      <li>经典通路地图 · 直观</li>
-      <li>覆盖 ~12.4% 人类基因注释</li>
-      <li>适合回答：差异基因集中在哪些经典通路？</li>
-    </ul>
-    <p>Reactome</p>
-    <p>反应级通路数据库</p>
-    <ul>
-      <li>以“生物反应”为核心 · 层级结构</li>
-      <li>覆盖 ~26.3% 人类基因注释</li>
-      <li>适合回答：变化发生在哪个具体反应环节？</li>
-    </ul>
-    <p>核心洞察 GO 看功能全貌 · KEGG 看通路框架 · Reactome 看反应细节 — 三者互补</p>
-    <p>KEGG 无结果时，Reactome 往往是突破口 — 因为信号可能集中在某个具体反应步骤</p>
-    <p>FCS 三兄弟 · GSEA / ssGSEA / GSVA</p>
-    <p>全基因排序 → 基因集整体偏移</p>
-    <p>GSEA</p>
-    <p>基因集富集分析</p>
-    <ul>
-      <li>输入：全基因排序列表 + 分组</li>
-      <li>输出：NES（方向 + 强度）</li>
-      <li>适合回答：某基因集是否整体偏向变化谱一端？</li>
-    </ul>
-    <p>ssGSEA</p>
-    <p>单样本 GSEA</p>
-    <ul>
-      <li>输入：表达矩阵（无需分组）</li>
-      <li>输出：每个样本 × 每条通路的富集分数</li>
-      <li>适合回答：每个样本的通路活性高不高？</li>
-    </ul>
-    <p>GSVA</p>
-    <p>基因集变异分析</p>
-    <ul>
-      <li>输入：表达矩阵（跨样本核密度估计）</li>
-      <li>输出：通路活性矩阵（与 ssGSEA 目标相同）</li>
-      <li>适合回答：样本间通路活性是否存在系统差异？</li>
-    </ul>
-    <p>关键区别 GSEA 需要分组信息，ssGSEA/GSVA 不需要 — 后者适合无监督探索和个体化分析</p>
-    <p>GSEA = 组间比较 · ssGSEA/GSVA = 个体特征提取</p>
-    <p>PT 方法（上）· 位置与连接</p>
-    <p>SPIA 看“位置” · NetGSA 看“连接”</p>
-    <p>PT 方法共同点：在 ORA/FCS 基础上，额外整合通路拓扑结构（基因位置、边方向、网络关系）</p>
-    <p>SPIA</p>
-    <p>信号通路影响分析</p>
-    <ul>
-      <li>核心思想：整合差异倍数 + 拓扑位置</li>
-      <li>计算 PNDE（ORA 富集）和 PPERT（拓扑扰动）</li>
-      <li>适用场景：信号通路（有向边），想知道“上游 vs 下游”哪个环节受扰动</li>
-    </ul>
-    <p>NetGSA</p>
-    <p>基于网络的基因集分析</p>
-    <ul>
-      <li>核心思想：整合差异表达 + 网络边权重</li>
-      <li>不仅看基因是否差异，还看基因间的相互作用模式</li>
-      <li>适用场景：已知基因-基因网络（KEGG/Reactome），研究调控网络重编程</li>
-    </ul>
-    <p>SPIA 回答“在通路哪个位置” · NetGSA 回答“网络连接怎么变”</p>
-    <p>PT 方法（下）· 子结构与全网络</p>
-    <p>Clipper 找“子结构” · DEGraph 验“全网络”</p>
-    <p>Clipper</p>
-    <p>图分解通路分析</p>
-    <ul>
-      <li>核心思想：基于图分解理论，两步检验</li>
-      <li>① 检验通路均值/协方差 ② 定位最相关信号路径</li>
-      <li>适用场景：想找通路内“哪一段子结构”最受扰动，无需 p 值的 FDR 控制</li>
-    </ul>
-    <p>DEGraph</p>
-    <p>差异表达图检验</p>
-    <ul>
-      <li>核心思想：多元 Hotelling T² 检验</li>
-      <li>直接检验整个基因网络是否在两组间差异表达</li>
-      <li>适用场景：敏感性要求极高，但特异性相对较低，需交叉验证</li>
-    </ul>
-    <p>PT 方法使用建议优先用 SPIA/NetGSA（更稳健），Clipper/DEGraph 作为深度补充，结合 ORA/FCS 结果交叉验证。</p>
-    <p>Clipper 找“哪一段” · DEGraph 问“整个网络” — 两者视角互补</p>
-    <p>实际分析 · 怎么选？</p>
-    <p>三步定位法</p>
+    <h2>FCS 三兄弟：GSEA / ssGSEA / GSVA</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>方法</th><th>输入</th><th>输出</th><th>典型问法</th></tr></thead>
+        <tbody>
+          <tr><td><strong>GSEA</strong></td><td>全基因排序列表 + 分组</td><td>NES（方向 + 强度）与 leading edge</td><td>某基因集是否整体偏向变化谱的一端？</td></tr>
+          <tr><td><strong>ssGSEA</strong></td><td>表达矩阵（无需分组）</td><td>每个样本 × 每条通路的富集分数</td><td>单个样本的通路活性高不高？</td></tr>
+          <tr><td><strong>GSVA</strong></td><td>表达矩阵（跨样本核密度估计）</td><td>通路活性矩阵</td><td>样本之间通路活性有无系统差异？</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>一句话分工：<strong>GSEA 做组间比较，ssGSEA / GSVA 做个体特征提取</strong>。后两者输出「样本 × 通路」矩阵，可以直接交给热图、聚类或生存分析，也是单细胞与多组学整合最常用的入口。</p>
   </section>
+
   <section>
-    <h3>第一步 · 看输入</h3>
-    <ul>
-      <li>只有差异基因列表 → GO / KEGG / Reactome</li>
-      <li>有全基因排序 → GSEA</li>
-      <li>有完整表达矩阵 → ssGSEA / GSVA / PT 方法</li>
-    </ul>
+    <h2>PT 四法：把拓扑结构算进去</h2>
+    <p>拓扑方法的共同点，是在 ORA / FCS 之上再加一层信息：基因在通路里的<strong>位置</strong>（上游还是下游），或者<strong>边</strong>（调控关系是否存在）。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>方法</th><th>核心思想</th><th>独特问答</th></tr></thead>
+        <tbody>
+          <tr><td><strong>SPIA</strong></td><td>合并差异倍数与拓扑位置，输出 PNDE（富集）与 PPERT（拓扑扰动）</td><td>扰动发生在通路的上游还是下游？</td></tr>
+          <tr><td><strong>NetGSA</strong></td><td>把网络边权重写进模型，看调控结构是否整体重编程</td><td>网络连接方式变了没有？</td></tr>
+          <tr><td><strong>Clipper</strong></td><td>图分解 + 两步检验，先判整体、再定位子结构</td><td>通路里哪一段子结构最受扰动？</td></tr>
+          <tr><td><strong>DEGraph</strong></td><td>多元 Hotelling T² 检验整张网络</td><td>整个子网络在两组间是否整体差异？</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note note-warn"><p><strong>使用建议：</strong>优先 SPIA / NetGSA（更稳健），Clipper / DEGraph 作为深度补充。拓扑方法灵敏度高、特异性偏低，结论必须与 ORA / FCS 交叉验证后再写进文章。</p></div>
   </section>
+
   <section>
-    <h3>第二步 · 看问题</h3>
-    <ul>
-      <li>组间差异 → GO/KEGG/Reactome + GSEA</li>
-      <li>个体特征 → ssGSEA / GSVA</li>
-      <li>精细机制 → Reactome + SPIA / NetGSA</li>
-    </ul>
+    <h2>三步定位：我的数据该用哪种</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>步骤</th><th>看什么</th><th>结论</th></tr></thead>
+        <tbody>
+          <tr><td>① 看输入</td><td>只有差异基因列表 / 有全基因排序 / 有完整表达矩阵</td><td>ORA / GSEA / ssGSEA·GSVA·PT</td></tr>
+          <tr><td>② 看问题</td><td>组间差异 / 个体特征 / 精细机制</td><td>GO·KEGG + GSEA / ssGSEA·GSVA / Reactome + SPIA·NetGSA</td></tr>
+          <tr><td>③ 看深度</td><td>初筛 / 深化 / 精雕</td><td>GO + KEGG → Reactome + GSEA → 拓扑方法</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>推荐组合：<strong>GO + KEGG + Reactome（打底）→ GSEA（验证）→ SPIA（机制）</strong>。重点不是把十种方法都跑一遍，而是想清楚数据能回答到哪一层——跑不动的方法，硬套只会得到无法解释的 p 值。</p>
   </section>
+
   <section>
-    <h3>第三步 · 看深度</h3>
+    <h2>论文里怎么写</h2>
     <ul>
-      <li>初筛：GO + KEGG（宏观方向）</li>
-      <li>深化：Reactome + GSEA（精细定位）</li>
-      <li>精雕：SPIA / NetGSA / Clipper / DEGraph（拓扑洞察）</li>
+      <li><strong>先给宏观方向</strong>——GO / KEGG 建立读者预期；</li>
+      <li><strong>再定位具体环节</strong>——Reactome / GSEA 把结论收窄；</li>
+      <li><strong>必要时补拓扑证据</strong>——SPIA / NetGSA 支撑「上游 vs 下游」的判断；</li>
+      <li><strong>措辞落到环节</strong>——写「通过 XX 通路中 YY 环节的 ZZ 机制」，而不是笼统的「通过 XX 通路」。</li>
     </ul>
-    <p>推荐组合：GO + KEGG + Reactome（基础）→ GSEA（验证）→ SPIA（深度机制）</p>
-    <p>富集分析的重点不是把所有方法都跑一遍，而是想清楚数据能回答什么问题</p>
-    <p>总结 · 十种方法一张图</p>
-    <p>ORA → FCS → PT · 从“有没有”到“在哪里”</p>
-    <p>ORA</p>
-    <p>GO · KEGG · Reactome</p>
-    <p>FCS</p>
-    <p>GSEA · ssGSEA · GSVA</p>
-    <p>PT</p>
-    <p>SPIA · NetGSA · Clipper · DEGraph</p>
-    <p>越往左越宏观</p>
-    <p>越往右越精细</p>
+    <p>没有「最好」的方法，只有「最合适」的方法：先问数据能回答什么，再选工具，最后才谈解读。</p>
   </section>
+
   <section>
-    <h3>核心要点</h3>
-    <ul>
-      <li>富集分析有三大范式、十种常用方法</li>
-      <li>ORA 回答“有没有” · FCS 回答“有多少” · PT 回答“在哪里”</li>
-      <li>没有“最好”的方法，只有“最合适”的方法</li>
-    </ul>
-  </section>
-  <section>
-    <h3>论文写作建议</h3>
-    <ul>
-      <li>先展示 GO/KEGG → 提出宏观方向</li>
-      <li>再用 Reactome/GSEA → 定位具体环节</li>
-      <li>必要时用 SPIA/NetGSA → 提供拓扑证据</li>
-      <li>避免只写“通过 XX 通路”，而是 “通过 XX 通路中 YY 环节的 ZZ 机制”</li>
-    </ul>
-    <p>可靠的机制研究 = 高质量数据 + 正确的方法选择 + 深入的生物学解读</p>
-    <p>下次分析时，问自己：我的数据适合哪种输入？我想回答什么问题？我需要多深的机制洞察？</p>
     <h3 class="refs-title">延伸阅读与参考文献</h3>
     <ol class="refs">
       <li>Subramanian A, Tamayo P, Mootha VK, et al. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. <em>PNAS</em>. 2005;102(43):15545–15550. doi:10.1073/pnas.0506580102</li>
