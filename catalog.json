@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "version": "1.0.0",
-  "updatedAt": "2026-10-23",
+  "version": "1.5.0",
+  "updatedAt": "2026-10-30",
   "pkg": {
     "version": "",
     "url": "",
@@ -10,7 +10,7 @@
   "tools": [
     {
       "id": "heatmap",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "matrix",
       "glyph": "heatmap",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/heatmap.png?v=31e13adb",
@@ -47,7 +47,7 @@
     },
     {
       "id": "volcano",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "deg",
       "glyph": "volcano",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/volcano.png?v=ced09e80",
@@ -84,7 +84,7 @@
     },
     {
       "id": "meta-volcano",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "deg",
       "glyph": "volcano",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/meta-volcano.png?v=cfb3333f",
@@ -113,7 +113,7 @@
     },
     {
       "id": "degs-volcano",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "deg",
       "glyph": "volcano",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/degs-volcano.png?v=4cabc8d7",
@@ -143,7 +143,7 @@
     },
     {
       "id": "enrich-bar",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "hbar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-bar.png?v=3f881dcc",
@@ -174,7 +174,7 @@
     },
     {
       "id": "enrich-lollipop",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "lollipop",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-lollipop.png?v=92383e23",
@@ -210,7 +210,7 @@
     },
     {
       "id": "gsea-bubble",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "bubble",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-bubble.png?v=ed6f39a2",
@@ -241,7 +241,7 @@
     },
     {
       "id": "gsea-lollipop",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "lollipop",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-lollipop.png?v=c595a05d",
@@ -270,7 +270,7 @@
     },
     {
       "id": "go-center-bar",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "hbar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/go-center-bar.png?v=e0e496e9",
@@ -303,7 +303,7 @@
     },
     {
       "id": "gsea-ridge",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "ridge",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-ridge.png?v=6225baeb",
@@ -333,7 +333,7 @@
     },
     {
       "id": "enrich-sankey",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "sankey",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-sankey.png?v=4119ef37",
@@ -346,6 +346,7 @@
         "tags": [
           "富集分析",
           "桑基图",
+          "气泡图",
           "通路",
           "流向"
         ]
@@ -356,6 +357,7 @@
         "tags": [
           "enrichment",
           "sankey",
+          "bubble",
           "pathway",
           "flow"
         ]
@@ -363,7 +365,7 @@
     },
     {
       "id": "enrich-chord",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "chord",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-chord.png?v=61b43556",
@@ -392,13 +394,13 @@
     },
     {
       "id": "dot-pie",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "dotpie",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/dot-pie.png?v=13bea886",
       "price": "",
       "buyUrl": "https://xhslink.com/m/26AyG4tQSdu",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "点饼组合图",
         "scope": "富集条目里「占比 + 数值」双编码；饼太小放不下时更清晰",
@@ -422,7 +424,7 @@
     },
     {
       "id": "bubble",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "bubble",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/bubble.png?v=384d2bcf",
@@ -451,7 +453,7 @@
     },
     {
       "id": "grouped-dot",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "enrich",
       "glyph": "dot",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/grouped-dot.png?v=0ea524c8",
@@ -482,7 +484,7 @@
     },
     {
       "id": "cor-heatmap",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "matrix",
       "glyph": "heatmap",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cor-heatmap.png?v=601cabb7",
@@ -512,7 +514,7 @@
     },
     {
       "id": "circular-heatmap",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "matrix",
       "glyph": "ring",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circular-heatmap.png?v=bcdfb0ca",
@@ -542,13 +544,13 @@
     },
     {
       "id": "cluster-enrich",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "matrix",
       "glyph": "cluster",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cluster-enrich.png?v=587e6309",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "聚类表达 + 富集",
         "scope": "时序 / 分群表达热图与富集结果并排（ClusterGVis 风格）",
@@ -573,13 +575,13 @@
     },
     {
       "id": "mantel",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "matrix",
       "glyph": "corr",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/mantel.png?v=65d0925d",
       "price": "",
       "buyUrl": "https://xhslink.com/m/HHcp4m4Bcy",
-      "version": "1.1.0",
+      "version": "1.5.0",
       "cn": {
         "name": "Mantel 检验相关图",
         "scope": "环境因子与距离矩阵的相关；微生物 / 生态多组学",
@@ -604,13 +606,13 @@
     },
     {
       "id": "matrix-cor",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "matrix",
       "glyph": "corr",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/matrix-cor.png?v=76efe283",
       "price": "",
       "buyUrl": "https://xhslink.com/m/1FfxGFOdPgG",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "两组矩阵相关",
         "scope": "模块 × 性状关联；两组矩阵间的相关系数矩阵",
@@ -635,13 +637,13 @@
     },
     {
       "id": "venn",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "set",
       "glyph": "venn",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/venn.png?v=8abf9f53",
       "price": "",
       "buyUrl": "https://xhslink.com/m/8c5qKX87Cnb",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "韦恩图",
         "scope": "2–5 组基因 / OTU 交集；组数少时最直观",
@@ -666,7 +668,7 @@
     },
     {
       "id": "upset",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "set",
       "glyph": "upset",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/upset.png?v=2ae7fcfc",
@@ -695,7 +697,7 @@
     },
     {
       "id": "stacked-bar",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "comp",
       "glyph": "stacked",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/stacked-bar.png?v=a1b2aedd",
@@ -726,13 +728,13 @@
     },
     {
       "id": "pie",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "comp",
       "glyph": "pie",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/pie.png?v=29fe8478",
       "price": "",
       "buyUrl": "https://xhslink.com/m/4Nr6ZrioyeV",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "饼图 / 环形图",
         "scope": "少量类别的占比；类别少时优于堆叠柱",
@@ -755,13 +757,13 @@
     },
     {
       "id": "sunburst",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "comp",
       "glyph": "sunburst",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sunburst.png?v=9d3d5661",
       "price": "",
       "buyUrl": "https://xhslink.com/m/4wuOWAI7fze",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "旭日图",
         "scope": "层级占比（门 / 纲 / 目 / 科）；一眼看层级构成",
@@ -784,13 +786,13 @@
     },
     {
       "id": "flower",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "comp",
       "glyph": "flower",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/flower.png?v=6e7b1da8",
       "price": "",
       "buyUrl": "https://xhslink.com/m/4mLdgYrJLo0",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "花瓣图",
         "scope": "多组 OTU / 基因交集与核心集；比韦恩图更省空间",
@@ -815,7 +817,7 @@
     },
     {
       "id": "network",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "relation",
       "glyph": "net",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/network.png?v=7a3042b1",
@@ -846,13 +848,13 @@
     },
     {
       "id": "chord",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "relation",
       "glyph": "chord",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/chord.png?v=8fd46aa2",
       "price": "",
       "buyUrl": "https://xhslink.com/m/RgKRXFiKte",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "弦图",
         "scope": "组间流向与共现；比桑基图更适合环形对比",
@@ -875,7 +877,7 @@
     },
     {
       "id": "sankey",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "relation",
       "glyph": "sankey",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sankey.png?v=6584f30c",
@@ -904,7 +906,7 @@
     },
     {
       "id": "path-net",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "relation",
       "glyph": "net",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/path-net.png?v=610a01b3",
@@ -935,13 +937,13 @@
     },
     {
       "id": "zi-pi",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "relation",
       "glyph": "net",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/zi-pi.png?v=5a4d10cd",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "Zi-Pi 共现网络",
         "scope": "微生物 OTU 共现模块与关键类群识别",
@@ -966,7 +968,7 @@
     },
     {
       "id": "circle-packing",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "relation",
       "glyph": "packing",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circle-packing.png?v=0bad38d7",
@@ -995,7 +997,7 @@
     },
     {
       "id": "scatter",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "dist",
       "glyph": "scatter",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/scatter.png?v=2d5157f9",
@@ -1024,13 +1026,13 @@
     },
     {
       "id": "four-quadrant",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "dist",
       "glyph": "quadrant",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/four-quadrant.png?v=38ece8b8",
       "price": "",
       "buyUrl": "https://xhslink.com/m/AHZbTEf0TSI",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "四象限散点图",
         "scope": "按两条阈值线分区（上调 / 下调 / 不显著）",
@@ -1054,13 +1056,13 @@
     },
     {
       "id": "nine-quadrant",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "dist",
       "glyph": "nine",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/nine-quadrant.png?v=39b8c143",
       "price": "",
       "buyUrl": "https://xhslink.com/m/A2xnnpEcOh0",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "九象限图",
         "scope": "三条阈值线分层筛选；多指标同时设限",
@@ -1083,13 +1085,13 @@
     },
     {
       "id": "ternary",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "dist",
       "glyph": "ternary",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/ternary.png?v=8a921080",
       "price": "",
       "buyUrl": "https://xhslink.com/m/6f5NUVGZFhF",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "三元图",
         "scope": "三组分比例（土壤质地、微生物门、营养配比）",
@@ -1113,7 +1115,7 @@
     },
     {
       "id": "box-violin",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "dist",
       "glyph": "box",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/box-violin.png?v=3972ba30",
@@ -1142,7 +1144,7 @@
     },
     {
       "id": "survival",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "dist",
       "glyph": "survival",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/survival.png?v=ae142ed1",
@@ -1173,13 +1175,13 @@
     },
     {
       "id": "forest",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "dist",
       "glyph": "forest",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/forest.png?v=e8a4b3fc",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "森林图",
         "scope": "效应量 + 置信区间；meta 分析与回归结果汇总",
@@ -1203,13 +1205,13 @@
     },
     {
       "id": "bump",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "dist",
       "glyph": "bump",
       "thumb": "",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "排名变化图",
         "scope": "多时间点排序迁移；看谁上升谁掉队",
@@ -1232,7 +1234,7 @@
     },
     {
       "id": "radar",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "shape",
       "glyph": "radar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radar.png?v=4e0ef89b",
@@ -1261,13 +1263,13 @@
     },
     {
       "id": "polar-bar",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "shape",
       "glyph": "polar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/polar-bar.png?v=8614e8c9",
       "price": "",
       "buyUrl": "https://xhslink.com/m/8LUbg0siLI3",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "极坐标柱状图",
         "scope": "周期性 / 方向性数据；月份、方位、角度分布",
@@ -1291,13 +1293,13 @@
     },
     {
       "id": "radial-bar",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "shape",
       "glyph": "radial",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radial-bar.png?v=b6dea96b",
       "price": "",
       "buyUrl": "https://xhslink.com/m/8ccVF2n9rut",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "径向条形图",
         "scope": "长列表排名紧凑展示；节省横向空间",
@@ -1320,13 +1322,13 @@
     },
     {
       "id": "rose",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "shape",
       "glyph": "rose",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/rose.png?v=08fc099a",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "玫瑰图",
         "scope": "方向性强度分布；比极坐标柱更强调轮廓",
@@ -1349,7 +1351,7 @@
     },
     {
       "id": "panel-forge",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "shape",
       "glyph": "panel",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/panel-forge.png?v=0a526fcd",
@@ -1380,13 +1382,13 @@
     },
     {
       "id": "as-te",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "omics",
       "glyph": "genome",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/as-te.png?v=087c1dbd",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "可变剪接 · 转座子互作图",
         "scope": "AS 事件与转座子的位置关系；基因组区间可视化",
@@ -1410,13 +1412,13 @@
     },
     {
       "id": "synteny",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "omics",
       "glyph": "synteny",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/synteny.png?v=0c6d7576",
       "price": "",
       "buyUrl": "",
-      "version": "1.0.0",
+      "version": "1.5.0",
       "cn": {
         "name": "共线性图",
         "scope": "多基因组区间比对；物种间同源块与重排",
@@ -1439,7 +1441,7 @@
     },
     {
       "id": "map",
-      "addedAt": "2026-10-23",
+      "addedAt": "2026-10-30",
       "group": "omics",
       "glyph": "map",
       "thumb": "",
