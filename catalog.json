@@ -1017,9 +1017,15 @@
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/path-net.png?v=610a01b3",
       "price": "",
       "buyUrl": "https://xhslink.com/m/1MXmxSdm1qB",
-      "version": "2.2.0",
-      "changelog": "",
-      "versions": [],
+      "version": "2.3.0",
+      "changelog": "新增：点击簇自动跳转设置面板、教程补齐 10 项设置说明；优化旋转动效不闪屏",
+      "versions": [
+        {
+          "version": "2.3.0",
+          "date": "2026-11-13",
+          "notes": "新增：点击簇自动跳转设置面板、教程补齐 10 项设置说明；优化旋转动效不闪屏"
+        }
+      ],
       "cn": {
         "name": "通路相似性网络",
         "scope": "富集结果聚类成通路模块；从条目列表到主题",
