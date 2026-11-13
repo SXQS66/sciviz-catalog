@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "version": "1.5.0",
-  "updatedAt": "2026-11-11",
+  "updatedAt": "2026-11-13",
   "pkg": {
     "version": "",
     "url": "",
@@ -10,7 +10,7 @@
   "tools": [
     {
       "id": "line",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "dist",
       "glyph": "line",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/line.png?v=40b11e02",
@@ -43,7 +43,7 @@
     },
     {
       "id": "heatmap",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "matrix",
       "glyph": "heatmap",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/heatmap.png?v=31e13adb",
@@ -76,15 +76,20 @@
     },
     {
       "id": "volcano",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "deg",
       "glyph": "volcano",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/volcano.png?v=ced09e80",
       "price": "",
       "buyUrl": "https://www.xiaohongshu.com/goods-detail/6895940302d7b00001661a80",
-      "version": "6.6.0",
-      "changelog": "小版本升级：优化基因标注避让与导出一致性",
+      "version": "6.8.0",
+      "changelog": "问题修复：大数据集下 SVG / PNG / PDF 导出均输出全部数据点",
       "versions": [
+        {
+          "version": "6.8.0",
+          "date": "2026-11-13",
+          "notes": "问题修复：大数据集下 SVG / PNG / PDF 导出均输出全部数据点"
+        },
         {
           "version": "6.6.0",
           "date": "2026-11-10",
@@ -115,7 +120,7 @@
     },
     {
       "id": "meta-volcano",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "deg",
       "glyph": "volcano",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/meta-volcano.png?v=cfb3333f",
@@ -146,7 +151,7 @@
     },
     {
       "id": "degs-volcano",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "deg",
       "glyph": "volcano",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/degs-volcano.png?v=4cabc8d7",
@@ -178,40 +183,43 @@
     },
     {
       "id": "enrich-bar",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "hbar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-bar.png?v=3f881dcc",
       "price": "",
       "buyUrl": "https://xhslink.com/m/AlE76Fprnul",
-      "version": "6.2.0",
+      "version": "7.0.0",
       "changelog": "",
       "versions": [],
       "cn": {
-        "name": "富集气泡条形图",
-        "scope": "GO / KEGG 富集结果；条目名过长自动换行",
+        "name": "通用气泡-条形图",
+        "scope": "任意「类别 + 标签 + 数值」表格；富集/排名/问卷/金融通用，长标签自动换行，支持垂直布局",
         "tags": [
+          "气泡图",
+          "条形图",
+          "通用绘图",
           "富集分析",
           "GO",
-          "KEGG",
-          "气泡图",
-          "条形图"
+          "KEGG"
         ]
       },
       "en": {
-        "name": "Enrichment Bubble-Bar",
-        "scope": "GO / KEGG terms as bubble bars, long labels wrapped",
+        "name": "General Bubble-Bar Chart",
+        "scope": "Any table with a category, a label and numeric scores — enrichment, rankings, surveys or finance; long labels wrapped; vertical layout supported",
         "tags": [
+          "bubble",
+          "bar",
+          "general plot",
           "enrichment",
           "GO",
-          "KEGG",
-          "bubble"
+          "KEGG"
         ]
       }
     },
     {
       "id": "enrich-lollipop",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "lollipop",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-lollipop.png?v=92383e23",
@@ -249,7 +257,7 @@
     },
     {
       "id": "gsea-bubble",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "bubble",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-bubble.png?v=ed6f39a2",
@@ -282,7 +290,7 @@
     },
     {
       "id": "gsea-lollipop",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "lollipop",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-lollipop.png?v=c595a05d",
@@ -313,7 +321,7 @@
     },
     {
       "id": "go-center-bar",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "hbar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/go-center-bar.png?v=e0e496e9",
@@ -348,7 +356,7 @@
     },
     {
       "id": "gsea-ridge",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "ridge",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/gsea-ridge.png?v=6225baeb",
@@ -380,7 +388,7 @@
     },
     {
       "id": "enrich-sankey",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "sankey",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-sankey.png?v=4119ef37",
@@ -420,7 +428,7 @@
     },
     {
       "id": "enrich-chord",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "chord",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/enrich-chord.png?v=61b43556",
@@ -451,7 +459,7 @@
     },
     {
       "id": "dot-pie",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "dotpie",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/dot-pie.png?v=13bea886",
@@ -483,7 +491,7 @@
     },
     {
       "id": "bubble",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "bubble",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/bubble.png?v=384d2bcf",
@@ -514,7 +522,7 @@
     },
     {
       "id": "grouped-dot",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "enrich",
       "glyph": "dot",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/grouped-dot.png?v=0ea524c8",
@@ -547,7 +555,7 @@
     },
     {
       "id": "cor-heatmap",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "matrix",
       "glyph": "heatmap",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cor-heatmap.png?v=601cabb7",
@@ -579,7 +587,7 @@
     },
     {
       "id": "circular-heatmap",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "matrix",
       "glyph": "ring",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circular-heatmap.png?v=bcdfb0ca",
@@ -611,7 +619,7 @@
     },
     {
       "id": "cluster-enrich",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "matrix",
       "glyph": "cluster",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/cluster-enrich.png?v=587e6309",
@@ -644,7 +652,7 @@
     },
     {
       "id": "mantel",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "matrix",
       "glyph": "corr",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/mantel.png?v=65d0925d",
@@ -677,7 +685,7 @@
     },
     {
       "id": "matrix-cor",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "matrix",
       "glyph": "corr",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/matrix-cor.png?v=76efe283",
@@ -710,7 +718,7 @@
     },
     {
       "id": "venn",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "set",
       "glyph": "venn",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/venn.png?v=8abf9f53",
@@ -743,7 +751,7 @@
     },
     {
       "id": "upset",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "set",
       "glyph": "upset",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/upset.png?v=2ae7fcfc",
@@ -774,7 +782,7 @@
     },
     {
       "id": "stacked-bar",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "comp",
       "glyph": "stacked",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/stacked-bar.png?v=a1b2aedd",
@@ -807,7 +815,7 @@
     },
     {
       "id": "pie",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "comp",
       "glyph": "pie",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/pie.png?v=29fe8478",
@@ -838,7 +846,7 @@
     },
     {
       "id": "sunburst",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "comp",
       "glyph": "sunburst",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sunburst.png?v=9d3d5661",
@@ -869,7 +877,7 @@
     },
     {
       "id": "flower",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "comp",
       "glyph": "flower",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/flower.png?v=6e7b1da8",
@@ -902,7 +910,7 @@
     },
     {
       "id": "network",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "relation",
       "glyph": "net",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/network.png?v=7a3042b1",
@@ -941,7 +949,7 @@
     },
     {
       "id": "chord",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "relation",
       "glyph": "chord",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/chord.png?v=8fd46aa2",
@@ -972,7 +980,7 @@
     },
     {
       "id": "sankey",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "relation",
       "glyph": "sankey",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/sankey.png?v=6584f30c",
@@ -1003,7 +1011,7 @@
     },
     {
       "id": "path-net",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "relation",
       "glyph": "net",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/path-net.png?v=610a01b3",
@@ -1014,7 +1022,7 @@
       "versions": [],
       "cn": {
         "name": "通路相似性网络",
-        "scope": "富集结果聚类成通路模块（aPEAR）；从条目列表到主题",
+        "scope": "富集结果聚类成通路模块；从条目列表到主题",
         "tags": [
           "富集分析",
           "通路",
@@ -1036,7 +1044,7 @@
     },
     {
       "id": "zi-pi",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "relation",
       "glyph": "net",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/zi-pi.png?v=5a4d10cd",
@@ -1069,7 +1077,7 @@
     },
     {
       "id": "circle-packing",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "relation",
       "glyph": "packing",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/circle-packing.png?v=0bad38d7",
@@ -1100,7 +1108,7 @@
     },
     {
       "id": "scatter",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "dist",
       "glyph": "scatter",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/scatter.png?v=2d5157f9",
@@ -1131,7 +1139,7 @@
     },
     {
       "id": "four-quadrant",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "dist",
       "glyph": "quadrant",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/four-quadrant.png?v=38ece8b8",
@@ -1163,7 +1171,7 @@
     },
     {
       "id": "nine-quadrant",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "dist",
       "glyph": "nine",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/nine-quadrant.png?v=39b8c143",
@@ -1194,7 +1202,7 @@
     },
     {
       "id": "ternary",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "dist",
       "glyph": "ternary",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/ternary.png?v=8a921080",
@@ -1226,7 +1234,7 @@
     },
     {
       "id": "box-violin",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "dist",
       "glyph": "box",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/box-violin.png?v=3972ba30",
@@ -1257,7 +1265,7 @@
     },
     {
       "id": "survival",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "dist",
       "glyph": "survival",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/survival.png?v=ae142ed1",
@@ -1290,7 +1298,7 @@
     },
     {
       "id": "forest",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "dist",
       "glyph": "forest",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/forest.png?v=e8a4b3fc",
@@ -1322,7 +1330,7 @@
     },
     {
       "id": "bump",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "dist",
       "glyph": "bump",
       "thumb": "",
@@ -1353,7 +1361,7 @@
     },
     {
       "id": "radar",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "shape",
       "glyph": "radar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radar.png?v=4e0ef89b",
@@ -1384,7 +1392,7 @@
     },
     {
       "id": "polar-bar",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "shape",
       "glyph": "polar",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/polar-bar.png?v=8614e8c9",
@@ -1416,7 +1424,7 @@
     },
     {
       "id": "radial-bar",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "shape",
       "glyph": "radial",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/radial-bar.png?v=b6dea96b",
@@ -1447,7 +1455,7 @@
     },
     {
       "id": "rose",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "shape",
       "glyph": "rose",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/rose.png?v=08fc099a",
@@ -1478,7 +1486,7 @@
     },
     {
       "id": "panel-forge",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "shape",
       "glyph": "panel",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/panel-forge.png?v=0a526fcd",
@@ -1511,7 +1519,7 @@
     },
     {
       "id": "as-te",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "omics",
       "glyph": "genome",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/as-te.png?v=087c1dbd",
@@ -1543,7 +1551,7 @@
     },
     {
       "id": "synteny",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "omics",
       "glyph": "synteny",
       "thumb": "https://sxqs66.github.io/sciviz-catalog/thumbs/synteny.png?v=0c6d7576",
@@ -1574,7 +1582,7 @@
     },
     {
       "id": "map",
-      "addedAt": "2026-11-11",
+      "addedAt": "2026-11-13",
       "group": "omics",
       "glyph": "map",
       "thumb": "",
